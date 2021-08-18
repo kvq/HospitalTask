@@ -6,6 +6,7 @@ import me.kvq.HospitalTask.person.Person;
 import me.kvq.HospitalTask.person.PersonDAO;
 import me.kvq.HospitalTask.person.PersonDTO;
 import me.kvq.HospitalTask.person.PersonMapper;
+import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 
 public class HospitalService<T extends Person,D extends PersonDTO> {
   
@@ -19,14 +20,14 @@ public class HospitalService<T extends Person,D extends PersonDTO> {
   
   public void add(D person) {
     person.setId(0);
-    person.setPhoneNumber(person.getPhoneNumber());
+    person.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(person.getPhoneNumber()));
     dao.save(mapper.dtoToEntity(person));
   }
   
   public void update(long id,D person) {
     if (!dao.isExists(id)) throw new NoSuchElementException("User does not exists");
     person.setId(id);
-    person.setPhoneNumber(person.getPhoneNumber());
+    person.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(person.getPhoneNumber()));
     dao.save(mapper.dtoToEntity(person));
   }
   
