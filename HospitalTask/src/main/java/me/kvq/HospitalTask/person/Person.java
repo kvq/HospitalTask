@@ -1,13 +1,11 @@
 package me.kvq.HospitalTask.person;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 
 @MappedSuperclass
 public class Person {

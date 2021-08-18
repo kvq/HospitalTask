@@ -3,7 +3,6 @@ package me.kvq.HospitalTask.person;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import me.kvq.HospitalTask.repositories.DoctorRepo;
 
 public abstract class PersonDAO<T extends Person> {
 

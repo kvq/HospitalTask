@@ -1,17 +1,11 @@
 package me.kvq.HospitalTask.logic;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import me.kvq.HospitalTask.person.Person;
 import me.kvq.HospitalTask.person.PersonDAO;
 import me.kvq.HospitalTask.person.PersonDTO;
 import me.kvq.HospitalTask.person.PersonMapper;
-import me.kvq.HospitalTask.person.doctor.Doctor;
-import me.kvq.HospitalTask.person.doctor.DoctorDAO;
-import me.kvq.HospitalTask.person.patient.Patient;
 
 public class HospitalService<T extends Person,D extends PersonDTO> {
   

@@ -1,7 +1,6 @@
 package me.kvq.HospitalTask.controllers;
 
 import java.util.List;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import me.kvq.HospitalTask.logic.HospitalService;
-import me.kvq.HospitalTask.person.Person;
 import me.kvq.HospitalTask.person.PersonDTO;
 
 

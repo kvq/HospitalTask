@@ -3,9 +3,6 @@ package me.kvq.HospitalTask.person.doctor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import me.kvq.HospitalTask.person.PersonMapper;
-import me.kvq.HospitalTask.person.patient.Patient;
-import me.kvq.HospitalTask.person.patient.PatientDTO;
-import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 
 @Service
 public class DoctorMapper extends PersonMapper<Doctor, DoctorDTO>{

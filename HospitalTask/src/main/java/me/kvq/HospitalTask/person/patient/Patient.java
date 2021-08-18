@@ -2,9 +2,6 @@ package me.kvq.HospitalTask.person.patient;
 
 import java.time.LocalDate;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import me.kvq.HospitalTask.person.Person;
 import me.kvq.HospitalTask.person.doctor.Doctor;
