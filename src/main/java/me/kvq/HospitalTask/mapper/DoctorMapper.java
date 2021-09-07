@@ -10,24 +10,24 @@ import java.util.stream.Collectors;
 @Service
 public class DoctorMapper{
 
-    public DoctorDto entityToDto(Doctor p) {
-        return new DoctorDto(p.getId(),
-                p.getFirstName(),
-                p.getLastName(),
-                p.getPatronymic(),
-                p.getBirthDate(),
-                p.getPhoneNumber(),
-                p.getPosition());
+    public DoctorDto entityToDto(Doctor doctor) {
+        return new DoctorDto(doctor.getId(),
+                doctor.getFirstName(),
+                doctor.getLastName(),
+                doctor.getPatronymic(),
+                doctor.getBirthDate(),
+                doctor.getPhoneNumber(),
+                doctor.getPosition());
     }
 
-    public Doctor dtoToEntity(DoctorDto d) {
-        return new Doctor(d.getId(),
-                d.getFirstName(),
-                d.getLastName(),
-                d.getPatronymic(),
-                d.getBirthDate(),
-                d.getPhoneNumber(),
-                d.getPosition());
+    public Doctor dtoToEntity(DoctorDto doctorDto) {
+        return new Doctor(doctorDto.getId(),
+                doctorDto.getFirstName(),
+                doctorDto.getLastName(),
+                doctorDto.getPatronymic(),
+                doctorDto.getBirthDate(),
+                doctorDto.getPhoneNumber(),
+                doctorDto.getPosition());
     }
 
     public List<DoctorDto> entityListToDtoList(List<Doctor> list) {

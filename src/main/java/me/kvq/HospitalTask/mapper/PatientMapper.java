@@ -18,24 +18,24 @@ public class PatientMapper {
         this.dao = dao;
     }
 
-    public PatientDto entityToDto(Patient p) {
-        long doctorId = p.getDoctor() == null ? 0 : p.getDoctor().getId();
-        return new PatientDto(p.getId(), p.getFirstName(),
-                p.getLastName(),
-                p.getPatronymic(),
-                p.getBirthDate(),
-                p.getPhoneNumber(),
+    public PatientDto entityToDto(Patient patient) {
+        long doctorId = patient.getDoctor() == null ? 0 : patient.getDoctor().getId();
+        return new PatientDto(patient.getId(), patient.getFirstName(),
+                patient.getLastName(),
+                patient.getPatronymic(),
+                patient.getBirthDate(),
+                patient.getPhoneNumber(),
                 doctorId);
     }
 
-    public Patient dtoToEntity(PatientDto d) {
-        Doctor doctor = dao.getById(d.getDoctor());
-        return new Patient(d.getId(),
-                d.getFirstName(),
-                d.getLastName(),
-                d.getPatronymic(),
-                d.getBirthDate(),
-                d.getPhoneNumber(),
+    public Patient dtoToEntity(PatientDto patientDto) {
+        Doctor doctor = dao.getById(patientDto.getDoctor());
+        return new Patient(patientDto.getId(),
+                patientDto.getFirstName(),
+                patientDto.getLastName(),
+                patientDto.getPatronymic(),
+                patientDto.getBirthDate(),
+                patientDto.getPhoneNumber(),
                 doctor);
     }
 
