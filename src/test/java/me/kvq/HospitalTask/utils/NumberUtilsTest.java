@@ -29,7 +29,7 @@ class NumberUtilsTest {
     }
 
     @Test
-    @DisplayName("Valid Landline Number0 +04423343242382")
+    @DisplayName("Invalid Landline Number +04423343242382")
     void testInvalidLandline() {
         assertThrows(IllegalArgumentException.class, () -> PhoneNumberUtils.fixPhoneNumber("+04423343242382"));
     }
