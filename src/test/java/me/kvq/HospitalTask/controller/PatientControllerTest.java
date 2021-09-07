@@ -20,7 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import me.kvq.HospitalTask.model.Doctor;;
+import me.kvq.HospitalTask.model.Doctor;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,7 +37,7 @@ class PatientControllerTest {
     private DoctorDao doctorDao;
 
     @BeforeAll
-    void createDoctor() {
+    void preCreateDoctor() {
         doctorDao.save(new Doctor(1, "DoctorName", "DoctorLastName", "DoctorF",
                 LocalDate.of(2000, 3, 3),
                 "381234567890", "Postion"));
@@ -45,8 +45,8 @@ class PatientControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("POST /patient/add")
-    void testAdd() throws Exception {
+    @DisplayName("Valid json request POST to /patient/add (Creating new valid patient), and expecting Ok status response")
+    void addPatientJsonRequestResponseCheckTest() throws Exception {
         long docid = doctorDao.findAll().get(0).getId();
         String patientJson = "{\"firstName\":\"First_Name\","
                 + "\"lastName\":\"Second_name\","
@@ -62,8 +62,8 @@ class PatientControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("PATCH to /patient/edit/id and expecing Ok status response")
-    void testPatch() throws Exception {
+    @DisplayName("Valid json request PATCH to /patient/edit/id (Updating patient by valid id) and expecting Ok status response")
+    void patchPatientJsonRequestResponseCheckTest() throws Exception {
         long id = dao.findAll().get(0).getId();
         long docid = doctorDao.findAll().get(0).getId();
         String patientJson = "{\"firstName\":\"First_Name\","
@@ -81,8 +81,8 @@ class PatientControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("DELETE /patient/delete/id/ and expecting Ok status response")
-    void testDelete() throws Exception {
+    @DisplayName("Valid requset DELETE /patient/delete/id/ (Deleting patient by valid id) and expecting Ok status response")
+    void deletePatientByIdResponseCheckTest() throws Exception {
         long id = dao.findAll().get(0).getId();
         mockMvc.perform(delete("/patient/delete/" + id))
                 .andExpect(status().isOk());
@@ -90,8 +90,8 @@ class PatientControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("GET to /patient/list and expecting Ok status response")
-    void testList() throws Exception {
+    @DisplayName("GET to /patient/list (Getting list of all patients) and expecting Ok status response")
+    void getListOfPatientsResponseCheckTest() throws Exception {
         mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk());
     }

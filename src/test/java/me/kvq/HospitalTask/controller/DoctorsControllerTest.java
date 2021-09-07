@@ -28,8 +28,8 @@ class DoctorsControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("POST to /doctors/add, and checking Ok response")
-    void addDoctorAndCheckResponseTest() throws Exception {
+    @DisplayName("Valid json request POST to /doctors/add (Creating new doctor), and expecting Ok status response")
+    void addDoctorJsonRequestResponseCheckTest() throws Exception {
 
         String doctorJson = "{\"firstName\":\"First_Name\","
                 + "\"lastName\":\"Second_name\","
@@ -46,8 +46,8 @@ class DoctorsControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("PATCH to /doctors/add and checking Ok response")
-    void patchDoctorAndCheckResponseTest() throws Exception {
+    @DisplayName("Valid json request PATCH to /doctors/patch (Updating valid doctor by id) and expecting Ok status response")
+    void patchDoctorJsonRequestResponseCheckTest() throws Exception {
 
         long id = dao.findAll().get(0).getId();
 
@@ -66,8 +66,8 @@ class DoctorsControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("DELETE to /doctors/delete")
-    void deleteDoctorAndCheckResponseTest() throws Exception {
+    @DisplayName("Valid request DELETE to /doctors/delete/id (Deleting doctor by valid id) and expecting Ok status response")
+    void deleteDoctorByIdResponseCheckTest() throws Exception {
         long id = dao.findAll().get(0).getId();
         mockMvc.perform(delete("/doctor/delete/" + id))
                 .andExpect(status().isOk());
@@ -75,8 +75,8 @@ class DoctorsControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("GET /doctors/list")
-    void getListOfDoctorsAndCheckResponseTest() throws Exception {
+    @DisplayName("GET to /doctors/list (Getting list of all doctors) and expecting Ok status response")
+    void getListOfDoctorsResponseCheckTest() throws Exception {
         mockMvc.perform(get("/doctor/list"))
                 .andExpect(status().isOk());
 
