@@ -1,4 +1,4 @@
-package me.kvq.HospitalTask.controllers;
+package me.kvq.HospitalTask.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class DoctorsRESTControllerTest {
+class DoctorsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -28,8 +28,8 @@ class DoctorsRESTControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("POST /doctors/add")
-    void testAdd() throws Exception {
+    @DisplayName("POST to /doctors/add, and checking Ok response")
+    void addDoctorAndCheckResponseTest() throws Exception {
 
         String doctorJson = "{\"firstName\":\"First_Name\","
                 + "\"lastName\":\"Second_name\","
@@ -46,8 +46,8 @@ class DoctorsRESTControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("PATCH /doctors/add")
-    void testPatch() throws Exception {
+    @DisplayName("PATCH to /doctors/add and checking Ok response")
+    void patchDoctorAndCheckResponseTest() throws Exception {
 
         long id = dao.findAll().get(0).getId();
 
@@ -66,8 +66,8 @@ class DoctorsRESTControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("DELETE /doctors/add")
-    void testDelete() throws Exception {
+    @DisplayName("DELETE to /doctors/delete")
+    void deleteDoctorAndCheckResponseTest() throws Exception {
         long id = dao.findAll().get(0).getId();
         mockMvc.perform(delete("/doctor/delete/" + id))
                 .andExpect(status().isOk());
@@ -76,9 +76,10 @@ class DoctorsRESTControllerTest {
     @Test
     @Order(3)
     @DisplayName("GET /doctors/list")
-    void testList() throws Exception {
+    void getListOfDoctorsAndCheckResponseTest() throws Exception {
         mockMvc.perform(get("/doctor/list"))
                 .andExpect(status().isOk());
+
     }
 
 }

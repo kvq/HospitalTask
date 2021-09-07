@@ -1,13 +1,16 @@
 package me.kvq.HospitalTask.mapper;
 
+import me.kvq.HospitalTask.dao.DoctorDao;
+import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
-import me.kvq.HospitalTask.dto.PatientDto;
-import me.kvq.HospitalTask.dao.DoctorDao;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
-public class PatientMapper extends PersonMapper<Patient, PatientDto> {
+public class PatientMapper {
 
     private DoctorDao dao;
 
@@ -15,7 +18,6 @@ public class PatientMapper extends PersonMapper<Patient, PatientDto> {
         this.dao = dao;
     }
 
-    @Override
     public PatientDto entityToDto(Patient p) {
         long doctorId = p.getDoctor() == null ? 0 : p.getDoctor().getId();
         return new PatientDto(p.getId(), p.getFirstName(),
@@ -23,10 +25,9 @@ public class PatientMapper extends PersonMapper<Patient, PatientDto> {
                 p.getPatronymic(),
                 p.getBirthDate(),
                 p.getPhoneNumber(),
-                p.getDoctor().getId());
+                doctorId);
     }
 
-    @Override
     public Patient dtoToEntity(PatientDto d) {
         Doctor doctor = dao.getById(d.getDoctor());
         return new Patient(d.getId(),
@@ -36,6 +37,14 @@ public class PatientMapper extends PersonMapper<Patient, PatientDto> {
                 d.getBirthDate(),
                 d.getPhoneNumber(),
                 doctor);
+    }
+
+    public List<PatientDto> entityListToDtoList(List<Patient> list) {
+        return list.stream().map(this::entityToDto).collect(Collectors.toList());
+    }
+
+    public List<Patient> dtoListToEntityList(List<PatientDto> list) {
+        return list.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
 
 }

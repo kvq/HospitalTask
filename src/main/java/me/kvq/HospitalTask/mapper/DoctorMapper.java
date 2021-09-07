@@ -4,10 +4,12 @@ import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import org.springframework.stereotype.Service;
 
-@Service
-public class DoctorMapper extends PersonMapper<Doctor, DoctorDto> {
+import java.util.List;
+import java.util.stream.Collectors;
 
-    @Override
+@Service
+public class DoctorMapper{
+
     public DoctorDto entityToDto(Doctor p) {
         return new DoctorDto(p.getId(),
                 p.getFirstName(),
@@ -18,7 +20,6 @@ public class DoctorMapper extends PersonMapper<Doctor, DoctorDto> {
                 p.getPosition());
     }
 
-    @Override
     public Doctor dtoToEntity(DoctorDto d) {
         return new Doctor(d.getId(),
                 d.getFirstName(),
@@ -27,6 +28,14 @@ public class DoctorMapper extends PersonMapper<Doctor, DoctorDto> {
                 d.getBirthDate(),
                 d.getPhoneNumber(),
                 d.getPosition());
+    }
+
+    public List<DoctorDto> entityListToDtoList(List<Doctor> list) {
+        return list.stream().map(this::entityToDto).collect(Collectors.toList());
+    }
+
+    public List<Doctor> dtoListToEntityList(List<DoctorDto> list) {
+        return list.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
 
 }

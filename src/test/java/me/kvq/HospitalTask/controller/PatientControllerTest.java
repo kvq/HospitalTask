@@ -1,4 +1,4 @@
-package me.kvq.HospitalTask.controllers;
+package me.kvq.HospitalTask.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -25,7 +25,7 @@ import me.kvq.HospitalTask.model.Doctor;;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class PatientRESTControllerTest {
+class PatientControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -62,7 +62,7 @@ class PatientRESTControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("PATCH /patient/edit")
+    @DisplayName("PATCH to /patient/edit/id and expecing Ok status response")
     void testPatch() throws Exception {
         long id = dao.findAll().get(0).getId();
         long docid = doctorDao.findAll().get(0).getId();
@@ -81,7 +81,7 @@ class PatientRESTControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("DELETE /patient/delete")
+    @DisplayName("DELETE /patient/delete/id/ and expecting Ok status response")
     void testDelete() throws Exception {
         long id = dao.findAll().get(0).getId();
         mockMvc.perform(delete("/patient/delete/" + id))
@@ -90,7 +90,7 @@ class PatientRESTControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("GET /patient/list")
+    @DisplayName("GET to /patient/list and expecting Ok status response")
     void testList() throws Exception {
         mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk());
