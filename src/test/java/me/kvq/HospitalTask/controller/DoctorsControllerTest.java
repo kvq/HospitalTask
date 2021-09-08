@@ -89,7 +89,6 @@ class DoctorsControllerTest {
     }
 
     @Test
-    @Order(1)
     @DisplayName("Valid Json DoctorDto POST /doctor/add. Expects HTTP OK, checks service list size")
     void addDoctorJsonRequestResponseCheckTest() throws Exception {
 
@@ -109,7 +108,6 @@ class DoctorsControllerTest {
     }
 
     @Test
-    @Order(2)
     @DisplayName("Valid Json DoctorDto PATCH /doctor/edit. Expects HTTP OK, checks service data change")
     void patchDoctorJsonRequestResponseCheckTest() throws Exception {
 
@@ -131,7 +129,6 @@ class DoctorsControllerTest {
     }
 
     @Test
-    @Order(4)
     @DisplayName("Request DELETE /doctor/delete. Expects HTTP OK, checks if user still exists")
     void deleteDoctorByIdResponseCheckTest() throws Exception {
         long id = testDoctor.getId();
@@ -142,7 +139,6 @@ class DoctorsControllerTest {
     }
 
     @Test
-    @Order(3)
     @DisplayName("Request GET /doctor/list. Expects HTTP OK")
     void getListOfDoctorsResponseCheckTest() throws Exception {
         mockMvc.perform(get("/doctor/list"))
