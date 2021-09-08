@@ -130,7 +130,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals("Different_Name",serviceGet(testDoctor.getId()).getFirstName());
+        assertEquals("Different_Name",serviceGet(testPatient.getId()).getFirstName());
     }
 
     @Test
