@@ -6,10 +6,7 @@ import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
@@ -22,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PatientServiceTest {
 
     PatientDao patientDao;
@@ -33,19 +31,13 @@ class PatientServiceTest {
 
     PatientMapper patientMapper;
 
-    @BeforeEach
-    void prepareData(){
+    @BeforeAll
+    void mockOverridesPrepare (){
         mockDoctor();
         patientDao = mock(PatientDao.class);
-        storage = new HashMap<>();
-        testPatientA = new Patient(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789",testDoctor);
-        testPatientB = new Patient(1,"PatientB_Name","PatientB_LastName", "PatientB_Patronymic",
-                LocalDate.of(1990,2,15),
-                "380123856789",testDoctor);
-        storage.put(1L, testPatientA);
-        storage.put(2L, testPatientB);
+        service = new PatientService(patientDao,patientMapper);
+
+
         when(patientDao.findAll()).thenAnswer(invocation -> getPatientList());
         when(patientDao.getById(anyLong()))
                 .thenAnswer(invocation -> storage.get(invocation.getArgument(0,Long.class)));
@@ -61,7 +53,22 @@ class PatientServiceTest {
                 -> savePatient(invocation.getArgument(0, Patient.class)))
                 .when(patientDao).save(any(Patient.class));
 
-        service = new PatientService(patientDao,patientMapper);
+    }
+
+    @BeforeEach
+    void prepareData(){
+
+        storage = new HashMap<>();
+        testPatientA = new Patient(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789",testDoctor);
+        testPatientB = new Patient(1,"PatientB_Name","PatientB_LastName", "PatientB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789",testDoctor);
+        storage.put(1L, testPatientA);
+        storage.put(2L, testPatientB);
+
+
     }
 
     void mockDoctor(){
@@ -89,8 +96,7 @@ class PatientServiceTest {
     }
 
     @Test
-    @Order(1)
-    @DisplayName("Adding new Patient, expecting returned value not null and looking patient id in mocked dao")
+    @DisplayName("Creating new valid PatientDto, checking return Dto not null & entity exists in mocked dao")
     void serviceAddNewValidPatientTest(){
         PatientDto testingPatient = new PatientDto(0,"Name", "LastName", "Patronymic",
                 LocalDate.of(1999,10,2),
@@ -101,8 +107,7 @@ class PatientServiceTest {
     }
 
     @Test
-    @Order(2)
-    @DisplayName("Updating existing patient with valid data, expecting valid return and looking patient changes in mocked dao")
+    @DisplayName("Updating existing patient with valid data, checking return not null & entity changed in mocked dao")
     void serviceUpdateExistingPatientByIdWithValidDataTest(){
         PatientDto patient = patientMapper.entityToDto(testPatientA);
         patient.setFirstName("DifferentName");
@@ -114,8 +119,7 @@ class PatientServiceTest {
     }
 
     @Test
-    @Order(3)
-    @DisplayName("Deleting existing Patient, expecting ture to be returned, checking dao for size change")
+    @DisplayName("Deleting existing patient, checking return is true & dao size decreased")
     void serviceDeleteExistingPatientByIdTest(){
         Patient patient = testPatientA;
         assertTrue(service.delete(patient.getId()), "Patient wasn't deleted");
@@ -124,7 +128,6 @@ class PatientServiceTest {
     }
 
     @Test
-    @Order(4)
     @DisplayName("Getting patient list, expecting 2 users in the list")
     void serviceGetPatientListTest(){
         List<PatientDto> patientDtoList = service.getList();
@@ -132,8 +135,7 @@ class PatientServiceTest {
     }
 
     @Test
-    @Order(5)
-    @DisplayName("Getting patient by id. Comparing returned dto id to origin entity id")
+    @DisplayName("Getting PatientDto by id then compare id with origin entity")
     void serviceGetPatientByIdTest(){
         PatientDto patient = service.get(testPatientA.getId());
         assertNotNull(patient);

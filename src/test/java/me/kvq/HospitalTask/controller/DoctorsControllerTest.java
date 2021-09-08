@@ -13,10 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.service.DoctorService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +28,7 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DoctorsControllerTest {
 
     private MockMvc mockMvc;
@@ -42,16 +40,9 @@ class DoctorsControllerTest {
     List<DoctorDto> list;
     HashMap<Long, DoctorDto> storage;
 
-    @BeforeEach
-    void setupService(){
-        storage = new HashMap<>();
+    @BeforeAll
+    void mockOverridesPrepare () {
         doctorService = mock(DoctorService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new DoctorController(doctorService)).build();
-
-        testDoctor = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789", "DoctorA_Position");
-        storage.put(1L, testDoctor);
         when(doctorService.get(anyLong())).thenAnswer(invocation -> serviceGet(invocation.getArgument(0,Long.class)));
         when(doctorService.add(any(DoctorDto.class))).thenAnswer(invocation -> serviceAdd(invocation.getArgument(0,DoctorDto.class)));
         when(doctorService.delete(anyLong())).thenAnswer(invocation -> serviceDelete(invocation.getArgument(0,Long.class)));
@@ -59,6 +50,19 @@ class DoctorsControllerTest {
         when(doctorService.update(anyLong(),any(DoctorDto.class))).thenAnswer(
                 invocation -> serviceUpdate(invocation.getArgument(0,Long.class),
                         invocation.getArgument(1,DoctorDto.class)));
+
+        mockMvc = MockMvcBuilders.standaloneSetup(new DoctorController(doctorService)).build();
+    }
+
+    @BeforeEach
+    void setupService(){
+        storage = new HashMap<>();
+
+        testDoctor = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", "DoctorA_Position");
+        storage.put(1L, testDoctor);
+
 
     }
 
@@ -86,7 +90,7 @@ class DoctorsControllerTest {
 
     @Test
     @Order(1)
-    @DisplayName("Valid json request POST to /doctors/add (Creating new doctor), and expecting Ok status response, checking size change in mocked service")
+    @DisplayName("Valid Json DoctorDto POST /doctor/add. Expects HTTP OK, checks service list size")
     void addDoctorJsonRequestResponseCheckTest() throws Exception {
 
         String doctorJson = "{\"firstName\":\"First_Name\","
@@ -106,7 +110,7 @@ class DoctorsControllerTest {
 
     @Test
     @Order(2)
-    @DisplayName("Valid json request PATCH to /doctors/patch (Updating valid doctor by id) and expecting Ok status response, checking change in mocked service")
+    @DisplayName("Valid Json DoctorDto PATCH /doctor/edit. Expects HTTP OK, checks service data change")
     void patchDoctorJsonRequestResponseCheckTest() throws Exception {
 
         long id = testDoctor.getId();
@@ -128,7 +132,7 @@ class DoctorsControllerTest {
 
     @Test
     @Order(4)
-    @DisplayName("Valid request DELETE to /doctors/delete/id (Deleting doctor by valid id) and expecting Ok status response, checking if doctor disappeared from mocked service")
+    @DisplayName("Request DELETE /doctor/delete. Expects HTTP OK, checks if user still exists")
     void deleteDoctorByIdResponseCheckTest() throws Exception {
         long id = testDoctor.getId();
         mockMvc.perform(delete("/doctor/delete/" + id))
@@ -139,7 +143,7 @@ class DoctorsControllerTest {
 
     @Test
     @Order(3)
-    @DisplayName("GET to /doctors/list (Getting list of all doctors) and expecting Ok status response")
+    @DisplayName("Request GET /doctor/list. Expects HTTP OK")
     void getListOfDoctorsResponseCheckTest() throws Exception {
         mockMvc.perform(get("/doctor/list"))
                 .andExpect(status().isOk());

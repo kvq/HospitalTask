@@ -44,29 +44,30 @@ class PatientControllerTest {
     List<PatientDto> list;
     HashMap<Long, PatientDto> storage;
 
-    @BeforeEach
-    void setupService(){
-        storage = new HashMap<>();
+    @BeforeAll
+    void mockOverridesPrepare(){
         patientService = mock(PatientService.class);
         mockMvc = MockMvcBuilders.standaloneSetup(new PatientController(patientService)).build();
-        testDoctor = mock(DoctorDto.class);
-        when(testDoctor.getId()).thenReturn(1L);
-        testPatient = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789", 1);
-        storage.put(1L,testPatient);
+
         when(patientService.get(anyLong())).thenAnswer(invocation -> serviceGet(invocation.getArgument(0,Long.class)));
         when(patientService.add(any(PatientDto.class))).thenAnswer(invocation -> serviceAdd(invocation.getArgument(0,PatientDto.class)));
         when(patientService.delete(anyLong())).thenAnswer(invocation -> serviceDelete(invocation.getArgument(0,Long.class)));
         when(patientService.getList()).thenAnswer(invocation -> serviceGetList());
         when(patientService.update(anyLong(),any(PatientDto.class))).thenAnswer(
                 invocation -> serviceUpdate(invocation.getArgument(0,Long.class),
-                                            invocation.getArgument(1,PatientDto.class)));
+                        invocation.getArgument(1,PatientDto.class)));
 
     }
 
-    @BeforeAll
-    void preCreateDoctor() {
+    @BeforeEach
+    void setupService(){
+        storage = new HashMap<>();
+        testDoctor = mock(DoctorDto.class);
+        when(testDoctor.getId()).thenReturn(1L);
+        testPatient = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", 1);
+        storage.put(1L,testPatient);
 
 
     }
@@ -94,8 +95,7 @@ class PatientControllerTest {
     }
 
     @Test
-    @Order(1)
-    @DisplayName("Valid json request POST to /patient/add (Creating new valid patient), and expecting Ok status response, checking size change in mocked service")
+    @DisplayName("Valid Json PatientDto POST /patient/add. Expects HTTP OK, checks service list size")
     void addPatientJsonRequestResponseCheckTest() throws Exception {
         long doctorId = testDoctor.getId();
         String patientJson = "{\"firstName\":\"First_Name\","
@@ -113,8 +113,7 @@ class PatientControllerTest {
     }
 
     @Test
-    @Order(2)
-    @DisplayName("Valid json request PATCH to /patient/edit/id (Updating patient by valid id) and expecting Ok status response, checking change in mocked service")
+    @DisplayName("Valid Json PatientDto PATCH /patient/edit. Expects HTTP OK, checks service data change")
     void patchPatientJsonRequestResponseCheckTest() throws Exception {
         long id = testPatient.getId();
         long doctorId = testDoctor.getId();
@@ -134,8 +133,7 @@ class PatientControllerTest {
     }
 
     @Test
-    @Order(4)
-    @DisplayName("Valid requset DELETE /patient/delete/id/ (Deleting patient by valid id) and expecting Ok status response, checking if patient disappeared from mocked service")
+    @DisplayName("Request DELETE /patient/delete. Expects HTTP OK, checks if user still exists")
     void deletePatientByIdResponseCheckTest() throws Exception {
         long id = testPatient.getId();
         mockMvc.perform(delete("/patient/delete/" + id))
@@ -145,8 +143,7 @@ class PatientControllerTest {
     }
 
     @Test
-    @Order(3)
-    @DisplayName("GET to /patient/list (Getting list of all patients) and expecting Ok status response")
+    @DisplayName("Request GET /patient/list. Expects HTTP OK")
     void getListOfPatientsResponseCheckTest() throws Exception {
         mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk());

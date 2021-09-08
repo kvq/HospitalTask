@@ -4,10 +4,7 @@ import me.kvq.HospitalTask.dao.DoctorDao;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.mapper.DoctorMapper;
 import me.kvq.HospitalTask.model.Doctor;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -18,7 +15,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DoctorServiceTest {
 
     DoctorDao doctorDao;
@@ -29,24 +28,19 @@ class DoctorServiceTest {
     @Autowired
     DoctorMapper doctorMapper;
 
-    @BeforeEach
-    void prepareData(){
+    @BeforeAll
+    void mockOverridesPrepare (){
+
         doctorDao = mock(DoctorDao.class);
-        storage = new HashMap<>();
-        testDoctorA = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
-                                    LocalDate.of(1991,5,4),
-                                    "380123455789","DoctorA_Position");
-        testDoctorB = new Doctor(1,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
-                                    LocalDate.of(1990,2,15),
-                        "380123856789","DoctorB_Position");
-        storage.put(1L, testDoctorA);
-        storage.put(2L, testDoctorB);
-        when(doctorDao.findAll()).thenAnswer(invocation -> getDoctorList());
+        service = new DoctorService(doctorDao,doctorMapper);
+
         when(doctorDao.getById(anyLong()))
                 .thenAnswer(invocation -> storage.get(invocation.getArgument(0,Long.class)));
 
         when(doctorDao.existsById(anyLong()))
                 .thenAnswer(invocation -> storage.containsKey(invocation.getArgument(0,Long.class)));
+
+        when(doctorDao.findAll()).thenAnswer(invocation -> getDoctorList());
 
         doAnswer(invocation
                 -> deleteDoctorById(invocation.getArgument(0,Long.class)))
@@ -56,7 +50,21 @@ class DoctorServiceTest {
                 -> saveDoctor(invocation.getArgument(0, Doctor.class)))
                 .when(doctorDao).save(any(Doctor.class));
 
-        service = new DoctorService(doctorDao,doctorMapper);
+    }
+
+
+    @BeforeEach
+    void prepareData(){
+
+        storage = new HashMap<>();
+        testDoctorA = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                                    LocalDate.of(1991,5,4),
+                                    "380123455789","DoctorA_Position");
+        testDoctorB = new Doctor(1,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
+                                    LocalDate.of(1990,2,15),
+                        "380123856789","DoctorB_Position");
+        storage.put(1L, testDoctorA);
+        storage.put(2L, testDoctorB);
     }
 
     boolean deleteDoctorById(long id) {
@@ -73,8 +81,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @Order(1)
-    @DisplayName("Adding new Doctor, expecting returned value not null and looking doctor id in mocked dao")
+    @DisplayName("Creating new valid DoctorDto, checking return Dto not null & entity exists in mocked dao")
     void serviceAddNewValidDoctorTest(){
         DoctorDto testingDoctor = new DoctorDto(0,"Name", "LastName", "Patronymic",
                 LocalDate.of(1999,10,2),
@@ -85,8 +92,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @Order(2)
-    @DisplayName("Updating existing doctor with valid data, expecting valid return and checking updates in mocked dao")
+    @DisplayName("Updating existing doctor with valid data, checking return not null & entity changed in mocked dao")
     void serviceUpdateExistingDoctorByIdWithValidDataTest(){
         DoctorDto doctor = doctorMapper.entityToDto(testDoctorA);
         doctor.setFirstName("DifferentName");
@@ -98,8 +104,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @Order(3)
-    @DisplayName("Deleting existing doctor, expecting ture to be returned, checking dao for size change")
+    @DisplayName("Deleting existing doctor, checking return is true & dao size decreased")
     void serviceDeleteExistingDoctorByIdTest(){
         Doctor doctor = testDoctorA;
         assertTrue(service.delete(doctor.getId()), "Doctor wasn't deleted");
@@ -108,16 +113,15 @@ class DoctorServiceTest {
     }
 
     @Test
-    @Order(4)
     @DisplayName("Getting doctor list, expecting 2 users in the list")
     void serviceGetDoctorListTest(){
         List<DoctorDto> doctorsDtoList = service.getList();
+
         assertEquals(2, doctorsDtoList.size(),"Expected 2 doctors to be returned");
     }
 
     @Test
-    @Order(5)
-    @DisplayName("Getting doctor by id. Comparing returned dto id to origin entity id")
+    @DisplayName("Getting DoctorDto by id then compare id with origin entity")
     void serviceGetDoctorByIdTest(){
         DoctorDto doctor = service.get(testDoctorA.getId());
         assertNotNull(doctor);
