@@ -5,18 +5,14 @@ import java.time.LocalDate;
 
 @Entity
 public class Patient {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
-
     private String firstName;
     private String lastName;
     private String patronymic;
-
     @Column(columnDefinition = "DATE")
     private LocalDate birthDate;
-
     private String phoneNumber;
     @ManyToOne
     private Doctor doctor;
@@ -37,13 +33,6 @@ public class Patient {
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
 
-    }
-
-    public Patient(String firstName, String lastName, String patronymic,
-                   LocalDate birthDate,
-                   String phoneNumber,
-                   Doctor doctor) {
-        this(0, firstName, lastName, patronymic, birthDate, phoneNumber, doctor);
     }
 
     public Doctor getDoctor() {

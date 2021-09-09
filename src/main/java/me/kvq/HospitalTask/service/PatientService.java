@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
 
 @Service
 public class PatientService{
-
     private PatientDao dao;
     private PatientMapper mapper;
 
@@ -21,21 +20,19 @@ public class PatientService{
         this.mapper = mapper;
     }
 
-    public PatientDto add(PatientDto patient) {
-        patient.setId(0);
-        patient.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(patient.getPhoneNumber()));
-        Patient patientEntity = dao.save(mapper.dtoToEntity(patient));
+    public PatientDto add(PatientDto patientDto) {
+        patientDto.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber()));
+        Patient patientEntity = dao.save(mapper.dtoToEntity(0,patientDto));
         return mapper.entityToDto(patientEntity);
     }
 
-    public PatientDto update(long id, PatientDto patient) {
+    public PatientDto update(long id, PatientDto patientDto) {
         if (!dao.existsById(id)) {
             throw new NoSuchElementException("User does not exists");
         }
-        patient.setId(id);
-        patient.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(patient.getPhoneNumber()));
-        Patient patientEntity = dao.save(mapper.dtoToEntity(patient));
-        return mapper.entityToDto(patientEntity);
+        patientDto.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber()));
+        Patient returnedPatient = dao.save(mapper.dtoToEntity(id,patientDto));
+        return mapper.entityToDto(returnedPatient);
     }
 
     public boolean delete(long id) {
@@ -47,7 +44,9 @@ public class PatientService{
     }
 
     public List<PatientDto> getList() {
-        return mapper.entityListToDtoList(dao.findAll());
+        List<Patient> patientList = dao.findAll();
+        List<PatientDto> patientDtoList = mapper.entityListToDtoList(patientList);
+        return patientDtoList;
     }
 
     public PatientDto get(long id){

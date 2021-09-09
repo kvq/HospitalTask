@@ -28,9 +28,9 @@ public class PatientMapper {
                 doctorId);
     }
 
-    public Patient dtoToEntity(PatientDto patientDto) {
+    public Patient dtoToEntity(long id,PatientDto patientDto) {
         Doctor doctor = dao.getById(patientDto.getDoctor());
-        return new Patient(patientDto.getId(),
+        return new Patient(id,
                 patientDto.getFirstName(),
                 patientDto.getLastName(),
                 patientDto.getPatronymic(),
@@ -41,10 +41,6 @@ public class PatientMapper {
 
     public List<PatientDto> entityListToDtoList(List<Patient> list) {
         return list.stream().map(this::entityToDto).collect(Collectors.toList());
-    }
-
-    public List<Patient> dtoListToEntityList(List<PatientDto> list) {
-        return list.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
 
 }

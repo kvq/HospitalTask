@@ -3,15 +3,12 @@ package me.kvq.HospitalTask.dto;
 import java.time.LocalDate;
 
 public class DoctorDto {
-
     private long id;
     private String firstName;
     private String lastName;
     private String patronymic;
-
     private LocalDate birthDate;
     private String phoneNumber;
-
     private String position;
 
     public DoctorDto() {

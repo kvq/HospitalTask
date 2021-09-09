@@ -20,8 +20,8 @@ public class DoctorMapper{
                 doctor.getPosition());
     }
 
-    public Doctor dtoToEntity(DoctorDto doctorDto) {
-        return new Doctor(doctorDto.getId(),
+    public Doctor dtoToEntity(long id,DoctorDto doctorDto) {
+        return new Doctor(id,
                 doctorDto.getFirstName(),
                 doctorDto.getLastName(),
                 doctorDto.getPatronymic(),
@@ -32,10 +32,6 @@ public class DoctorMapper{
 
     public List<DoctorDto> entityListToDtoList(List<Doctor> list) {
         return list.stream().map(this::entityToDto).collect(Collectors.toList());
-    }
-
-    public List<Doctor> dtoListToEntityList(List<DoctorDto> list) {
-        return list.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
 
 }

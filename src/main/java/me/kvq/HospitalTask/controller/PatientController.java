@@ -10,7 +10,6 @@ import java.util.List;
 @RestController()
 @RequestMapping("patient")
 public class PatientController {
-
     private PatientService service;
 
     public PatientController(PatientService service) {
@@ -18,18 +17,18 @@ public class PatientController {
     }
 
     @GetMapping("/list")
-    public List<PatientDto> list() {
+    public List<PatientDto> getList() {
         return service.getList();
     }
 
     @PostMapping("/add")
-    public PatientDto add(@RequestBody PatientDto patient) {
-        return service.add(patient);
+    public PatientDto add(@RequestBody PatientDto patientDto) {
+        return service.add(patientDto);
     }
 
     @PatchMapping("/edit/{id}")
-    public PatientDto patch(@PathVariable long id, @RequestBody PatientDto person) {
-        return service.update(id, person);
+    public PatientDto update(@PathVariable long id, @RequestBody PatientDto patientDto) {
+        return service.update(id, patientDto);
     }
 
     @DeleteMapping("/delete/{id}")

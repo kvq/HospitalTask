@@ -5,18 +5,14 @@ import java.time.LocalDate;
 
 @Entity
 public class Doctor{
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
-
     private String firstName;
     private String lastName;
     private String patronymic;
-
     @Column(columnDefinition = "DATE")
     private LocalDate birthDate;
-
     private String phoneNumber;
     private String position;
 
@@ -36,14 +32,6 @@ public class Doctor{
         this.phoneNumber = phoneNumber;
         this.position = position;
     }
-
-    public Doctor(String firstName, String lastName, String patronymic,
-                  LocalDate birthDate,
-                  String phoneNumber,
-                  String position) {
-        this(0,firstName,lastName,patronymic,birthDate,phoneNumber,position);
-    }
-
 
     public String getPosition() {
         return position;
