@@ -42,12 +42,12 @@ class PatientControllerTest {
         patientService = mock(PatientService.class);
         mockMvc = MockMvcBuilders.standaloneSetup(new PatientController(patientService)).build();
 
-        when(patientService.get(anyLong())).thenAnswer(invocation -> serviceGet(invocation.getArgument(0,Long.class)));
-        when(patientService.add(any(PatientDto.class))).thenAnswer(invocation -> serviceAdd(invocation.getArgument(0,PatientDto.class)));
+        when(patientService.get(anyLong())).thenAnswer(invocation -> servicePatientGet(invocation.getArgument(0,Long.class)));
+        when(patientService.add(any(PatientDto.class))).thenAnswer(invocation -> servicePatientAdd(invocation.getArgument(0,PatientDto.class)));
         when(patientService.delete(anyLong())).thenAnswer(invocation -> serviceDelete(invocation.getArgument(0,Long.class)));
-        when(patientService.getList()).thenAnswer(invocation -> serviceGetList());
+        when(patientService.getList()).thenAnswer(invocation -> servicePatientGetList());
         when(patientService.update(anyLong(),any(PatientDto.class))).thenAnswer(
-                invocation -> serviceUpdate(invocation.getArgument(0,Long.class),
+                invocation -> servicePatientUpdate(invocation.getArgument(0,Long.class),
                         invocation.getArgument(1,PatientDto.class)));
 
     }
@@ -57,16 +57,16 @@ class PatientControllerTest {
         storage = new HashMap<>();
     }
 
-    PatientDto serviceAdd(PatientDto dto){
+    PatientDto servicePatientAdd(PatientDto dto){
         storage.put(dto.getId(),dto);
         return dto;
     }
 
-    PatientDto serviceGet(long id){
+    PatientDto servicePatientGet(long id){
         return storage.get(id);
     }
 
-    List<PatientDto> serviceGetList(){
+    List<PatientDto> servicePatientGetList(){
         return new ArrayList<>(storage.values());
     }
 
@@ -77,7 +77,7 @@ class PatientControllerTest {
         throw new NoSuchElementException("User does not exists");
     }
 
-    PatientDto serviceUpdate(long id,PatientDto dto){
+    PatientDto servicePatientUpdate(long id, PatientDto dto){
         storage.put(id,dto);
         return dto;
     }
@@ -89,7 +89,7 @@ class PatientControllerTest {
                 LocalDate.of(1990,2,15),
                 "380123856789","DoctorB_Position");
 
-        assertEquals(0, serviceGetList().size(),"Service supposed to be empty when test starts");
+        assertEquals(0, servicePatientGetList().size(),"Service supposed to be empty when test starts");
         long doctorId = testDoctorDto.getId();
         String patientJson = "{\"firstName\":\"First_Name\","
                 + "\"lastName\":\"Second_name\","
@@ -103,7 +103,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals(1, serviceGetList().size(),"Doctor wasn't added to service");
+        assertEquals(1, servicePatientGetList().size(),"Doctor wasn't added to service");
     }
 
     @Test
@@ -115,7 +115,7 @@ class PatientControllerTest {
         PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789", testDoctorDto.getId());
-        serviceAdd(testPatientDto);
+        servicePatientAdd(testPatientDto);
 
         long id = testPatientDto.getId();
         long doctorId = testDoctorDto.getId();
@@ -131,7 +131,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals("Different_Name",serviceGet(testPatientDto.getId()).getFirstName());
+        assertEquals("Different_Name", servicePatientGet(testPatientDto.getId()).getFirstName());
     }
 
     @Test
@@ -143,13 +143,13 @@ class PatientControllerTest {
         PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789", testDoctorDto.getId());
-        serviceAdd(testPatientDto);
+        servicePatientAdd(testPatientDto);
 
         long id = testPatientDto.getId();
         mockMvc.perform(delete("/patient/delete/" + id))
                 .andExpect(status().isOk());
 
-        assertTrue(serviceGet(id) == null);
+        assertTrue(servicePatientGet(id) == null);
     }
 
     @Test
@@ -161,7 +161,7 @@ class PatientControllerTest {
         PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789", testDoctorDto.getId());
-        serviceAdd(testPatientDto);
+        servicePatientAdd(testPatientDto);
 
         mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk());

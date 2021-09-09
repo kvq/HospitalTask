@@ -41,12 +41,12 @@ class DoctorsControllerTest {
     @BeforeAll
     void mockOverridesPrepare () {
         doctorService = mock(DoctorService.class);
-        when(doctorService.get(anyLong())).thenAnswer(invocation -> serviceGet(invocation.getArgument(0,Long.class)));
-        when(doctorService.add(any(DoctorDto.class))).thenAnswer(invocation -> serviceAdd(invocation.getArgument(0,DoctorDto.class)));
-        when(doctorService.delete(anyLong())).thenAnswer(invocation -> serviceDelete(invocation.getArgument(0,Long.class)));
-        when(doctorService.getList()).thenAnswer(invocation -> serviceGetList());
+        when(doctorService.get(anyLong())).thenAnswer(invocation -> serviceDoctorGet(invocation.getArgument(0,Long.class)));
+        when(doctorService.add(any(DoctorDto.class))).thenAnswer(invocation -> serviceDoctorAdd(invocation.getArgument(0,DoctorDto.class)));
+        when(doctorService.delete(anyLong())).thenAnswer(invocation -> serviceDoctorDelete(invocation.getArgument(0,Long.class)));
+        when(doctorService.getList()).thenAnswer(invocation -> serviceDoctorGetList());
         when(doctorService.update(anyLong(),any(DoctorDto.class))).thenAnswer(
-                invocation -> serviceUpdate(invocation.getArgument(0,Long.class),
+                invocation -> serviceDoctorUpdate(invocation.getArgument(0,Long.class),
                         invocation.getArgument(1,DoctorDto.class)));
 
         mockMvc = MockMvcBuilders.standaloneSetup(new DoctorController(doctorService)).build();
@@ -57,31 +57,31 @@ class DoctorsControllerTest {
         storage = new HashMap<>();
     }
 
-    DoctorDto serviceAdd(DoctorDto dto){
+    DoctorDto serviceDoctorAdd(DoctorDto dto){
         storage.put(dto.getId(),dto);
         return dto;
     }
 
-    boolean serviceExistsById(long l){
+    boolean serviceDoctorExistsById(long l){
         return storage.containsKey(l);
     }
 
-    DoctorDto serviceGet(long id){
+    DoctorDto serviceDoctorGet(long id){
         return storage.get(id);
     }
 
-    List<DoctorDto> serviceGetList(){
+    List<DoctorDto> serviceDoctorGetList(){
         return new ArrayList<>(storage.values());
     }
 
-    boolean serviceDelete(long id){
+    boolean serviceDoctorDelete(long id){
         boolean exists = storage.remove(id) != null;
         if (exists) return true;
 
         throw new NoSuchElementException("User does not exists");
     }
 
-    DoctorDto serviceUpdate(long id,DoctorDto dto){
+    DoctorDto serviceDoctorUpdate(long id, DoctorDto dto){
         storage.put(id,dto);
         return dto;
     }
@@ -98,13 +98,13 @@ class DoctorsControllerTest {
                 + "\"position\":\"Position\"}";
 
 
-        assertEquals(0, serviceGetList().size(), "Service supposed to be empty when test starts");
+        assertEquals(0, serviceDoctorGetList().size(), "Service supposed to be empty when test starts");
         mockMvc.perform(post("/doctor/add")
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals(1, serviceGetList().size(), "Doctor wasn't add to service");
+        assertEquals(1, serviceDoctorGetList().size(), "Doctor wasn't add to service");
     }
 
     @Test
@@ -114,7 +114,7 @@ class DoctorsControllerTest {
         DoctorDto testDoctorDto = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789", "DoctorA_Position");
-        serviceAdd(testDoctorDto);
+        serviceDoctorAdd(testDoctorDto);
         long id = testDoctorDto.getId();
 
         String doctorJson = "{\"firstName\":\"First_NewName\","
@@ -129,7 +129,7 @@ class DoctorsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-       assertEquals("Position2",serviceGet(testDoctorDto.getId()).getPosition());
+       assertEquals("Position2", serviceDoctorGet(testDoctorDto.getId()).getPosition());
     }
 
     @Test
@@ -138,14 +138,14 @@ class DoctorsControllerTest {
         DoctorDto testDoctorDto = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789", "DoctorA_Position");
-        serviceAdd(testDoctorDto);
-        assertTrue(serviceExistsById(testDoctorDto.getId()), "Test doctor was not created");
+        serviceDoctorAdd(testDoctorDto);
+        assertTrue(serviceDoctorExistsById(testDoctorDto.getId()), "Test doctor was not created");
 
         long id = testDoctorDto.getId();
         mockMvc.perform(delete("/doctor/delete/" + id))
                 .andExpect(status().isOk());
 
-        assertTrue(!serviceExistsById(testDoctorDto.getId()), "Doctor was not deleted from service");
+        assertTrue(!serviceDoctorExistsById(testDoctorDto.getId()), "Doctor was not deleted from service");
     }
 
     @Test
@@ -154,7 +154,7 @@ class DoctorsControllerTest {
         DoctorDto testDoctorDto = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789", "DoctorA_Position");
-        serviceAdd(testDoctorDto);
+        serviceDoctorAdd(testDoctorDto);
 
         mockMvc.perform(get("/doctor/list"))
                 .andExpect(status().isOk());
