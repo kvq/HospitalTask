@@ -32,10 +32,8 @@ import java.util.NoSuchElementException;
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DoctorsControllerTest {
-
     private MockMvc mockMvc;
     DoctorService doctorService;
-
     List<DoctorDto> list;
     HashMap<Long, DoctorDto> storage;
 
