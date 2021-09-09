@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -80,7 +81,10 @@ class DoctorsControllerTest {
     }
 
     boolean serviceDelete(long id){
-        return storage.remove(id) != null;
+        boolean exists = storage.remove(id) != null;
+        if (exists) return true;
+
+        throw new NoSuchElementException("User does not exists");
     }
 
     DoctorDto serviceUpdate(long id,DoctorDto dto){
