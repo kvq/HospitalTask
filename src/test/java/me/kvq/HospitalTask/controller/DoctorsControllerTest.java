@@ -1,5 +1,7 @@
 package me.kvq.HospitalTask.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -9,12 +11,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.jupiter.api.Assertions.*;
 
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.service.DoctorService;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -33,10 +33,7 @@ import java.util.NoSuchElementException;
 class DoctorsControllerTest {
 
     private MockMvc mockMvc;
-
     DoctorService doctorService;
-
-    DoctorDto testDoctor;
 
     List<DoctorDto> list;
     HashMap<Long, DoctorDto> storage;
@@ -58,18 +55,15 @@ class DoctorsControllerTest {
     @BeforeEach
     void setupService(){
         storage = new HashMap<>();
-
-        testDoctor = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789", "DoctorA_Position");
-        storage.put(1L, testDoctor);
-
-
     }
 
     DoctorDto serviceAdd(DoctorDto dto){
         storage.put(dto.getId(),dto);
         return dto;
+    }
+
+    boolean serviceExistsById(long l){
+        return storage.containsKey(l);
     }
 
     DoctorDto serviceGet(long id){
@@ -103,19 +97,25 @@ class DoctorsControllerTest {
                 + "\"phoneNumber\":\"381234567890\","
                 + "\"position\":\"Position\"}";
 
+
+        assertEquals(0, serviceGetList().size(), "Service supposed to be empty when test starts");
         mockMvc.perform(post("/doctor/add")
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals(2, serviceGetList().size());
+        assertEquals(1, serviceGetList().size(), "Doctor wasn't add to service");
     }
 
     @Test
     @DisplayName("Valid Json DoctorDto PATCH /doctor/edit. Expects HTTP OK, checks service data change")
     void patchDoctorJsonRequestResponseCheckTest() throws Exception {
 
-        long id = testDoctor.getId();
+        DoctorDto testDoctorDto = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", "DoctorA_Position");
+        serviceAdd(testDoctorDto);
+        long id = testDoctorDto.getId();
 
         String doctorJson = "{\"firstName\":\"First_NewName\","
                 + "\"lastName\":\"Second_NewName\","
@@ -129,22 +129,33 @@ class DoctorsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-       assertEquals("Position2",serviceGet(testDoctor.getId()).getPosition());
+       assertEquals("Position2",serviceGet(testDoctorDto.getId()).getPosition());
     }
 
     @Test
     @DisplayName("Request DELETE /doctor/delete. Expects HTTP OK, checks if user still exists")
     void deleteDoctorByIdResponseCheckTest() throws Exception {
-        long id = testDoctor.getId();
+        DoctorDto testDoctorDto = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", "DoctorA_Position");
+        serviceAdd(testDoctorDto);
+        assertTrue(serviceExistsById(testDoctorDto.getId()), "Test doctor was not created");
+
+        long id = testDoctorDto.getId();
         mockMvc.perform(delete("/doctor/delete/" + id))
                 .andExpect(status().isOk());
 
-        assertTrue(serviceGet(id) == null);
+        assertTrue(!serviceExistsById(testDoctorDto.getId()), "Doctor was not deleted from service");
     }
 
     @Test
     @DisplayName("Request GET /doctor/list. Expects HTTP OK")
     void getListOfDoctorsResponseCheckTest() throws Exception {
+        DoctorDto testDoctorDto = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", "DoctorA_Position");
+        serviceAdd(testDoctorDto);
+
         mockMvc.perform(get("/doctor/list"))
                 .andExpect(status().isOk());
     }

@@ -15,20 +15,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import me.kvq.HospitalTask.dao.DoctorDao;
-import me.kvq.HospitalTask.dao.PatientDao;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.dto.PatientDto;
-import me.kvq.HospitalTask.model.Patient;
+
 import me.kvq.HospitalTask.service.PatientService;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import me.kvq.HospitalTask.model.Doctor;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @SpringBootTest
@@ -37,11 +32,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 class PatientControllerTest {
 
     private MockMvc mockMvc;
-
     PatientService patientService;
 
-    PatientDto testPatient;
-    DoctorDto testDoctor;
     List<PatientDto> list;
     HashMap<Long, PatientDto> storage;
 
@@ -63,14 +55,6 @@ class PatientControllerTest {
     @BeforeEach
     void setupService(){
         storage = new HashMap<>();
-        testDoctor = mock(DoctorDto.class);
-        when(testDoctor.getId()).thenReturn(1L);
-        testPatient = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789", 1);
-        storage.put(1L,testPatient);
-
-
     }
 
     PatientDto serviceAdd(PatientDto dto){
@@ -101,26 +85,40 @@ class PatientControllerTest {
     @Test
     @DisplayName("Valid Json PatientDto POST /patient/add. Expects HTTP OK, checks service list size")
     void addPatientJsonRequestResponseCheckTest() throws Exception {
-        long doctorId = testDoctor.getId();
+        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789","DoctorB_Position");
+
+        assertEquals(0, serviceGetList().size(),"Service supposed to be empty when test starts");
+        long doctorId = testDoctorDto.getId();
         String patientJson = "{\"firstName\":\"First_Name\","
                 + "\"lastName\":\"Second_name\","
                 + "\"fathersName\":\"Fathers_Name\","
                 + "\"birthDate\":[2000,1,1],"
                 + "\"phoneNumber\":\"381234567890\","
                 + "\"doctor\":" + doctorId + "}";
+
         mockMvc.perform(post("/patient/add")
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals(2, serviceGetList().size());
+        assertEquals(1, serviceGetList().size(),"Doctor wasn't added to service");
     }
 
     @Test
     @DisplayName("Valid Json PatientDto PATCH /patient/edit. Expects HTTP OK, checks service data change")
     void patchPatientJsonRequestResponseCheckTest() throws Exception {
-        long id = testPatient.getId();
-        long doctorId = testDoctor.getId();
+        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789","DoctorB_Position");
+        PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", testDoctorDto.getId());
+        serviceAdd(testPatientDto);
+
+        long id = testPatientDto.getId();
+        long doctorId = testDoctorDto.getId();
         String patientJson = "{\"firstName\":\"Different_Name\","
                 + "\"lastName\":\"Second_name\","
                 + "\"fathersName\":\"Fathers_Name\","
@@ -133,13 +131,21 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals("Different_Name",serviceGet(testPatient.getId()).getFirstName());
+        assertEquals("Different_Name",serviceGet(testPatientDto.getId()).getFirstName());
     }
 
     @Test
-    @DisplayName("Request DELETE /patient/delete. Expects HTTP OK, checks if user still exists")
+    @DisplayName("Request DELETE /patient/delete. Expects HTTP OK, checks if user no longer exists")
     void deletePatientByIdResponseCheckTest() throws Exception {
-        long id = testPatient.getId();
+        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789","DoctorB_Position");
+        PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", testDoctorDto.getId());
+        serviceAdd(testPatientDto);
+
+        long id = testPatientDto.getId();
         mockMvc.perform(delete("/patient/delete/" + id))
                 .andExpect(status().isOk());
 
@@ -149,6 +155,14 @@ class PatientControllerTest {
     @Test
     @DisplayName("Request GET /patient/list. Expects HTTP OK")
     void getListOfPatientsResponseCheckTest() throws Exception {
+        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789","DoctorB_Position");
+        PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789", testDoctorDto.getId());
+        serviceAdd(testPatientDto);
+
         mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk());
     }

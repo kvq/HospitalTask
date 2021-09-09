@@ -7,7 +7,6 @@ import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ class PatientServiceTest {
     PatientDao patientDao;
     DoctorDao doctorDao;
     HashMap<Long, Patient> storage;
-    Patient testPatientA, testPatientB;
     PatientService service;
     Doctor testDoctor;
 
@@ -59,25 +57,17 @@ class PatientServiceTest {
     void prepareData(){
 
         storage = new HashMap<>();
-        testPatientA = new Patient(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789",testDoctor);
-        testPatientB = new Patient(1,"PatientB_Name","PatientB_LastName", "PatientB_Patronymic",
-                LocalDate.of(1990,2,15),
-                "380123856789",testDoctor);
-        storage.put(1L, testPatientA);
-        storage.put(2L, testPatientB);
 
 
     }
 
+    void setTestDoctor(Doctor doctor){
+        testDoctor = doctor;
+    }
+
     void mockDoctor(){
-        testDoctor = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789","DoctorA_Position");
         DoctorDao mockDao = mock(DoctorDao.class);
         when(mockDao.getById(any())).thenReturn(testDoctor);
-
         patientMapper = new PatientMapper(mockDao);
     }
 
@@ -91,6 +81,12 @@ class PatientServiceTest {
         return patient;
     }
 
+    void addPatients(Patient... patients){
+        for (Patient patient : patients){
+            storage.put(patient.getId(),patient);
+        }
+    }
+
     public List<Patient> getPatientList(){
         return new ArrayList<Patient>(storage.values());
     }
@@ -98,9 +94,14 @@ class PatientServiceTest {
     @Test
     @DisplayName("Creating new valid PatientDto, checking return Dto not null & entity exists in mocked dao")
     void serviceAddNewValidPatientTest(){
+        Doctor testDoctor = new Doctor(3,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        setTestDoctor(testDoctor);
         PatientDto testingPatient = new PatientDto(0,"Name", "LastName", "Patronymic",
                 LocalDate.of(1999,10,2),
                 "380123456789", testDoctor.getId());
+
         PatientDto returnedDto = service.add(testingPatient);
         assertNotNull(returnedDto,"Dto returned by service is null");
         assertTrue(patientDao.existsById(returnedDto.getId()), "Patient not exists in mocked dao");
@@ -109,7 +110,16 @@ class PatientServiceTest {
     @Test
     @DisplayName("Updating existing patient with valid data, checking return not null & entity changed in mocked dao")
     void serviceUpdateExistingPatientByIdWithValidDataTest(){
-        PatientDto patient = patientMapper.entityToDto(testPatientA);
+        Doctor testDoctor = new Doctor(3,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        setTestDoctor(testDoctor);
+        Patient testPatient = new Patient(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789",testDoctor);
+        addPatients(testPatient);
+
+        PatientDto patient = patientMapper.entityToDto(testPatient);
         patient.setFirstName("DifferentName");
         PatientDto returnedPatient = service.update(patient.getId(),patient);
         assertNotNull(returnedPatient, "Dto returned by service is null");
@@ -121,15 +131,36 @@ class PatientServiceTest {
     @Test
     @DisplayName("Deleting existing patient, checking return is true & dao size decreased")
     void serviceDeleteExistingPatientByIdTest(){
-        Patient patient = testPatientA;
-        assertTrue(service.delete(patient.getId()), "Patient wasn't deleted");
-        assertEquals(1, patientDao.findAll().size(), "There should be only one patient in mocked dao after deletion");
+        Doctor testDoctor = new Doctor(3,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        setTestDoctor(testDoctor);
+        Patient testPatient = new Patient(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789",testDoctor);
+        addPatients(testPatient);
+        assertEquals(1, patientDao.findAll().size(), "Test patient wasn't added to mocked dao");
+
+        assertTrue(service.delete(testPatient.getId()), "Patient wasn't deleted");
+        assertEquals(0, patientDao.findAll().size(), "There should be no patients in mocked dao after deletion");
 
     }
 
     @Test
     @DisplayName("Getting patient list, expecting 2 users in the list")
     void serviceGetPatientListTest(){
+        Doctor testDoctor = new Doctor(3,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        setTestDoctor(testDoctor);
+        Patient testPatientA = new Patient(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789",testDoctor);
+        Patient testPatientB = new Patient(2,"PatientB_Name","PatientB_LastName", "PatientB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789",testDoctor);
+        addPatients(testPatientA,testPatientB);
+
         List<PatientDto> patientDtoList = service.getList();
         assertEquals(2, patientDtoList.size(),"Expected 2 patients to be returned");
     }
@@ -137,9 +168,18 @@ class PatientServiceTest {
     @Test
     @DisplayName("Getting PatientDto by id then compare id with origin entity")
     void serviceGetPatientByIdTest(){
-        PatientDto patient = service.get(testPatientA.getId());
+        Doctor testDoctor = new Doctor(3,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        setTestDoctor(testDoctor);
+        Patient testPatient = new Patient(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789",testDoctor);
+        addPatients(testPatient);
+
+        PatientDto patient = service.get(testPatient.getId());
         assertNotNull(patient);
-        assertEquals(testPatientA.getId(), patient.getId());
+        assertEquals(testPatient.getId(), patient.getId());
     }
 
 }

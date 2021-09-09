@@ -22,7 +22,6 @@ class DoctorServiceTest {
 
     DoctorDao doctorDao;
     HashMap<Long,Doctor> storage;
-    Doctor testDoctorA, testDoctorB;
     DoctorService service;
 
     @Autowired
@@ -55,20 +54,17 @@ class DoctorServiceTest {
 
     @BeforeEach
     void prepareData(){
-
         storage = new HashMap<>();
-        testDoctorA = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
-                                    LocalDate.of(1991,5,4),
-                                    "380123455789","DoctorA_Position");
-        testDoctorB = new Doctor(1,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
-                                    LocalDate.of(1990,2,15),
-                        "380123856789","DoctorB_Position");
-        storage.put(1L, testDoctorA);
-        storage.put(2L, testDoctorB);
     }
 
     boolean deleteDoctorById(long id) {
        return storage.remove(id) != null;
+    }
+
+    void addDoctors(Doctor... doctors){
+        for (Doctor doctor : doctors){
+            storage.put(doctor.getId(),doctor);
+        }
     }
 
     Doctor saveDoctor(Doctor doctor){
@@ -83,17 +79,26 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Creating new valid DoctorDto, checking return Dto not null & entity exists in mocked dao")
     void serviceAddNewValidDoctorTest(){
-        DoctorDto testingDoctor = new DoctorDto(0,"Name", "LastName", "Patronymic",
+        DoctorDto testDoctor = new DoctorDto(1,"Name", "LastName", "Patronymic",
                 LocalDate.of(1999,10,2),
                 "380123456789", "Position");
-        DoctorDto returnedDto = service.add(testingDoctor);
+
+        DoctorDto returnedDto = service.add(testDoctor);
         assertNotNull(returnedDto,"Dto returned by service is null");
         assertTrue(doctorDao.existsById(returnedDto.getId()), "Doctor not exists in mocked dao");
     }
 
     @Test
-    @DisplayName("Updating existing doctor with valid data, checking return not null & entity changed in mocked dao")
+    @DisplayName("Updating existing doctor with valid data, checking return not null & if entity changed in mocked dao")
     void serviceUpdateExistingDoctorByIdWithValidDataTest(){
+        Doctor testDoctorA = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        Doctor testDoctorB = new Doctor(2,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789","DoctorB_Position");
+        addDoctors(testDoctorA,testDoctorB);
+
         DoctorDto doctor = doctorMapper.entityToDto(testDoctorA);
         doctor.setFirstName("DifferentName");
         DoctorDto returnedDoctor = service.update(doctor.getId(),doctor);
@@ -106,26 +111,43 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Deleting existing doctor, checking return is true & dao size decreased")
     void serviceDeleteExistingDoctorByIdTest(){
-        Doctor doctor = testDoctorA;
+        Doctor doctor = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        addDoctors(doctor);
+        assertEquals(1, doctorDao.findAll().size(), "Test patient wasn't added to mocked dao");
+
         assertTrue(service.delete(doctor.getId()), "Doctor wasn't deleted");
-        assertEquals(1, this.doctorDao.findAll().size(), "There should be only one doctor in mocked dao after deletion");
+        assertEquals(0, doctorDao.findAll().size(), "There should be no doctors in mocked dao after deletion");
 
     }
 
     @Test
     @DisplayName("Getting doctor list, expecting 2 users in the list")
     void serviceGetDoctorListTest(){
-        List<DoctorDto> doctorsDtoList = service.getList();
+        Doctor testDoctorA = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        Doctor testDoctorB = new Doctor(2,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
+                LocalDate.of(1990,2,15),
+                "380123856789","DoctorB_Position");
+        addDoctors(testDoctorA,testDoctorB);
 
+        List<DoctorDto> doctorsDtoList = service.getList();
         assertEquals(2, doctorsDtoList.size(),"Expected 2 doctors to be returned");
     }
 
     @Test
     @DisplayName("Getting DoctorDto by id then compare id with origin entity")
     void serviceGetDoctorByIdTest(){
-        DoctorDto doctor = service.get(testDoctorA.getId());
+        Doctor testDoctor = new Doctor(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789","DoctorA_Position");
+        addDoctors(testDoctor);
+
+        DoctorDto doctor = service.get(testDoctor.getId());
         assertNotNull(doctor);
-        assertEquals(testDoctorA.getId(), doctor.getId());
+        assertEquals(testDoctor.getId(), doctor.getId());
     }
 
 }
