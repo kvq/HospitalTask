@@ -38,10 +38,10 @@ class PatientServiceTest {
 
         when(patientDao.findAll()).thenAnswer(invocation -> getPatientList());
         when(patientDao.getById(anyLong()))
-                .thenAnswer(invocation -> storage.get(invocation.getArgument(0,Long.class)));
+                .thenAnswer(invocation -> getPatientById(invocation.getArgument(0,Long.class)));
 
         when(patientDao.existsById(anyLong()))
-                .thenAnswer(invocation -> storage.containsKey(invocation.getArgument(0,Long.class)));
+                .thenAnswer(invocation -> existsById(invocation.getArgument(0,Long.class)));
 
         doAnswer(invocation
                 -> deletePatientById(invocation.getArgument(0,Long.class)))
@@ -89,6 +89,14 @@ class PatientServiceTest {
 
     public List<Patient> getPatientList(){
         return new ArrayList<Patient>(storage.values());
+    }
+    
+    public boolean existsById(long id){
+        return storage.containsKey(id);
+    }
+    
+    public Patient getPatientById(long id){
+        return storage.get(id);
     }
 
     @Test

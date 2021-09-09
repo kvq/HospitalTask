@@ -76,6 +76,14 @@ class DoctorServiceTest {
         return new ArrayList<Doctor>(storage.values());
     }
 
+    public boolean existsById(long id){
+        return storage.containsKey(id);
+    }
+
+    public Doctor getDoctorById(long id){
+        return storage.get(id);
+    }
+
     @Test
     @DisplayName("Creating new valid DoctorDto, checking return Dto not null & entity exists in mocked dao")
     void serviceAddNewValidDoctorTest(){
