@@ -1,8 +1,5 @@
 package me.kvq.HospitalTask.controller;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -56,15 +53,15 @@ class DoctorsControllerTest {
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("id", not(0)))
-                        .andExpect(jsonPath("firstName", is("First_Name")))
-                        .andExpect(jsonPath("lastName", is("Second_name")))
-                        .andExpect(jsonPath("patronymic", is("Patronymic")))
-                        .andExpect(jsonPath("phoneNumber", is("381234567890")))
-                        .andExpect(jsonPath("birthDate[0]",is(2000)))
-                        .andExpect(jsonPath("birthDate[1]",is(1)))
-                        .andExpect(jsonPath("birthDate[2]",is(2)))
-                        .andExpect(jsonPath("position", is("Position")));
+                        .andExpect(jsonPath("id").value(1))
+                        .andExpect(jsonPath("firstName").value("First_Name"))
+                        .andExpect(jsonPath("lastName").value("Second_name"))
+                        .andExpect(jsonPath("patronymic").value("Patronymic"))
+                        .andExpect(jsonPath("phoneNumber").value("381234567890"))
+                        .andExpect(jsonPath("birthDate[0]").value(2000))
+                        .andExpect(jsonPath("birthDate[1]").value(1))
+                        .andExpect(jsonPath("birthDate[2]").value(2))
+                        .andExpect(jsonPath("position").value("Position"));
     }
 
     @Test
@@ -89,15 +86,21 @@ class DoctorsControllerTest {
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
-                       .andExpect(jsonPath("id", is(1)))
-                        .andExpect(jsonPath("firstName", is("First_NewName")))
-                        .andExpect(jsonPath("lastName", is("Second_NewName")))
-                        .andExpect(jsonPath("patronymic", is("Patronymic")))
-                        .andExpect(jsonPath("phoneNumber", is("381234567891")))
-                        .andExpect(jsonPath("birthDate[0]",is(2001)))
-                        .andExpect(jsonPath("birthDate[1]",is(2)))
-                        .andExpect(jsonPath("birthDate[2]",is(3)))
-                        .andExpect(jsonPath("position", is("Position2")));
+                .andExpect(content().json("{\"firstName\":\"First_NewName\","
+                        + "\"lastName\":\"Second_NewName\","
+                        + "\"patronymic\":\"Patronymic\","
+                        + "\"birthDate\":[2001,2,3],"
+                        + "\"phoneNumber\":\"381234567891\","
+                        + "\"position\":\"Position2\"}"))
+                       .andExpect(jsonPath("id").value(1))
+                        .andExpect(jsonPath("firstName").value("First_NewName"))
+                        .andExpect(jsonPath("lastName").value("Second_NewName"))
+                        .andExpect(jsonPath("patronymic").value("Patronymic"))
+                        .andExpect(jsonPath("phoneNumber").value("381234567891"))
+                        .andExpect(jsonPath("birthDate[0]").value(2001))
+                        .andExpect(jsonPath("birthDate[1]").value(2))
+                        .andExpect(jsonPath("birthDate[2]").value(3))
+                        .andExpect(jsonPath("position").value("Position2"));
     }
 
     @Test
@@ -120,16 +123,16 @@ class DoctorsControllerTest {
 
         mockMvc.perform(get("/doctor/list"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", hasSize(1)))
-                        .andExpect(jsonPath("$[0].id", is(1)))
-                        .andExpect(jsonPath("$[0].firstName", is("DoctorA_Name")))
-                        .andExpect(jsonPath("$[0].lastName", is("DoctorA_LastName")))
-                        .andExpect(jsonPath("$[0].patronymic", is("DoctorA_Patronymic")))
-                        .andExpect(jsonPath("$[0].phoneNumber", is("380123455789")))
-                        .andExpect(jsonPath("$[0].birthDate[0]",is(1991)))
-                        .andExpect(jsonPath("$[0].birthDate[1]",is(5)))
-                        .andExpect(jsonPath("$[0].birthDate[2]",is(4)))
-                        .andExpect(jsonPath("$[0].position", is("DoctorA_Position")));
+                        .andExpect(jsonPath("$").isArray())
+                        .andExpect(jsonPath("$[0].id").value(1))
+                        .andExpect(jsonPath("$[0].firstName").value("DoctorA_Name"))
+                        .andExpect(jsonPath("$[0].lastName").value("DoctorA_LastName"))
+                        .andExpect(jsonPath("$[0].patronymic").value("DoctorA_Patronymic"))
+                        .andExpect(jsonPath("$[0].phoneNumber").value("380123455789"))
+                        .andExpect(jsonPath("$[0].birthDate[0]").value(1991))
+                        .andExpect(jsonPath("$[0].birthDate[1]").value(5))
+                        .andExpect(jsonPath("$[0].birthDate[2]").value(4))
+                        .andExpect(jsonPath("$[0].position").value("DoctorA_Position"));
     }
 
 }
