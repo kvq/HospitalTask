@@ -13,24 +13,18 @@ import java.util.Arrays;
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.service.PatientService;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(PatientController.class)
 class PatientControllerTest {
-    private MockMvc mockMvc;
-    @Mock
+    @MockBean
     PatientService patientService;
-
-    @BeforeEach
-    void prepareController(){
-        mockMvc = MockMvcBuilders.standaloneSetup(new PatientController(patientService)).build();
-    }
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     @DisplayName("Valid Json POST /patient/add. Expects HTTP OK, checks if returned Json values are correct")
@@ -53,15 +47,15 @@ class PatientControllerTest {
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(1))
-                .andExpect(jsonPath("firstName").value("First_Name"))
-                .andExpect(jsonPath("lastName").value("Second_name"))
-                .andExpect(jsonPath("patronymic").value("Patronymic"))
-                .andExpect(jsonPath("phoneNumber").value("381234567890"))
-                .andExpect(jsonPath("birthDate[0]").value(2001))
-                .andExpect(jsonPath("birthDate[1]").value(2))
-                .andExpect(jsonPath("birthDate[2]").value(3))
-                .andExpect(jsonPath("doctor").value(3));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.firstName").value("First_Name"))
+                .andExpect(jsonPath("$.lastName").value("Second_name"))
+                .andExpect(jsonPath("$.patronymic").value("Patronymic"))
+                .andExpect(jsonPath("$.phoneNumber").value("381234567890"))
+                .andExpect(jsonPath("$.birthDate[0]").value(2001))
+                .andExpect(jsonPath("$.birthDate[1]").value(2))
+                .andExpect(jsonPath("$.birthDate[2]").value(3))
+                .andExpect(jsonPath("$.doctor").value(3));
     }
 
     @Test
@@ -87,15 +81,15 @@ class PatientControllerTest {
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(1))
-                .andExpect(jsonPath("firstName").value("Different_Name"))
-                .andExpect(jsonPath("lastName").value("Second_name"))
-                .andExpect(jsonPath("patronymic").value("Patronymic"))
-                .andExpect(jsonPath("phoneNumber").value("381234567890"))
-                .andExpect(jsonPath("birthDate[0]").value(2000))
-                .andExpect(jsonPath("birthDate[1]").value(1))
-                .andExpect(jsonPath("birthDate[2]").value(2))
-                .andExpect(jsonPath("doctor").value(3));;
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.firstName").value("Different_Name"))
+                .andExpect(jsonPath("$.lastName").value("Second_name"))
+                .andExpect(jsonPath("$.patronymic").value("Patronymic"))
+                .andExpect(jsonPath("$.phoneNumber").value("381234567890"))
+                .andExpect(jsonPath("$.birthDate[0]").value(2000))
+                .andExpect(jsonPath("$.birthDate[1]").value(1))
+                .andExpect(jsonPath("$.birthDate[2]").value(2))
+                .andExpect(jsonPath("$.doctor").value(3));;
     }
 
     @Test

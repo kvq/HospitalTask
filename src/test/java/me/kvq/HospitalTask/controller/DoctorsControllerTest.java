@@ -12,26 +12,21 @@ import static org.mockito.Mockito.when;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.service.DoctorService;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(DoctorController.class)
 class DoctorsControllerTest {
-    @Mock
+    @MockBean
     DoctorService doctorService;
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeEach
-    void prepareController(){
-        mockMvc = MockMvcBuilders.standaloneSetup(new DoctorController(doctorService)).build();
-    }
 
     @Test
     @DisplayName("Valid Json POST /doctor/add. Expects HTTP OK, checks if returned Json values are correct")
@@ -54,14 +49,14 @@ class DoctorsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("id").value(1))
-                        .andExpect(jsonPath("firstName").value("First_Name"))
-                        .andExpect(jsonPath("lastName").value("Second_name"))
-                        .andExpect(jsonPath("patronymic").value("Patronymic"))
-                        .andExpect(jsonPath("phoneNumber").value("381234567890"))
-                        .andExpect(jsonPath("birthDate[0]").value(2000))
-                        .andExpect(jsonPath("birthDate[1]").value(1))
-                        .andExpect(jsonPath("birthDate[2]").value(2))
-                        .andExpect(jsonPath("position").value("Position"));
+                        .andExpect(jsonPath("$.firstName").value("First_Name"))
+                        .andExpect(jsonPath("$.lastName").value("Second_name"))
+                        .andExpect(jsonPath("$.patronymic").value("Patronymic"))
+                        .andExpect(jsonPath("$.phoneNumber").value("381234567890"))
+                        .andExpect(jsonPath("$.birthDate[0]").value(2000))
+                        .andExpect(jsonPath("$.birthDate[1]").value(1))
+                        .andExpect(jsonPath("$.birthDate[2]").value(2))
+                        .andExpect(jsonPath("$.position").value("Position"));
     }
 
     @Test
@@ -92,15 +87,15 @@ class DoctorsControllerTest {
                         + "\"birthDate\":[2001,2,3],"
                         + "\"phoneNumber\":\"381234567891\","
                         + "\"position\":\"Position2\"}"))
-                       .andExpect(jsonPath("id").value(1))
-                        .andExpect(jsonPath("firstName").value("First_NewName"))
-                        .andExpect(jsonPath("lastName").value("Second_NewName"))
-                        .andExpect(jsonPath("patronymic").value("Patronymic"))
-                        .andExpect(jsonPath("phoneNumber").value("381234567891"))
-                        .andExpect(jsonPath("birthDate[0]").value(2001))
-                        .andExpect(jsonPath("birthDate[1]").value(2))
-                        .andExpect(jsonPath("birthDate[2]").value(3))
-                        .andExpect(jsonPath("position").value("Position2"));
+                       .andExpect(jsonPath("$.id").value(1))
+                        .andExpect(jsonPath("$.firstName").value("First_NewName"))
+                        .andExpect(jsonPath("$.lastName").value("Second_NewName"))
+                        .andExpect(jsonPath("$.patronymic").value("Patronymic"))
+                        .andExpect(jsonPath("$.phoneNumber").value("381234567891"))
+                        .andExpect(jsonPath("$.birthDate[0]").value(2001))
+                        .andExpect(jsonPath("$.birthDate[1]").value(2))
+                        .andExpect(jsonPath("$.birthDate[2]").value(3))
+                        .andExpect(jsonPath("$.position").value("Position2"));
     }
 
     @Test
