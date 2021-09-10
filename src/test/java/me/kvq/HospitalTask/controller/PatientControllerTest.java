@@ -1,25 +1,22 @@
 package me.kvq.HospitalTask.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import me.kvq.HospitalTask.dto.DoctorDto;
+import java.util.Arrays;
 import me.kvq.HospitalTask.dto.PatientDto;
-
 import me.kvq.HospitalTask.service.PatientService;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -28,143 +25,112 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PatientControllerTest {
-
     private MockMvc mockMvc;
+    @Mock
     PatientService patientService;
-
-    List<PatientDto> list;
-    HashMap<Long, PatientDto> storage;
-
-    @BeforeAll
-    void mockOverridesPrepare(){
-        patientService = mock(PatientService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new PatientController(patientService)).build();
-
-        when(patientService.get(anyLong())).thenAnswer(invocation -> servicePatientGet(invocation.getArgument(0,Long.class)));
-        when(patientService.add(any(PatientDto.class))).thenAnswer(invocation -> servicePatientAdd(invocation.getArgument(0,PatientDto.class)));
-        when(patientService.delete(anyLong())).thenAnswer(invocation -> serviceDelete(invocation.getArgument(0,Long.class)));
-        when(patientService.getList()).thenAnswer(invocation -> servicePatientGetList());
-        when(patientService.update(anyLong(),any(PatientDto.class))).thenAnswer(
-                invocation -> servicePatientUpdate(invocation.getArgument(0,Long.class),
-                        invocation.getArgument(1,PatientDto.class)));
-
-    }
 
     @BeforeEach
     void setupService(){
-        storage = new HashMap<>();
-    }
-
-    PatientDto servicePatientAdd(PatientDto dto){
-        storage.put(dto.getId(),dto);
-        return dto;
-    }
-
-    PatientDto servicePatientGet(long id){
-        return storage.get(id);
-    }
-
-    List<PatientDto> servicePatientGetList(){
-        return new ArrayList<>(storage.values());
-    }
-
-    boolean serviceDelete(long id){
-        boolean exists = storage.remove(id) != null;
-        if (exists) return true;
-
-        throw new NoSuchElementException("User does not exists");
-    }
-
-    PatientDto servicePatientUpdate(long id, PatientDto dto){
-        storage.put(id,dto);
-        return dto;
+        mockMvc = MockMvcBuilders.standaloneSetup(new PatientController(patientService)).build();
     }
 
     @Test
-    @DisplayName("Valid Json PatientDto POST /patient/add. Expects HTTP OK, checks service list size")
+    @DisplayName("Valid Json POST /patient/add. Expects HTTP OK, checks if returned Json values are correct")
     void addPatientJsonRequestResponseCheckTest() throws Exception {
-        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
-                LocalDate.of(1990,2,15),
-                "380123856789","DoctorB_Position");
-
-        assertEquals(0, servicePatientGetList().size(),"Service supposed to be empty when test starts");
-        long doctorId = testDoctorDto.getId();
+        long testDoctorId = 3;
         String patientJson = "{\"firstName\":\"First_Name\","
                 + "\"lastName\":\"Second_name\","
-                + "\"fathersName\":\"Fathers_Name\","
-                + "\"birthDate\":[2000,1,1],"
+                + "\"patronymic\":\"Patronymic\","
+                + "\"birthDate\":[2001,2,3],"
                 + "\"phoneNumber\":\"381234567890\","
-                + "\"doctor\":" + doctorId + "}";
+                + "\"doctor\":" + testDoctorId + "}";
+
+        when(patientService.add(any(PatientDto.class))).thenAnswer(invocation -> {
+                    PatientDto dto = invocation.getArgument(0,PatientDto.class);
+                    dto.setId(1);
+                    return dto;
+        });
 
         mockMvc.perform(post("/patient/add")
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        assertEquals(1, servicePatientGetList().size(),"Doctor wasn't added to service");
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", not(0)))
+                .andExpect(jsonPath("firstName", is("First_Name")))
+                .andExpect(jsonPath("lastName", is("Second_name")))
+                .andExpect(jsonPath("patronymic", is("Patronymic")))
+                .andExpect(jsonPath("phoneNumber", is("381234567890")))
+                .andExpect(jsonPath("birthDate[0]",is(2001)))
+                .andExpect(jsonPath("birthDate[1]",is(2)))
+                .andExpect(jsonPath("birthDate[2]",is(3)))
+                .andExpect(jsonPath("doctor", is(3)));;
     }
 
     @Test
-    @DisplayName("Valid Json PatientDto PATCH /patient/edit. Expects HTTP OK, checks service data change")
+    @DisplayName("Valid Json PATCH /patient/edit. Expects HTTP OK, checks if returned Json values are correct")
     void patchPatientJsonRequestResponseCheckTest() throws Exception {
-        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
-                LocalDate.of(1990,2,15),
-                "380123856789","DoctorB_Position");
-        PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789", testDoctorDto.getId());
-        servicePatientAdd(testPatientDto);
-
-        long id = testPatientDto.getId();
-        long doctorId = testDoctorDto.getId();
+        long testDoctorId = 3;
+        long testPatientId = 1;
         String patientJson = "{\"firstName\":\"Different_Name\","
                 + "\"lastName\":\"Second_name\","
-                + "\"fathersName\":\"Fathers_Name\","
-                + "\"birthDate\":[2000,1,1],"
+                + "\"patronymic\":\"Patronymic\","
+                + "\"birthDate\":[2000,1,2],"
                 + "\"phoneNumber\":\"381234567890\","
-                + "\"doctor\":" + doctorId + "}";
+                + "\"doctor\":" + testDoctorId + "}";
 
-        mockMvc.perform(patch("/patient/edit/" + id)
+        when(patientService.update(eq(1L),any(PatientDto.class))).thenAnswer(invocation -> {
+                    long dtoid = invocation.getArgument(0,Long.class);
+                    PatientDto dto = invocation.getArgument(1,PatientDto.class);
+                    dto.setId(dtoid);
+                    return dto;
+        });
+
+        mockMvc.perform(patch("/patient/edit/" + testPatientId)
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        assertEquals("Different_Name", servicePatientGet(testPatientDto.getId()).getFirstName());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", is(1)))
+                .andExpect(jsonPath("firstName", is("Different_Name")))
+                .andExpect(jsonPath("lastName", is("Second_name")))
+                .andExpect(jsonPath("patronymic", is("Patronymic")))
+                .andExpect(jsonPath("phoneNumber", is("381234567890")))
+                .andExpect(jsonPath("birthDate[0]",is(2000)))
+                .andExpect(jsonPath("birthDate[1]",is(1)))
+                .andExpect(jsonPath("birthDate[2]",is(2)))
+                .andExpect(jsonPath("doctor", is(3)));;
     }
 
     @Test
-    @DisplayName("Request DELETE /patient/delete. Expects HTTP OK, checks if user no longer exists")
+    @DisplayName("Request DELETE /patient/delete. Expects HTTP OK")
     void deletePatientByIdResponseCheckTest() throws Exception {
-        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
-                LocalDate.of(1990,2,15),
-                "380123856789","DoctorB_Position");
-        PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789", testDoctorDto.getId());
-        servicePatientAdd(testPatientDto);
-
-        long id = testPatientDto.getId();
-        mockMvc.perform(delete("/patient/delete/" + id))
+        long testPatientId = 1;
+        when(patientService.delete(1L)).thenReturn(true);
+        mockMvc.perform(delete("/patient/delete/" + testPatientId))
                 .andExpect(status().isOk());
-
-        assertTrue(servicePatientGet(id) == null);
     }
 
     @Test
-    @DisplayName("Request GET /patient/list. Expects HTTP OK")
+    @DisplayName("Request GET /patient/list. Expects HTTP OK and checking Json list values")
     void getListOfPatientsResponseCheckTest() throws Exception {
-        DoctorDto testDoctorDto = new DoctorDto(3,"DoctorB_Name","DoctorB_LastName", "DoctorB_Patronymic",
-                LocalDate.of(1990,2,15),
-                "380123856789","DoctorB_Position");
         PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991,5,4),
-                "380123455789", testDoctorDto.getId());
-        servicePatientAdd(testPatientDto);
+                "380123455789", 3);
+
+        when(patientService.getList()).thenReturn(Arrays.asList(testPatientDto));
 
         mockMvc.perform(get("/patient/list"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].firstName", is("PatientA_Name")))
+                .andExpect(jsonPath("$[0].lastName", is("PatientA_LastName")))
+                .andExpect(jsonPath("$[0].patronymic", is("PatientA_Patronymic")))
+                .andExpect(jsonPath("$[0].phoneNumber", is("380123455789")))
+                .andExpect(jsonPath("$[0].birthDate[0]",is(1991)))
+                .andExpect(jsonPath("$[0].birthDate[1]",is(5)))
+                .andExpect(jsonPath("$[0].birthDate[2]",is(4)))
+                .andExpect(jsonPath("$[0].doctor", is(3)));;
     }
 
 }
