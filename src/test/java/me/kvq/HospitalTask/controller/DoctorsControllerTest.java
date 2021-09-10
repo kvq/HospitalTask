@@ -32,7 +32,7 @@ class DoctorsControllerTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    void setupService(){
+    void prepareController(){
         mockMvc = MockMvcBuilders.standaloneSetup(new DoctorController(doctorService)).build();
     }
 

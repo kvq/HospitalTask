@@ -91,7 +91,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("(getList) expected to return 2 Dto users, then compare fields to origin entities")
+    @DisplayName("(getList) expected to return 2 Dtos, then compare fields to origin entities")
     void serviceGetDoctorListTest(){
         Doctor testDoctorA = new Doctor(1,
                 "DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",

@@ -31,7 +31,7 @@ class PatientControllerTest {
     PatientService patientService;
 
     @BeforeEach
-    void setupService(){
+    void prepareController(){
         mockMvc = MockMvcBuilders.standaloneSetup(new PatientController(patientService)).build();
     }
 
