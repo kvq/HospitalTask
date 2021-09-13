@@ -4,8 +4,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.Mockito.when;
 
@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 
@@ -81,13 +80,7 @@ class DoctorsControllerTest {
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
-                .andExpect(content().json("{\"firstName\":\"First_NewName\","
-                        + "\"lastName\":\"Second_NewName\","
-                        + "\"patronymic\":\"Patronymic\","
-                        + "\"birthDate\":[2001,2,3],"
-                        + "\"phoneNumber\":\"381234567891\","
-                        + "\"position\":\"Position2\"}"))
-                       .andExpect(jsonPath("$.id").value(1))
+                        .andExpect(jsonPath("$.id").value(1))
                         .andExpect(jsonPath("$.firstName").value("First_NewName"))
                         .andExpect(jsonPath("$.lastName").value("Second_NewName"))
                         .andExpect(jsonPath("$.patronymic").value("Patronymic"))
