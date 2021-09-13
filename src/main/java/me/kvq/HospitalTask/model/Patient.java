@@ -32,7 +32,7 @@ public class Patient {
         this.patronymic = patronymic;
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
-
+        this.doctor = doctor;
     }
 
     public Doctor getDoctor() {

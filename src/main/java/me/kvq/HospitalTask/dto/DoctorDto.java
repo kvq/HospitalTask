@@ -83,4 +83,5 @@ public class DoctorDto {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
 }
