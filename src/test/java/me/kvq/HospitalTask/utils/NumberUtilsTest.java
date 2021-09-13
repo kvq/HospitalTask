@@ -28,7 +28,7 @@ class NumberUtilsTest {
         assertEquals("380444618061", number);
     }
 
-    @Test()
+    @Test
     @DisplayName("Invalid Landline Number Parsing, expecting exception")
     void invalidLandlineParseTest() {
         assertThrows(IllegalArgumentException.class, () -> PhoneNumberUtils.fixPhoneNumber("+04423343242382"));

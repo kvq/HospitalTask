@@ -6,16 +6,21 @@ import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.model.Doctor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+@SpringBootTest
 public class DoctorMapperTest {
-    DoctorMapper mapper = new DoctorMapper();
+    @Autowired
+    DoctorMapper mapper;
 
     @Test
     @DisplayName("(entityToDto) passes Doctor, compare returned Dto fields")
-    void testMappingEntityToDto(){
+    void mappingEntityToDtoTest(){
         Doctor testDoctor = new Doctor(1,
                 "DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
@@ -33,7 +38,7 @@ public class DoctorMapperTest {
 
     @Test
     @DisplayName("(dtoToEntity) passes Id & DoctorDto, compare returned Dto fields")
-    void testMappingDtoToEntity(){
+    void mappingDtoToEntityTest(){
         DoctorDto testDoctorDto = new DoctorDto(1,
                 "DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
@@ -51,7 +56,7 @@ public class DoctorMapperTest {
 
     @Test
     @DisplayName("(entityListToDtoList) passes Doctor list, checks returned list size & compare Dtos")
-    void testMappingEntityListToDtoList(){
+    void mappingEntityListToDtoListTest(){
         Doctor testDoctorA = new Doctor(1,
                 "DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),

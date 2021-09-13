@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.service.PatientService;
 import org.junit.jupiter.api.*;
@@ -36,12 +37,11 @@ class PatientControllerTest {
                 + "\"birthDate\":[2001,2,3],"
                 + "\"phoneNumber\":\"381234567890\","
                 + "\"doctor\":" + testDoctorId + "}";
+        PatientDto dto = new PatientDto(1,
+                "First_Name", "Second_name", "Patronymic", LocalDate.of(2001,2,3),
+                "381234567890", testDoctorId);
 
-        when(patientService.add(any(PatientDto.class))).thenAnswer(invocation -> {
-                    PatientDto dto = invocation.getArgument(0,PatientDto.class);
-                    dto.setId(1);
-                    return dto;
-        });
+        when(patientService.add(any(PatientDto.class))).thenReturn(dto);
 
         mockMvc.perform(post("/patient/add")
                         .content(patientJson)
@@ -55,7 +55,8 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.birthDate[0]").value(2001))
                 .andExpect(jsonPath("$.birthDate[1]").value(2))
                 .andExpect(jsonPath("$.birthDate[2]").value(3))
-                .andExpect(jsonPath("$.doctor").value(3));
+                .andExpect(jsonPath("$.doctor").value(testDoctorId));
+        verify(patientService, times(1)).add(any());
     }
 
     @Test
@@ -69,19 +70,17 @@ class PatientControllerTest {
                 + "\"birthDate\":[2000,1,2],"
                 + "\"phoneNumber\":\"381234567890\","
                 + "\"doctor\":" + testDoctorId + "}";
+        PatientDto dto = new PatientDto(testPatientId,
+                "Different_Name", "Second_name", "Patronymic", LocalDate.of(2000,1,2),
+                "381234567890", testDoctorId);
 
-        when(patientService.update(eq(1L),any(PatientDto.class))).thenAnswer(invocation -> {
-                    long dtoid = invocation.getArgument(0,Long.class);
-                    PatientDto dto = invocation.getArgument(1,PatientDto.class);
-                    dto.setId(dtoid);
-                    return dto;
-        });
+        when(patientService.update(eq(testPatientId),any(PatientDto.class))).thenReturn(dto);
 
         mockMvc.perform(patch("/patient/edit/" + testPatientId)
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(testPatientId))
                 .andExpect(jsonPath("$.firstName").value("Different_Name"))
                 .andExpect(jsonPath("$.lastName").value("Second_name"))
                 .andExpect(jsonPath("$.patronymic").value("Patronymic"))
@@ -89,24 +88,27 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.birthDate[0]").value(2000))
                 .andExpect(jsonPath("$.birthDate[1]").value(1))
                 .andExpect(jsonPath("$.birthDate[2]").value(2))
-                .andExpect(jsonPath("$.doctor").value(3));;
+                .andExpect(jsonPath("$.doctor").value(3));
+        verify(patientService, times(1)).update(anyLong(),any(PatientDto.class));
     }
 
     @Test
     @DisplayName("Request DELETE /patient/delete. Expects HTTP OK")
     void deletePatientByIdResponseCheckTest() throws Exception {
         long testPatientId = 1;
-        when(patientService.delete(1L)).thenReturn(true);
+        when(patientService.delete(testPatientId)).thenReturn(true);
         mockMvc.perform(delete("/patient/delete/" + testPatientId))
                 .andExpect(status().isOk());
+        verify(patientService, times(1)).delete(testPatientId);
     }
 
     @Test
     @DisplayName("Request GET /patient/list. Expects HTTP OK and checking Json list values")
     void getListOfPatientsResponseCheckTest() throws Exception {
+        long testDoctorId = 3;
         PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991,5,4),
-                "380123455789", 3);
+                "380123455789", testDoctorId);
 
         when(patientService.getList()).thenReturn(Arrays.asList(testPatientDto));
 
@@ -121,7 +123,8 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$[0].birthDate[0]").value(1991))
                 .andExpect(jsonPath("$[0].birthDate[1]").value(5))
                 .andExpect(jsonPath("$[0].birthDate[2]").value(4))
-                .andExpect(jsonPath("$[0].doctor").value(3));;
+                .andExpect(jsonPath("$[0].doctor").value(testDoctorId));
+        verify(patientService, times(1)).getList();
     }
 
 }

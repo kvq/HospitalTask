@@ -11,42 +11,40 @@ import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest
 class PatientServiceTest {
-    @Mock
+    @MockBean
     PatientDao patientDao;
-    @Mock
+    @MockBean
     DoctorDao doctorDao;
+    @Autowired
+    PatientMapper mapper;
+    @Autowired
     PatientService service;
-
-    @BeforeEach
-    void prepareData(){
-        PatientMapper patientMapper = new PatientMapper(doctorDao);
-        service = new PatientService(patientDao,patientMapper);
-    }
 
     @Test
     @DisplayName("(add) Pass Valid Dto, then compare return Dto to passed, and checks id not same")
-    void serviceAddNewValidPatientTest(){
+    void addNewValidPatientTest(){
         Doctor testDoctor = new Doctor(3,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789","DoctorA_Position");
         PatientDto testingPatient = new PatientDto(0,"Name", "LastName", "Patronymic",
                 LocalDate.of(1999,10,2),
                 "380123456789", testDoctor.getId());
+        Patient testDaoPatient = new Patient(1,"Name", "LastName", "Patronymic",
+                LocalDate.of(1999,10,2),
+                "380123456789", testDoctor);
 
         when(doctorDao.getById(3L)).thenReturn(testDoctor);
-        when(patientDao.save(any(Patient.class))).thenAnswer(invocation -> {
-            Patient patient = invocation.getArgument(0,Patient.class);
-            patient.setId(1);
-            return patient;
-        });
+        when(patientDao.save(any(Patient.class))).thenReturn(testDaoPatient);
 
         PatientDto returnedDto = service.add(testingPatient);
         assertNotNull(returnedDto,"Dto returned by service is null");
@@ -57,23 +55,29 @@ class PatientServiceTest {
         assertEquals(testingPatient.getBirthDate(),returnedDto.getBirthDate());
         assertEquals(testingPatient.getPhoneNumber(),returnedDto.getPhoneNumber());
         assertEquals(testingPatient.getDoctor(),testDoctor.getId());
+        verify(doctorDao, times(1)).getById(anyLong());
+        verify(patientDao,times(1)).save(any(Patient.class));
     }
 
     @Test
     @DisplayName("(update) Pass Id & Dto, then compare return Dto to passed")
-    void serviceUpdateExistingPatientByIdWithValidDataTest(){
-        Doctor testDoctor = new Doctor(3,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
+    void updateExistingPatientByIdWithValidDataTest(){
+        Doctor testDoctor = new Doctor(3,
+                "DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789","DoctorA_Position");
-        PatientDto testPatient = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+        PatientDto testPatient = new PatientDto(1,
+                "PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991,5,4),
                 "380123455789",testDoctor.getId());
+        Patient testDaoPatient = new Patient(1,
+                "PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991,5,4),
+                "380123455789",testDoctor);
 
         when(doctorDao.getById(3L)).thenReturn(testDoctor);
         when(patientDao.existsById(1L)).thenReturn(true);
-        when(patientDao.save(any(Patient.class))).thenAnswer(invocation -> {
-            return invocation.getArgument(0,Patient.class);
-        });
+        when(patientDao.save(any(Patient.class))).thenReturn(testDaoPatient);
 
         PatientDto returnedPatient = service.update(testPatient.getId(),testPatient);
         assertNotNull(returnedPatient, "Dto returned by service is null");
@@ -84,47 +88,45 @@ class PatientServiceTest {
         assertEquals(testPatient.getBirthDate(),returnedPatient.getBirthDate());
         assertEquals(testPatient.getPhoneNumber(),returnedPatient.getPhoneNumber());
         assertEquals(testPatient.getDoctor(),returnedPatient.getDoctor());
+        verify(doctorDao, times(1)).getById(anyLong());
+        verify(patientDao, times(1)).existsById(anyLong());
+        verify(patientDao,times(1)).save(any(Patient.class));
     }
 
     @Test
     @DisplayName("(delete) Pass Id, expected to return true")
-    void serviceDeleteExistingPatientByIdTest(){
-        Patient testPatient = new Patient(1,
-                "PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789",null);
-        doNothing().when(patientDao).deleteById(1L);
-        when(patientDao.existsById(1L)).thenReturn(true);
+    void deleteExistingPatientByIdTest(){
+        long testPatientId = 1;
+        doNothing().when(patientDao).deleteById(testPatientId);
+        when(patientDao.existsById(testPatientId)).thenReturn(true);
 
-        assertTrue(service.delete(testPatient.getId()), "Patient wasn't deleted");
+        assertTrue(service.delete(testPatientId));
+        verify(patientDao, times(1)).existsById(anyLong());
     }
 
     @Test
     @DisplayName("(getList) expected to return 2 Dtos, then compare fields to origin entities")
-    void serviceGetPatientListTest(){
-        Doctor testDoctor = new Doctor(3,
-                "DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
-                LocalDate.of(1991,5,4),
-                "380123455789","DoctorA_Position");
+    void detPatientListTest(){
+
         Patient testPatientA = new Patient(1,
                 "PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991,5,4),
-                "380123455789",testDoctor);
+                "380123455789",null);
         Patient testPatientB = new Patient(2,
                 "PatientB_Name","PatientB_LastName", "PatientB_Patronymic",
                 LocalDate.of(1990,2,15),
-                "380123856789",testDoctor);
+                "380123856789",null);
         List<Patient> testPatientList = Arrays.asList(testPatientA,testPatientB);
 
-        when(doctorDao.getById(3L)).thenReturn(testDoctor);
+
         when(patientDao.findAll()).thenReturn(testPatientList);
 
         List<PatientDto> returnedPatientDtoList = service.getList();
         assertEquals(2, returnedPatientDtoList.size(),"Expected 2 patients to be returned");
 
-        for (int i = 0; i < returnedPatientDtoList.size(); i++){
-            PatientDto returnedPatientDto = returnedPatientDtoList.get(i);
-            Patient testPatient = testPatientList.get(i);
+        for (int index = 0; index < returnedPatientDtoList.size(); index++){
+            PatientDto returnedPatientDto = returnedPatientDtoList.get(index);
+            Patient testPatient = testPatientList.get(index);
             assertNotNull(returnedPatientDto);
             assertEquals(testPatient.getId(),returnedPatientDto.getId());
             assertEquals(testPatient.getFirstName(),returnedPatientDto.getFirstName());
@@ -132,13 +134,13 @@ class PatientServiceTest {
             assertEquals(testPatient.getPatronymic(),returnedPatientDto.getPatronymic());
             assertEquals(testPatient.getBirthDate(),returnedPatientDto.getBirthDate());
             assertEquals(testPatient.getPhoneNumber(),returnedPatientDto.getPhoneNumber());
-            assertEquals(testPatient.getDoctor().getId(),returnedPatientDto.getDoctor());
         }
+        verify(patientDao,times(1)).findAll();
     }
 
     @Test
     @DisplayName("(get) Pass Id, expected to return Dto, fields compared to origin entity")
-    void serviceGetPatientByIdTest(){
+    void getPatientByIdTest(){
         Doctor testDoctor = new Doctor(3,
                 "DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991,5,4),
@@ -148,8 +150,7 @@ class PatientServiceTest {
                 LocalDate.of(1991,5,4),
                 "380123455789",testDoctor);
 
-        when(doctorDao.getById(3L)).thenReturn(testDoctor);
-        when(patientDao.getById(1L)).thenReturn(testPatient);
+        when(patientDao.getById(testPatient.getId())).thenReturn(testPatient);
 
         PatientDto returnedPatient = service.get(testPatient.getId());
         assertNotNull(returnedPatient);
@@ -160,6 +161,7 @@ class PatientServiceTest {
         assertEquals(testPatient.getBirthDate(),returnedPatient.getBirthDate());
         assertEquals(testPatient.getPhoneNumber(),returnedPatient.getPhoneNumber());
         assertEquals(testPatient.getDoctor().getId(),returnedPatient.getDoctor());
+        verify(patientDao,times(1)).getById(anyLong());
     }
 
 }

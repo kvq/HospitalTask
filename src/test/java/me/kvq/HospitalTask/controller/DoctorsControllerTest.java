@@ -1,13 +1,13 @@
 package me.kvq.HospitalTask.controller;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.Mockito.when;
 
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.service.DoctorService;
@@ -36,26 +36,27 @@ class DoctorsControllerTest {
                 + "\"birthDate\":[2000,1,2],"
                 + "\"phoneNumber\":\"381234567890\","
                 + "\"position\":\"Position\"}";
+        DoctorDto dto = new DoctorDto(1,
+                "First_Name", "Second_name", "Patronymic",
+                LocalDate.of(2000, 1, 2),
+                "381234567890", "Position");
 
-        when(doctorService.add(any(DoctorDto.class))).thenAnswer(invocation -> {
-            DoctorDto dto = invocation.getArgument(0,DoctorDto.class);
-            dto.setId(1);
-            return dto;
-        });
+        when(doctorService.add(any(DoctorDto.class))).thenReturn(dto);
 
         mockMvc.perform(post("/doctor/add")
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("id").value(1))
-                        .andExpect(jsonPath("$.firstName").value("First_Name"))
-                        .andExpect(jsonPath("$.lastName").value("Second_name"))
-                        .andExpect(jsonPath("$.patronymic").value("Patronymic"))
-                        .andExpect(jsonPath("$.phoneNumber").value("381234567890"))
-                        .andExpect(jsonPath("$.birthDate[0]").value(2000))
-                        .andExpect(jsonPath("$.birthDate[1]").value(1))
-                        .andExpect(jsonPath("$.birthDate[2]").value(2))
-                        .andExpect(jsonPath("$.position").value("Position"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(1))
+                .andExpect(jsonPath("$.firstName").value("First_Name"))
+                .andExpect(jsonPath("$.lastName").value("Second_name"))
+                .andExpect(jsonPath("$.patronymic").value("Patronymic"))
+                .andExpect(jsonPath("$.phoneNumber").value("381234567890"))
+                .andExpect(jsonPath("$.birthDate[0]").value(2000))
+                .andExpect(jsonPath("$.birthDate[1]").value(1))
+                .andExpect(jsonPath("$.birthDate[2]").value(2))
+                .andExpect(jsonPath("$.position").value("Position"));
+        verify(doctorService, times(1)).add(any(DoctorDto.class));
     }
 
     @Test
@@ -68,13 +69,12 @@ class DoctorsControllerTest {
                 + "\"birthDate\":[2001,2,3],"
                 + "\"phoneNumber\":\"381234567891\","
                 + "\"position\":\"Position2\"}";
+        DoctorDto dto = new DoctorDto(1,
+                "First_NewName","Second_NewName","Patronymic",
+                LocalDate.of(2001,2,3),
+                "381234567891","Position2");
 
-        when(doctorService.update(eq(1L),any(DoctorDto.class))).thenAnswer(invocation -> {
-                    long dtoid = invocation.getArgument(0,Long.class);
-                    DoctorDto dto = invocation.getArgument(1,DoctorDto.class);
-                    dto.setId(dtoid);
-                    return dto;
-        });
+        when(doctorService.update(eq(1L),any(DoctorDto.class))).thenReturn(dto);
 
         mockMvc.perform(patch("/doctor/edit/" + id)
                         .content(doctorJson)
@@ -89,6 +89,7 @@ class DoctorsControllerTest {
                         .andExpect(jsonPath("$.birthDate[1]").value(2))
                         .andExpect(jsonPath("$.birthDate[2]").value(3))
                         .andExpect(jsonPath("$.position").value("Position2"));
+        verify(doctorService, times(1)).update(anyLong(),any(DoctorDto.class));
     }
 
     @Test
@@ -98,6 +99,8 @@ class DoctorsControllerTest {
         when(doctorService.delete(id)).thenReturn(true);
         mockMvc.perform(delete("/doctor/delete/" + id))
                         .andExpect(status().isOk());
+
+        verify(doctorService,times(1)).delete(anyLong());
     }
 
     @Test
@@ -121,6 +124,7 @@ class DoctorsControllerTest {
                         .andExpect(jsonPath("$[0].birthDate[1]").value(5))
                         .andExpect(jsonPath("$[0].birthDate[2]").value(4))
                         .andExpect(jsonPath("$[0].position").value("DoctorA_Position"));
+        verify(doctorService,times(1)).getList();
     }
 
 }
