@@ -69,18 +69,18 @@ class DoctorsControllerTest {
                 + "\"birthDate\":[2001,2,3],"
                 + "\"phoneNumber\":\"381234567891\","
                 + "\"position\":\"Position2\"}";
-        DoctorDto dto = new DoctorDto(1,
+        DoctorDto dto = new DoctorDto(id,
                 "First_NewName","Second_NewName","Patronymic",
                 LocalDate.of(2001,2,3),
                 "381234567891","Position2");
 
-        when(doctorService.update(eq(1L),any(DoctorDto.class))).thenReturn(dto);
+        when(doctorService.update(eq(id),any(DoctorDto.class))).thenReturn(dto);
 
         mockMvc.perform(patch("/doctor/edit/" + id)
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.id").value(1))
+                        .andExpect(jsonPath("$.id").value(id))
                         .andExpect(jsonPath("$.firstName").value("First_NewName"))
                         .andExpect(jsonPath("$.lastName").value("Second_NewName"))
                         .andExpect(jsonPath("$.patronymic").value("Patronymic"))
