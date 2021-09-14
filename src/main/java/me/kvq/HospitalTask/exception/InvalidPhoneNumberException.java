@@ -7,4 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class InvalidPhoneNumberException extends RuntimeException{
     private String enteredValue;
+
 }

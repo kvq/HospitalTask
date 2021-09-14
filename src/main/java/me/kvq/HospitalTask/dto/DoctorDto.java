@@ -16,4 +16,5 @@ public class DoctorDto {
     private LocalDate birthDate;
     private String phoneNumber;
     private String position;
+
 }

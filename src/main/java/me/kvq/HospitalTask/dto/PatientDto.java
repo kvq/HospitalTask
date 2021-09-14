@@ -19,4 +19,5 @@ public class PatientDto {
     private LocalDate birthDate;
     private String phoneNumber;
     private long doctor;
+
 }

@@ -34,4 +34,5 @@ class NumberUtilsTest {
     void invalidLandlineParseTest() {
         assertThrows(InvalidPhoneNumberException.class, () -> PhoneNumberUtils.fixPhoneNumber("+04423343242382"));
     }
+
 }

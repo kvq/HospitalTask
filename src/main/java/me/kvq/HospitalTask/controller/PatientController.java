@@ -36,4 +36,5 @@ public class PatientController {
         service.delete(id);
         return "success";
     }
+
 }

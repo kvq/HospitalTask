@@ -22,4 +22,5 @@ public class Patient {
     private String phoneNumber;
     @ManyToOne
     private Doctor doctor;
+
 }

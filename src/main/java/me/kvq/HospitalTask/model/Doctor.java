@@ -21,4 +21,5 @@ public class Doctor{
     private LocalDate birthDate;
     private String phoneNumber;
     private String position;
+
 }
