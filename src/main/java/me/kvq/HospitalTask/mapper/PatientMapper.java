@@ -1,5 +1,6 @@
 package me.kvq.HospitalTask.mapper;
 
+import lombok.AllArgsConstructor;
 import me.kvq.HospitalTask.dao.DoctorDao;
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.model.Doctor;
@@ -10,13 +11,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class PatientMapper {
 
     private DoctorDao dao;
-
-    public PatientMapper(DoctorDao dao){
-        this.dao = dao;
-    }
 
     public PatientDto entityToDto(Patient patient) {
         long doctorId = patient.getDoctor() == null ? 0 : patient.getDoctor().getId();

@@ -1,5 +1,6 @@
 package me.kvq.HospitalTask.service;
 
+import lombok.AllArgsConstructor;
 import me.kvq.HospitalTask.exception.UserNotFoundException;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.dto.DoctorDto;
@@ -12,14 +13,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class DoctorService {
     private DoctorDao dao;
     private DoctorMapper mapper;
-
-    public DoctorService(DoctorDao dao, DoctorMapper mapper) {
-        this.dao = dao;
-        this.mapper = mapper;
-    }
 
     public DoctorDto add(DoctorDto doctorDto) {
         doctorDto.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(doctorDto.getPhoneNumber()));
