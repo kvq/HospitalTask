@@ -1,5 +1,6 @@
 package me.kvq.HospitalTask.service;
 
+import me.kvq.HospitalTask.exception.UserNotFoundException;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.mapper.DoctorMapper;
@@ -9,7 +10,6 @@ import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class DoctorService {
@@ -29,7 +29,7 @@ public class DoctorService {
 
     public DoctorDto update(long id, DoctorDto doctorDto) {
         if (!dao.existsById(id)) {
-            throw new NoSuchElementException("User does not exists");
+            throw new UserNotFoundException(id);
         }
         doctorDto.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(doctorDto.getPhoneNumber()));
         Doctor doctorEntity = dao.save(mapper.dtoToEntity(id,doctorDto));
@@ -38,7 +38,7 @@ public class DoctorService {
 
     public boolean delete(long id) {
         if (!dao.existsById(id)) {
-            throw new NoSuchElementException("User does not exists");
+            throw new UserNotFoundException(id);
         }
         dao.deleteById(id);
         return true;
@@ -52,7 +52,7 @@ public class DoctorService {
     public DoctorDto get(long id){
         Doctor entity = dao.getById(id);
         if (entity == null) {
-            throw new NoSuchElementException("User does not exists");
+            throw new UserNotFoundException(id);
         }
         return mapper.entityToDto(entity);
     }

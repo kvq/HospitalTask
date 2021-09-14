@@ -1,5 +1,6 @@
 package me.kvq.HospitalTask.utils;
 
+import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,7 @@ class NumberUtilsTest {
     @Test
     @DisplayName("Invalid Mobile Number Parsing, expecting exception")
     void invalidMobileParseTest() {
-        assertThrows(IllegalArgumentException.class, () -> PhoneNumberUtils.fixPhoneNumber("+38015152"));
+        assertThrows(InvalidPhoneNumberException.class, () -> PhoneNumberUtils.fixPhoneNumber("+38015152"));
     }
 
     @Test
@@ -31,6 +32,6 @@ class NumberUtilsTest {
     @Test
     @DisplayName("Invalid Landline Number Parsing, expecting exception")
     void invalidLandlineParseTest() {
-        assertThrows(IllegalArgumentException.class, () -> PhoneNumberUtils.fixPhoneNumber("+04423343242382"));
+        assertThrows(InvalidPhoneNumberException.class, () -> PhoneNumberUtils.fixPhoneNumber("+04423343242382"));
     }
 }
