@@ -155,7 +155,8 @@ class DoctorsControllerTest {
     @DisplayName("Invalid PATCH /doctor/edit. Expects HTTP 400, and valid error message")
     @MethodSource("getExceptions")
     void updateDoctorExceptionTest(RuntimeException exception) throws Exception {
-        long invalidId = 1L; String emptyJson = "{}";
+        long invalidId = 1L;
+        String emptyJson = "{}";
         when(doctorService.update(eq(invalidId), any(DoctorDto.class))).thenThrow(exception);
         mockMvc.perform(patch("/doctor/edit/" + invalidId)
                         .content(emptyJson)
