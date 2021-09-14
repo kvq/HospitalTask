@@ -1,11 +1,9 @@
 package me.kvq.HospitalTask.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public class InvalidPhoneNumberException extends RuntimeException{
-    private String enteredValue;
+
+    public InvalidPhoneNumberException(String invalidValue){
+        super("Number you entered (" + invalidValue + ") is invalid.");
+    }
 
 }

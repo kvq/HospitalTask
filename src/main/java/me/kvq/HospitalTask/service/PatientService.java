@@ -2,7 +2,7 @@ package me.kvq.HospitalTask.service;
 
 import lombok.AllArgsConstructor;
 import me.kvq.HospitalTask.dto.PatientDto;
-import me.kvq.HospitalTask.exception.UserNotFoundException;
+import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Patient;
 import me.kvq.HospitalTask.dao.PatientDao;
@@ -14,27 +14,31 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class PatientService{
-    private PatientDao dao;
-    private PatientMapper mapper;
+    final private PatientDao dao;
+    final private PatientMapper mapper;
 
     public PatientDto add(PatientDto patientDto) {
-        patientDto.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber()));
-        Patient patientEntity = dao.save(mapper.dtoToEntity(0,patientDto));
-        return mapper.entityToDto(patientEntity);
+        String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber());
+        patientDto.setPhoneNumber(fixedPhoneNumber);
+        Patient patient = mapper.dtoToEntity(0,patientDto);
+        Patient returnPatient = dao.save(patient);
+        return mapper.entityToDto(returnPatient);
     }
 
     public PatientDto update(long id, PatientDto patientDto) {
         if (!dao.existsById(id)) {
-            throw new UserNotFoundException(id);
+            throw new NotFoundException("No patient found by that Id");
         }
-        patientDto.setPhoneNumber(PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber()));
-        Patient returnedPatient = dao.save(mapper.dtoToEntity(id,patientDto));
-        return mapper.entityToDto(returnedPatient);
+        String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber());
+        patientDto.setPhoneNumber(fixedPhoneNumber);
+        Patient patient = mapper.dtoToEntity(id,patientDto);
+        Patient returnPatient = dao.save(patient);
+        return mapper.entityToDto(returnPatient);
     }
 
     public boolean delete(long id) {
         if (!dao.existsById(id)) {
-            throw new UserNotFoundException(id);
+            throw new NotFoundException("No patient found by that Id");
         }
         dao.deleteById(id);
         return true;
@@ -49,7 +53,7 @@ public class PatientService{
     public PatientDto get(long id){
         Patient entity = dao.getById(id);
         if (entity == null) {
-            throw new UserNotFoundException(id);
+            throw new NotFoundException("No patient found by that Id");
         }
         return mapper.entityToDto(entity);
     }

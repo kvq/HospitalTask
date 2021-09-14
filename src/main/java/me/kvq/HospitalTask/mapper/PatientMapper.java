@@ -13,8 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class PatientMapper {
-
-    private DoctorDao dao;
+    final private DoctorDao dao;
 
     public PatientDto entityToDto(Patient patient) {
         long doctorId = patient.getDoctor() == null ? 0 : patient.getDoctor().getId();

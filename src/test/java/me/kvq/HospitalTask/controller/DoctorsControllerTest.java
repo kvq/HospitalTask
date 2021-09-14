@@ -10,8 +10,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
+import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.service.DoctorService;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 @WebMvcTest(DoctorController.class)
 class DoctorsControllerTest {
@@ -125,6 +131,52 @@ class DoctorsControllerTest {
                         .andExpect(jsonPath("$[0].birthDate[2]").value(4))
                         .andExpect(jsonPath("$[0].position").value("DoctorA_Position"));
         verify(doctorService,times(1)).getList();
+    }
+
+    public static Stream<Arguments> getExceptions(){
+        return Stream.of(
+                Arguments.of(new InvalidPhoneNumberException("12345")),
+                Arguments.of(new NotFoundException("No doctor found by that id")));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Invalid DELETE /doctor/delete. Expects HTTP 400, and valid error message")
+    @MethodSource("getExceptions")
+    void deleteDoctorExceptionTest(RuntimeException exception) throws Exception {
+        long invalidId = 1L;
+        when(doctorService.delete(invalidId)).thenThrow(exception);
+        mockMvc.perform(delete("/doctor/delete/" + invalidId))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value(exception.getMessage()));
+        verify(doctorService,times(1)).delete(anyLong());
+    }
+
+    @ParameterizedTest
+    @DisplayName("Invalid PATCH /doctor/edit. Expects HTTP 400, and valid error message")
+    @MethodSource("getExceptions")
+    void updateDoctorExceptionTest(RuntimeException exception) throws Exception {
+        long invalidId = 1L; String emptyJson = "{}";
+        when(doctorService.update(eq(invalidId), any(DoctorDto.class))).thenThrow(exception);
+        mockMvc.perform(patch("/doctor/edit/" + invalidId)
+                        .content(emptyJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value(exception.getMessage()));
+        verify(doctorService,times(1)).update(anyLong(),any(DoctorDto.class));
+    }
+
+    @Test
+    @DisplayName("Invalid POST /doctor/edit. Expects HTTP 400, and valid error message")
+    void addDoctorExceptionTest() throws Exception {
+        InvalidPhoneNumberException exception = new InvalidPhoneNumberException("12345");
+        String emptyJson = "{}";
+        when(doctorService.add(any(DoctorDto.class))).thenThrow(exception);
+        mockMvc.perform(post("/doctor/add/")
+                        .content(emptyJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value(exception.getMessage()));
+        verify(doctorService,times(1)).add(any(DoctorDto.class));
     }
 
 }

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import me.kvq.HospitalTask.dao.DoctorDao;
 import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.model.Doctor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +144,42 @@ class DoctorServiceTest {
         assertEquals(testDoctor.getPhoneNumber(),returnedDoctor.getPhoneNumber());
         assertEquals(testDoctor.getPosition(),returnedDoctor.getPosition());
         verify(doctorDao, times(1)).getById(anyLong());
+    }
+
+    @Test
+    @DisplayName("(get) Pass non existing Id, expected exception")
+    void getNonExistingDoctorById(){
+        long nonExistingId = 1L;
+
+        when(doctorDao.getById(nonExistingId)).thenReturn(null);
+        assertThrows(NotFoundException.class, () -> {
+            service.get(nonExistingId);
+        });
+        verify(doctorDao, times(1)).getById(anyLong());
+    }
+
+    @Test
+    @DisplayName("(delete) Pass non existing Id, expected exception")
+    void deleteNonExistingDoctorByIdTest(){
+        long nonExistingId = 1L;
+
+        when(doctorDao.existsById(nonExistingId)).thenReturn(false);
+        assertThrows(NotFoundException.class,() -> {
+            service.delete(nonExistingId);
+        });
+        verify(doctorDao,times(1)).existsById(anyLong());
+    }
+
+    @Test
+    @DisplayName("(update) Pass non existing Id, expected exception")
+    void updateNonExistingDoctorByIdTest(){
+        long nonExistingId = 1L;
+
+        when(doctorDao.existsById(nonExistingId)).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> {
+            service.update(nonExistingId,null);
+        });
+        verify(doctorDao,times(1)).existsById(anyLong());
     }
 
 }

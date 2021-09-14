@@ -10,10 +10,16 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import me.kvq.HospitalTask.dto.PatientDto;
+import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
+import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.service.PatientService;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -125,6 +131,52 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$[0].birthDate[2]").value(4))
                 .andExpect(jsonPath("$[0].doctor").value(testDoctorId));
         verify(patientService, times(1)).getList();
+    }
+
+    public static Stream<Arguments> getExceptions(){
+        return Stream.of(
+                Arguments.of(new InvalidPhoneNumberException("12345")),
+                Arguments.of(new NotFoundException("No patient found by that id")));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Invalid DELETE /patient/delete. Expects HTTP 400, and valid error message")
+    @MethodSource("getExceptions")
+    void deletePatientExceptionTest(RuntimeException exception) throws Exception {
+        long invalidId = 1L;
+        when(patientService.delete(invalidId)).thenThrow(exception);
+        mockMvc.perform(delete("/patient/delete/" + invalidId))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value(exception.getMessage()));
+        verify(patientService,times(1)).delete(anyLong());
+    }
+
+    @ParameterizedTest
+    @DisplayName("Invalid PATCH /patient/edit. Expects HTTP 400, and valid error message")
+    @MethodSource("getExceptions")
+    void updatePatientExceptionTest(RuntimeException exception) throws Exception {
+        long invalidId = 1L; String emptyJson = "{}";
+        when(patientService.update(eq(invalidId), any(PatientDto.class))).thenThrow(exception);
+        mockMvc.perform(patch("/patient/edit/" + invalidId)
+                        .content(emptyJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value(exception.getMessage()));
+        verify(patientService,times(1)).update(anyLong(),any(PatientDto.class));
+    }
+
+    @Test
+    @DisplayName("Invalid POST /patient/add. Expects HTTP 400, and valid error message")
+    void addPatientExceptionTest() throws Exception {
+        InvalidPhoneNumberException exception = new InvalidPhoneNumberException("12345");
+        String emptyJson = "{}";
+        when(patientService.add(any(PatientDto.class))).thenThrow(exception);
+        mockMvc.perform(post("/patient/add/")
+                        .content(emptyJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value(exception.getMessage()));
+        verify(patientService,times(1)).add(any(PatientDto.class));
     }
 
 }
