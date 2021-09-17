@@ -120,7 +120,6 @@ class PatientServiceTest {
                 "380123856789", null);
         List<Patient> testPatientList = Arrays.asList(testPatientA, testPatientB);
 
-
         when(patientDao.findAll()).thenReturn(testPatientList);
 
         List<PatientDto> returnedPatientDtoList = service.getList();
