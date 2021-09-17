@@ -1,19 +1,17 @@
 package me.kvq.HospitalTask.controller;
 
+import lombok.AllArgsConstructor;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.service.DoctorService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("doctor")
 public class DoctorController {
-    private DoctorService service;
-
-    public DoctorController(DoctorService service) {
-        this.service = service;
-    }
+    private final DoctorService service;
 
     @GetMapping("/list")
     public List<DoctorDto> getList() {

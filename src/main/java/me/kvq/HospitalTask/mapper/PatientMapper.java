@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @AllArgsConstructor
+@Service
 public class PatientMapper {
     final private DoctorDao dao;
 

@@ -59,7 +59,6 @@ public class PatientMapperTest {
                 "380123455789", 3);
 
         when(doctorDao.getById(3L)).thenReturn(testDoctor);
-
         Patient returnPatient = mapper.dtoToEntity(1, testPatientDto);
         assertEquals(returnPatient.getId(), testPatientDto.getId());
         assertEquals(returnPatient.getFirstName(), testPatientDto.getFirstName());

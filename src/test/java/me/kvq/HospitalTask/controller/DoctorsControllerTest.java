@@ -47,7 +47,6 @@ class DoctorsControllerTest {
                 "381234567890", "Position");
 
         when(doctorService.add(any(DoctorDto.class))).thenReturn(dto);
-
         mockMvc.perform(post("/doctor/add")
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -103,7 +102,6 @@ class DoctorsControllerTest {
         when(doctorService.delete(id)).thenReturn(true);
         mockMvc.perform(delete("/doctor/delete/" + id))
                 .andExpect(status().isOk());
-
         verify(doctorService, times(1)).delete(anyLong());
     }
 
@@ -115,7 +113,6 @@ class DoctorsControllerTest {
                 "380123455789", "DoctorA_Position");
 
         when(doctorService.getList()).thenReturn(Arrays.asList(testDoctorDto));
-
         mockMvc.perform(get("/doctor/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

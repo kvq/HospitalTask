@@ -79,7 +79,6 @@ class PatientControllerTest {
                 "381234567890", testDoctorId);
 
         when(patientService.update(eq(testPatientId), any(PatientDto.class))).thenReturn(dto);
-
         mockMvc.perform(patch("/patient/edit/" + testPatientId)
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -115,7 +114,6 @@ class PatientControllerTest {
                 "380123455789", testDoctorId);
 
         when(patientService.getList()).thenReturn(Arrays.asList(testPatientDto));
-
         mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

@@ -37,10 +37,8 @@ class DoctorServiceTest {
                 "380123456789", "Position");
 
         when(doctorDao.save(any(Doctor.class))).thenReturn(testDaoDoctor);
-
         DoctorDto returnedDoctorDto = service.add(testDoctorDto);
         assertNotNull(returnedDoctorDto, "Dto returned by service is null");
-
         assertNotEquals(testDoctorDto.getId(), returnedDoctorDto.getId());
         assertEquals(testDoctorDto.getFirstName(), returnedDoctorDto.getFirstName());
         assertEquals(testDoctorDto.getLastName(), returnedDoctorDto.getLastName());
@@ -65,7 +63,6 @@ class DoctorServiceTest {
 
         when(doctorDao.existsById(testDoctorDto.getId())).thenReturn(true);
         when(doctorDao.save(any(Doctor.class))).thenReturn(testDaoDoctor);
-
         DoctorDto returnedDoctor = service.update(testDoctorDto.getId(), testDoctorDto);
         assertNotNull(returnedDoctor, "Dto returned by service is null");
         assertEquals(testDoctorDto.getId(), returnedDoctor.getId());
@@ -87,7 +84,6 @@ class DoctorServiceTest {
                 "380123455789", "DoctorA_Position");
         doNothing().when(doctorDao).deleteById(1L);
         when(doctorDao.existsById(1L)).thenReturn(true);
-
         assertTrue(service.delete(doctor.getId()), "Doctor wasn't deleted");
     }
 
@@ -105,11 +101,9 @@ class DoctorServiceTest {
         List<Doctor> testDoctorList = Arrays.asList(testDoctorA, testDoctorB);
 
         when(doctorDao.findAll()).thenReturn(testDoctorList);
-
         List<DoctorDto> doctorReturnDtoList = service.getList();
         assertNotNull(doctorReturnDtoList);
         assertEquals(doctorReturnDtoList.size(), testDoctorList.size());
-
         for (int index = 0; index < doctorReturnDtoList.size(); index++) {
             DoctorDto returnedDoctorDto = doctorReturnDtoList.get(index);
             Doctor testDoctor = testDoctorList.get(index);
@@ -134,7 +128,6 @@ class DoctorServiceTest {
                 "380123455789", "DoctorA_Position");
 
         when(doctorDao.getById(1L)).thenReturn(testDoctor);
-
         DoctorDto returnedDoctor = service.get(testDoctor.getId());
         assertNotNull(returnedDoctor);
         assertEquals(testDoctor.getId(), returnedDoctor.getId());
@@ -151,7 +144,6 @@ class DoctorServiceTest {
     @DisplayName("(get) Pass non existing Id, expected exception")
     void getNonExistingDoctorById() {
         long nonExistingId = 1L;
-
         when(doctorDao.getById(nonExistingId)).thenReturn(null);
         assertThrows(NotFoundException.class, () -> {
             service.get(nonExistingId);
@@ -163,7 +155,6 @@ class DoctorServiceTest {
     @DisplayName("(delete) Pass non existing Id, expected exception")
     void deleteNonExistingDoctorByIdTest() {
         long nonExistingId = 1L;
-
         when(doctorDao.existsById(nonExistingId)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> {
             service.delete(nonExistingId);
@@ -175,7 +166,6 @@ class DoctorServiceTest {
     @DisplayName("(update) Pass non existing Id, expected exception")
     void updateNonExistingDoctorByIdTest() {
         long nonExistingId = 1L;
-
         when(doctorDao.existsById(nonExistingId)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> {
             service.update(nonExistingId, null);

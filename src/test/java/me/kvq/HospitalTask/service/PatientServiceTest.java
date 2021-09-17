@@ -47,7 +47,6 @@ class PatientServiceTest {
 
         when(doctorDao.getById(3L)).thenReturn(testDoctor);
         when(patientDao.save(any(Patient.class))).thenReturn(testDaoPatient);
-
         PatientDto returnedDto = service.add(testingPatient);
         assertNotNull(returnedDto, "Dto returned by service is null");
         assertNotEquals(testingPatient.getId(), returnedDto.getId());
@@ -80,7 +79,6 @@ class PatientServiceTest {
         when(doctorDao.getById(3L)).thenReturn(testDoctor);
         when(patientDao.existsById(1L)).thenReturn(true);
         when(patientDao.save(any(Patient.class))).thenReturn(testDaoPatient);
-
         PatientDto returnedPatient = service.update(testPatient.getId(), testPatient);
         assertNotNull(returnedPatient, "Dto returned by service is null");
         assertEquals(testPatient.getId(), returnedPatient.getId());
@@ -101,7 +99,6 @@ class PatientServiceTest {
         long testPatientId = 1;
         doNothing().when(patientDao).deleteById(testPatientId);
         when(patientDao.existsById(testPatientId)).thenReturn(true);
-
         assertTrue(service.delete(testPatientId));
         verify(patientDao, times(1)).existsById(anyLong());
     }
@@ -121,10 +118,8 @@ class PatientServiceTest {
         List<Patient> testPatientList = Arrays.asList(testPatientA, testPatientB);
 
         when(patientDao.findAll()).thenReturn(testPatientList);
-
         List<PatientDto> returnedPatientDtoList = service.getList();
         assertEquals(2, returnedPatientDtoList.size(), "Expected 2 patients to be returned");
-
         for (int index = 0; index < returnedPatientDtoList.size(); index++) {
             PatientDto returnedPatientDto = returnedPatientDtoList.get(index);
             Patient testPatient = testPatientList.get(index);
@@ -152,7 +147,6 @@ class PatientServiceTest {
                 "380123455789", testDoctor);
 
         when(patientDao.getById(testPatient.getId())).thenReturn(testPatient);
-
         PatientDto returnedPatient = service.get(testPatient.getId());
         assertNotNull(returnedPatient);
         assertEquals(testPatient.getId(), returnedPatient.getId());
@@ -169,7 +163,6 @@ class PatientServiceTest {
     @DisplayName("(get) Pass non existing Id, expected exception")
     void getNonExistingPatientById() {
         long nonExistingId = 1L;
-
         when(patientDao.getById(nonExistingId)).thenReturn(null);
         assertThrows(NotFoundException.class, () -> {
             service.get(nonExistingId);
@@ -181,7 +174,6 @@ class PatientServiceTest {
     @DisplayName("(delete) Pass non existing Id, expected exception")
     void deleteNonExistingPatientByIdTest() {
         long nonExistingId = 1L;
-
         when(patientDao.existsById(nonExistingId)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> {
             service.delete(nonExistingId);
@@ -193,7 +185,6 @@ class PatientServiceTest {
     @DisplayName("(update) Pass non existing Id, expected exception")
     void updateNonExistingPatientByIdTest() {
         long nonExistingId = 1L;
-
         when(patientDao.existsById(nonExistingId)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> {
             service.update(nonExistingId, null);
