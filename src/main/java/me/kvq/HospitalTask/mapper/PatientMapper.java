@@ -25,7 +25,7 @@ public class PatientMapper {
                 doctorId);
     }
 
-    public Patient dtoToEntity(long id,PatientDto patientDto) {
+    public Patient dtoToEntity(long id, PatientDto patientDto) {
         Doctor doctor = dao.getById(patientDto.getDoctor());
         return new Patient(id,
                 patientDto.getFirstName(),

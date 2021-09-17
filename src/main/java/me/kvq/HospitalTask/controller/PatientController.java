@@ -1,7 +1,6 @@
 package me.kvq.HospitalTask.controller;
 
 import me.kvq.HospitalTask.dto.PatientDto;
-import me.kvq.HospitalTask.model.Patient;
 import me.kvq.HospitalTask.service.PatientService;
 import org.springframework.web.bind.annotation.*;
 

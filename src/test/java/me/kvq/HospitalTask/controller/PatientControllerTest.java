@@ -1,22 +1,11 @@
 package me.kvq.HospitalTask.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.Mockito.*;
-
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.service.PatientService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -25,6 +14,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PatientController.class)
 class PatientControllerTest {
@@ -44,7 +42,7 @@ class PatientControllerTest {
                 + "\"phoneNumber\":\"381234567890\","
                 + "\"doctor\":" + testDoctorId + "}";
         PatientDto dto = new PatientDto(1,
-                "First_Name", "Second_name", "Patronymic", LocalDate.of(2001,2,3),
+                "First_Name", "Second_name", "Patronymic", LocalDate.of(2001, 2, 3),
                 "381234567890", testDoctorId);
 
         when(patientService.add(any(PatientDto.class))).thenReturn(dto);
@@ -77,10 +75,10 @@ class PatientControllerTest {
                 + "\"phoneNumber\":\"381234567890\","
                 + "\"doctor\":" + testDoctorId + "}";
         PatientDto dto = new PatientDto(testPatientId,
-                "Different_Name", "Second_name", "Patronymic", LocalDate.of(2000,1,2),
+                "Different_Name", "Second_name", "Patronymic", LocalDate.of(2000, 1, 2),
                 "381234567890", testDoctorId);
 
-        when(patientService.update(eq(testPatientId),any(PatientDto.class))).thenReturn(dto);
+        when(patientService.update(eq(testPatientId), any(PatientDto.class))).thenReturn(dto);
 
         mockMvc.perform(patch("/patient/edit/" + testPatientId)
                         .content(patientJson)
@@ -95,7 +93,7 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.birthDate[1]").value(1))
                 .andExpect(jsonPath("$.birthDate[2]").value(2))
                 .andExpect(jsonPath("$.doctor").value(3));
-        verify(patientService, times(1)).update(anyLong(),any(PatientDto.class));
+        verify(patientService, times(1)).update(anyLong(), any(PatientDto.class));
     }
 
     @Test
@@ -112,8 +110,8 @@ class PatientControllerTest {
     @DisplayName("Request GET /patient/list. Expects HTTP OK and checking Json list values")
     void getListOfPatientsResponseCheckTest() throws Exception {
         long testDoctorId = 3;
-        PatientDto testPatientDto = new PatientDto(1,"PatientA_Name","PatientA_LastName", "PatientA_Patronymic",
-                LocalDate.of(1991,5,4),
+        PatientDto testPatientDto = new PatientDto(1, "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
+                LocalDate.of(1991, 5, 4),
                 "380123455789", testDoctorId);
 
         when(patientService.getList()).thenReturn(Arrays.asList(testPatientDto));
@@ -133,7 +131,7 @@ class PatientControllerTest {
         verify(patientService, times(1)).getList();
     }
 
-    public static Stream<Arguments> getExceptions(){
+    public static Stream<Arguments> getExceptions() {
         return Stream.of(
                 Arguments.of(new InvalidPhoneNumberException("12345")),
                 Arguments.of(new NotFoundException("No patient found by that id")));
@@ -148,7 +146,7 @@ class PatientControllerTest {
         mockMvc.perform(delete("/patient/delete/" + invalidId))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(patientService,times(1)).delete(anyLong());
+        verify(patientService, times(1)).delete(anyLong());
     }
 
     @ParameterizedTest
@@ -163,7 +161,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(patientService,times(1)).update(anyLong(),any(PatientDto.class));
+        verify(patientService, times(1)).update(anyLong(), any(PatientDto.class));
     }
 
     @Test
@@ -177,7 +175,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(patientService,times(1)).add(any(PatientDto.class));
+        verify(patientService, times(1)).add(any(PatientDto.class));
     }
 
 }

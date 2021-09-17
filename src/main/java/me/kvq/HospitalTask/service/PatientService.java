@@ -1,11 +1,11 @@
 package me.kvq.HospitalTask.service;
 
 import lombok.AllArgsConstructor;
+import me.kvq.HospitalTask.dao.PatientDao;
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Patient;
-import me.kvq.HospitalTask.dao.PatientDao;
 import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +13,14 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class PatientService{
+public class PatientService {
     final private PatientDao dao;
     final private PatientMapper mapper;
 
     public PatientDto add(PatientDto patientDto) {
         String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber());
         patientDto.setPhoneNumber(fixedPhoneNumber);
-        Patient patient = mapper.dtoToEntity(0,patientDto);
+        Patient patient = mapper.dtoToEntity(0, patientDto);
         Patient returnPatient = dao.save(patient);
         return mapper.entityToDto(returnPatient);
     }
@@ -31,7 +31,7 @@ public class PatientService{
         }
         String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(patientDto.getPhoneNumber());
         patientDto.setPhoneNumber(fixedPhoneNumber);
-        Patient patient = mapper.dtoToEntity(id,patientDto);
+        Patient patient = mapper.dtoToEntity(id, patientDto);
         Patient returnPatient = dao.save(patient);
         return mapper.entityToDto(returnPatient);
     }
@@ -50,7 +50,7 @@ public class PatientService{
         return patientDtoList;
     }
 
-    public PatientDto get(long id){
+    public PatientDto get(long id) {
         Patient entity = dao.getById(id);
         if (entity == null) {
             throw new NotFoundException("No patient found by that Id");

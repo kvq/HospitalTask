@@ -1,12 +1,11 @@
 package me.kvq.HospitalTask.service;
 
 import lombok.AllArgsConstructor;
-import me.kvq.HospitalTask.exception.NotFoundException;
-import me.kvq.HospitalTask.model.Doctor;
-import me.kvq.HospitalTask.dto.DoctorDto;
-import me.kvq.HospitalTask.mapper.DoctorMapper;
 import me.kvq.HospitalTask.dao.DoctorDao;
-
+import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.exception.NotFoundException;
+import me.kvq.HospitalTask.mapper.DoctorMapper;
+import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,7 @@ public class DoctorService {
     public DoctorDto add(DoctorDto doctorDto) {
         String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(doctorDto.getPhoneNumber());
         doctorDto.setPhoneNumber(fixedPhoneNumber);
-        Doctor doctor = mapper.dtoToEntity(0,doctorDto);
+        Doctor doctor = mapper.dtoToEntity(0, doctorDto);
         Doctor returnDoctor = dao.save(doctor);
         return mapper.entityToDto(returnDoctor);
     }
@@ -32,7 +31,7 @@ public class DoctorService {
         }
         String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(doctorDto.getPhoneNumber());
         doctorDto.setPhoneNumber(fixedPhoneNumber);
-        Doctor doctor = mapper.dtoToEntity(id,doctorDto);
+        Doctor doctor = mapper.dtoToEntity(id, doctorDto);
         Doctor returnDoctor = dao.save(doctor);
         return mapper.entityToDto(returnDoctor);
     }
@@ -50,7 +49,7 @@ public class DoctorService {
         return mapper.entityListToDtoList(doctorList);
     }
 
-    public DoctorDto get(long id){
+    public DoctorDto get(long id) {
         Doctor entity = dao.getById(id);
         if (entity == null) {
             throw new NotFoundException("No doctor found by that id");

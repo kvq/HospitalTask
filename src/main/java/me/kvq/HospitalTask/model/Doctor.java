@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Doctor{
+public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;

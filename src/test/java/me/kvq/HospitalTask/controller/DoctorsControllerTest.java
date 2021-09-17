@@ -22,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -76,26 +77,25 @@ class DoctorsControllerTest {
                 + "\"phoneNumber\":\"381234567891\","
                 + "\"position\":\"Position2\"}";
         DoctorDto dto = new DoctorDto(id,
-                "First_NewName","Second_NewName","Patronymic",
-                LocalDate.of(2001,2,3),
-                "381234567891","Position2");
+                "First_NewName", "Second_NewName", "Patronymic",
+                LocalDate.of(2001, 2, 3),
+                "381234567891", "Position2");
 
-        when(doctorService.update(eq(id),any(DoctorDto.class))).thenReturn(dto);
-
+        when(doctorService.update(eq(id), any(DoctorDto.class))).thenReturn(dto);
         mockMvc.perform(patch("/doctor/edit/" + id)
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.id").value(id))
-                        .andExpect(jsonPath("$.firstName").value("First_NewName"))
-                        .andExpect(jsonPath("$.lastName").value("Second_NewName"))
-                        .andExpect(jsonPath("$.patronymic").value("Patronymic"))
-                        .andExpect(jsonPath("$.phoneNumber").value("381234567891"))
-                        .andExpect(jsonPath("$.birthDate[0]").value(2001))
-                        .andExpect(jsonPath("$.birthDate[1]").value(2))
-                        .andExpect(jsonPath("$.birthDate[2]").value(3))
-                        .andExpect(jsonPath("$.position").value("Position2"));
-        verify(doctorService, times(1)).update(anyLong(),any(DoctorDto.class));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.firstName").value("First_NewName"))
+                .andExpect(jsonPath("$.lastName").value("Second_NewName"))
+                .andExpect(jsonPath("$.patronymic").value("Patronymic"))
+                .andExpect(jsonPath("$.phoneNumber").value("381234567891"))
+                .andExpect(jsonPath("$.birthDate[0]").value(2001))
+                .andExpect(jsonPath("$.birthDate[1]").value(2))
+                .andExpect(jsonPath("$.birthDate[2]").value(3))
+                .andExpect(jsonPath("$.position").value("Position2"));
+        verify(doctorService, times(1)).update(anyLong(), any(DoctorDto.class));
     }
 
     @Test
@@ -104,36 +104,36 @@ class DoctorsControllerTest {
         long id = 1;
         when(doctorService.delete(id)).thenReturn(true);
         mockMvc.perform(delete("/doctor/delete/" + id))
-                        .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
-        verify(doctorService,times(1)).delete(anyLong());
+        verify(doctorService, times(1)).delete(anyLong());
     }
 
     @Test
     @DisplayName("Request GET /doctor/list. Expects HTTP OK and checking Json list values")
     void getListOfDoctorsResponseCheckTest() throws Exception {
-        DoctorDto testDoctorDto = new DoctorDto(1,"DoctorA_Name","DoctorA_LastName", "DoctorA_Patronymic",
-                LocalDate.of(1991,5,4),
+        DoctorDto testDoctorDto = new DoctorDto(1, "DoctorA_Name", "DoctorA_LastName", "DoctorA_Patronymic",
+                LocalDate.of(1991, 5, 4),
                 "380123455789", "DoctorA_Position");
 
         when(doctorService.getList()).thenReturn(Arrays.asList(testDoctorDto));
 
         mockMvc.perform(get("/doctor/list"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$").isArray())
-                        .andExpect(jsonPath("$[0].id").value(1))
-                        .andExpect(jsonPath("$[0].firstName").value("DoctorA_Name"))
-                        .andExpect(jsonPath("$[0].lastName").value("DoctorA_LastName"))
-                        .andExpect(jsonPath("$[0].patronymic").value("DoctorA_Patronymic"))
-                        .andExpect(jsonPath("$[0].phoneNumber").value("380123455789"))
-                        .andExpect(jsonPath("$[0].birthDate[0]").value(1991))
-                        .andExpect(jsonPath("$[0].birthDate[1]").value(5))
-                        .andExpect(jsonPath("$[0].birthDate[2]").value(4))
-                        .andExpect(jsonPath("$[0].position").value("DoctorA_Position"));
-        verify(doctorService,times(1)).getList();
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].firstName").value("DoctorA_Name"))
+                .andExpect(jsonPath("$[0].lastName").value("DoctorA_LastName"))
+                .andExpect(jsonPath("$[0].patronymic").value("DoctorA_Patronymic"))
+                .andExpect(jsonPath("$[0].phoneNumber").value("380123455789"))
+                .andExpect(jsonPath("$[0].birthDate[0]").value(1991))
+                .andExpect(jsonPath("$[0].birthDate[1]").value(5))
+                .andExpect(jsonPath("$[0].birthDate[2]").value(4))
+                .andExpect(jsonPath("$[0].position").value("DoctorA_Position"));
+        verify(doctorService, times(1)).getList();
     }
 
-    public static Stream<Arguments> getExceptions(){
+    public static Stream<Arguments> getExceptions() {
         return Stream.of(
                 Arguments.of(new InvalidPhoneNumberException("12345")),
                 Arguments.of(new NotFoundException("No doctor found by that id")));
@@ -148,7 +148,7 @@ class DoctorsControllerTest {
         mockMvc.perform(delete("/doctor/delete/" + invalidId))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(doctorService,times(1)).delete(anyLong());
+        verify(doctorService, times(1)).delete(anyLong());
     }
 
     @ParameterizedTest
@@ -163,7 +163,7 @@ class DoctorsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(doctorService,times(1)).update(anyLong(),any(DoctorDto.class));
+        verify(doctorService, times(1)).update(anyLong(), any(DoctorDto.class));
     }
 
     @Test
@@ -177,7 +177,7 @@ class DoctorsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(doctorService,times(1)).add(any(DoctorDto.class));
+        verify(doctorService, times(1)).add(any(DoctorDto.class));
     }
 
 }

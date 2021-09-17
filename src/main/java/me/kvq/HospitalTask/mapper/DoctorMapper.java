@@ -1,14 +1,14 @@
 package me.kvq.HospitalTask.mapper;
 
-import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.model.Doctor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class DoctorMapper{
+public class DoctorMapper {
 
     public DoctorDto entityToDto(Doctor doctor) {
         return new DoctorDto(doctor.getId(),
@@ -20,7 +20,7 @@ public class DoctorMapper{
                 doctor.getPosition());
     }
 
-    public Doctor dtoToEntity(long id,DoctorDto doctorDto) {
+    public Doctor dtoToEntity(long id, DoctorDto doctorDto) {
         return new Doctor(id,
                 doctorDto.getFirstName(),
                 doctorDto.getLastName(),
