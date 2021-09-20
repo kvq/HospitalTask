@@ -106,7 +106,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("(getList) expected to return 2 Dtos, then compare fields to origin entities")
     void detPatientListTest() {
-
         Patient testPatientA = new Patient(1,
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
