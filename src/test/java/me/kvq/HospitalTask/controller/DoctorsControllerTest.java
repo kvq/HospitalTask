@@ -19,7 +19,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -92,7 +93,7 @@ class DoctorsControllerTest {
                 .andExpect(jsonPath("$.birthDate[1]").value(2))
                 .andExpect(jsonPath("$.birthDate[2]").value(3))
                 .andExpect(jsonPath("$.position").value("Position2"));
-        verify(doctorService, times(1)).update(anyLong(), any(DoctorDto.class));
+        verify(doctorService, times(1)).update(eq(id), any(DoctorDto.class));
     }
 
     @Test
@@ -102,7 +103,7 @@ class DoctorsControllerTest {
         when(doctorService.delete(id)).thenReturn(true);
         mockMvc.perform(delete("/doctor/delete/" + id))
                 .andExpect(status().isOk());
-        verify(doctorService, times(1)).delete(anyLong());
+        verify(doctorService, times(1)).delete(id);
     }
 
     @Test
@@ -143,7 +144,7 @@ class DoctorsControllerTest {
         mockMvc.perform(delete("/doctor/delete/" + invalidId))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(doctorService, times(1)).delete(anyLong());
+        verify(doctorService, times(1)).delete(invalidId);
     }
 
     @ParameterizedTest
@@ -158,7 +159,7 @@ class DoctorsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(doctorService, times(1)).update(anyLong(), any(DoctorDto.class));
+        verify(doctorService, times(1)).update(eq(invalidId), any(DoctorDto.class));
     }
 
     @Test

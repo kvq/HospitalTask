@@ -46,7 +46,6 @@ class PatientControllerTest {
                 "381234567890", testDoctorId);
 
         when(patientService.add(any(PatientDto.class))).thenReturn(dto);
-
         mockMvc.perform(post("/patient/add")
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -60,7 +59,7 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.birthDate[1]").value(2))
                 .andExpect(jsonPath("$.birthDate[2]").value(3))
                 .andExpect(jsonPath("$.doctor").value(testDoctorId));
-        verify(patientService, times(1)).add(any());
+        verify(patientService, times(1)).add(any(PatientDto.class));
     }
 
     @Test
@@ -92,7 +91,7 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.birthDate[1]").value(1))
                 .andExpect(jsonPath("$.birthDate[2]").value(2))
                 .andExpect(jsonPath("$.doctor").value(3));
-        verify(patientService, times(1)).update(anyLong(), any(PatientDto.class));
+        verify(patientService, times(1)).update(eq(testPatientId), any(PatientDto.class));
     }
 
     @Test
@@ -144,7 +143,7 @@ class PatientControllerTest {
         mockMvc.perform(delete("/patient/delete/" + invalidId))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(patientService, times(1)).delete(anyLong());
+        verify(patientService, times(1)).delete(invalidId);
     }
 
     @ParameterizedTest
@@ -159,7 +158,7 @@ class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(patientService, times(1)).update(anyLong(), any(PatientDto.class));
+        verify(patientService, times(1)).update(eq(invalidId), any(PatientDto.class));
     }
 
     @Test

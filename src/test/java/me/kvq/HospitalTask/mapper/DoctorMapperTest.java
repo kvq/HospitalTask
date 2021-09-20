@@ -21,37 +21,37 @@ public class DoctorMapperTest {
     @Test
     @DisplayName("(entityToDto) passes Doctor, compare returned Dto fields")
     void mappingEntityToDtoTest() {
-        Doctor testDoctor = new Doctor(1,
+        Doctor originDoctor = new Doctor(1,
                 "DoctorA_Name", "DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", "DoctorA_Position");
 
-        DoctorDto returnDoctorDto = mapper.entityToDto(testDoctor);
-        assertEquals(returnDoctorDto.getId(), testDoctor.getId());
-        assertEquals(returnDoctorDto.getFirstName(), testDoctor.getFirstName());
-        assertEquals(returnDoctorDto.getLastName(), testDoctor.getLastName());
-        assertEquals(returnDoctorDto.getPatronymic(), testDoctor.getPatronymic());
-        assertEquals(returnDoctorDto.getBirthDate(), testDoctor.getBirthDate());
-        assertEquals(returnDoctorDto.getPhoneNumber(), testDoctor.getPhoneNumber());
-        assertEquals(returnDoctorDto.getPosition(), testDoctor.getPosition());
+        DoctorDto returnedDoctorDto = mapper.entityToDto(originDoctor);
+        assertEquals(originDoctor.getId(), returnedDoctorDto.getId());
+        assertEquals(originDoctor.getFirstName(), returnedDoctorDto.getFirstName());
+        assertEquals(originDoctor.getLastName(), returnedDoctorDto.getLastName());
+        assertEquals(originDoctor.getPatronymic(), returnedDoctorDto.getPatronymic());
+        assertEquals(originDoctor.getBirthDate(), returnedDoctorDto.getBirthDate());
+        assertEquals(originDoctor.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
+        assertEquals(originDoctor.getPosition(), returnedDoctorDto.getPosition());
     }
 
     @Test
     @DisplayName("(dtoToEntity) passes Id & DoctorDto, compare returned Dto fields")
     void mappingDtoToEntityTest() {
-        DoctorDto testDoctorDto = new DoctorDto(1,
+        DoctorDto originDoctorDto = new DoctorDto(1,
                 "DoctorA_Name", "DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", "DoctorA_Position");
 
-        Doctor returnDoctor = mapper.dtoToEntity(1, testDoctorDto);
-        assertEquals(returnDoctor.getId(), testDoctorDto.getId());
-        assertEquals(returnDoctor.getFirstName(), testDoctorDto.getFirstName());
-        assertEquals(returnDoctor.getLastName(), testDoctorDto.getLastName());
-        assertEquals(returnDoctor.getPatronymic(), testDoctorDto.getPatronymic());
-        assertEquals(returnDoctor.getBirthDate(), testDoctorDto.getBirthDate());
-        assertEquals(returnDoctor.getPhoneNumber(), testDoctorDto.getPhoneNumber());
-        assertEquals(returnDoctor.getPosition(), testDoctorDto.getPosition());
+        Doctor returnedDoctor = mapper.dtoToEntity(1, originDoctorDto);
+        assertEquals(originDoctorDto.getId(), returnedDoctor.getId());
+        assertEquals(originDoctorDto.getFirstName(), returnedDoctor.getFirstName());
+        assertEquals(originDoctorDto.getLastName(), returnedDoctor.getLastName());
+        assertEquals(originDoctorDto.getPatronymic(), returnedDoctor.getPatronymic());
+        assertEquals(originDoctorDto.getBirthDate(), returnedDoctor.getBirthDate());
+        assertEquals(originDoctorDto.getPhoneNumber(), returnedDoctor.getPhoneNumber());
+        assertEquals(originDoctorDto.getPosition(), returnedDoctor.getPosition());
     }
 
     @Test

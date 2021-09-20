@@ -4,19 +4,16 @@ import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
 
 public class PhoneNumberUtils {
 
-    public static String fixPhoneNumber(String number) throws InvalidPhoneNumberException {
+    public static void checkPhoneNumber(String number) throws InvalidPhoneNumberException {
         if (number == null) {
-            return null;
-        }
-        number = number.replaceAll("[^\\d.]", "");
-        if (!number.startsWith("38")) {
-            number = "38" + number;
+            return;
         }
         int length = number.length();
-        if (length < 12 || length > 13) {
+        if (!number.matches("^[0-9+]+$")
+                || !number.startsWith("38")
+                || length < 12 || length > 13) {
             throw new InvalidPhoneNumberException(number);
         }
-        return number;
     }
 
 }

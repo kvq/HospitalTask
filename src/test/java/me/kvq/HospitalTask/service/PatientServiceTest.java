@@ -41,22 +41,22 @@ class PatientServiceTest {
         PatientDto testingPatient = new PatientDto(0, "Name", "LastName", "Patronymic",
                 LocalDate.of(1999, 10, 2),
                 "380123456789", testDoctor.getId());
-        Patient testDaoPatient = new Patient(1, "Name", "LastName", "Patronymic",
+        Patient expectedPatient = new Patient(1, "Name", "LastName", "Patronymic",
                 LocalDate.of(1999, 10, 2),
                 "380123456789", testDoctor);
 
-        when(doctorDao.getById(3L)).thenReturn(testDoctor);
-        when(patientDao.save(any(Patient.class))).thenReturn(testDaoPatient);
+        when(doctorDao.getById(testDoctor.getId())).thenReturn(testDoctor);
+        when(patientDao.save(any(Patient.class))).thenReturn(expectedPatient);
         PatientDto returnedDto = service.add(testingPatient);
         assertNotNull(returnedDto, "Dto returned by service is null");
-        assertNotEquals(testingPatient.getId(), returnedDto.getId());
-        assertEquals(testingPatient.getFirstName(), returnedDto.getFirstName());
-        assertEquals(testingPatient.getLastName(), returnedDto.getLastName());
-        assertEquals(testingPatient.getPatronymic(), returnedDto.getPatronymic());
-        assertEquals(testingPatient.getBirthDate(), returnedDto.getBirthDate());
-        assertEquals(testingPatient.getPhoneNumber(), returnedDto.getPhoneNumber());
-        assertEquals(testingPatient.getDoctor(), testDoctor.getId());
-        verify(doctorDao, times(1)).getById(anyLong());
+        assertEquals(expectedPatient.getId(), returnedDto.getId());
+        assertEquals(expectedPatient.getFirstName(), returnedDto.getFirstName());
+        assertEquals(expectedPatient.getLastName(), returnedDto.getLastName());
+        assertEquals(expectedPatient.getPatronymic(), returnedDto.getPatronymic());
+        assertEquals(expectedPatient.getBirthDate(), returnedDto.getBirthDate());
+        assertEquals(expectedPatient.getPhoneNumber(), returnedDto.getPhoneNumber());
+        assertEquals(expectedPatient.getDoctor().getId(), testDoctor.getId());
+        verify(doctorDao, times(1)).getById(testDoctor.getId());
         verify(patientDao, times(1)).save(any(Patient.class));
     }
 
@@ -71,25 +71,25 @@ class PatientServiceTest {
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", testDoctor.getId());
-        Patient testDaoPatient = new Patient(1,
+        Patient expectedPatient = new Patient(1,
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", testDoctor);
 
-        when(doctorDao.getById(3L)).thenReturn(testDoctor);
-        when(patientDao.existsById(1L)).thenReturn(true);
-        when(patientDao.save(any(Patient.class))).thenReturn(testDaoPatient);
+        when(doctorDao.getById(testDoctor.getId())).thenReturn(testDoctor);
+        when(patientDao.existsById(testPatient.getId())).thenReturn(true);
+        when(patientDao.save(any(Patient.class))).thenReturn(expectedPatient);
         PatientDto returnedPatient = service.update(testPatient.getId(), testPatient);
         assertNotNull(returnedPatient, "Dto returned by service is null");
-        assertEquals(testPatient.getId(), returnedPatient.getId());
-        assertEquals(testPatient.getFirstName(), returnedPatient.getFirstName());
-        assertEquals(testPatient.getLastName(), returnedPatient.getLastName());
-        assertEquals(testPatient.getPatronymic(), returnedPatient.getPatronymic());
-        assertEquals(testPatient.getBirthDate(), returnedPatient.getBirthDate());
-        assertEquals(testPatient.getPhoneNumber(), returnedPatient.getPhoneNumber());
-        assertEquals(testPatient.getDoctor(), returnedPatient.getDoctor());
-        verify(doctorDao, times(1)).getById(anyLong());
-        verify(patientDao, times(1)).existsById(anyLong());
+        assertEquals(expectedPatient.getId(), returnedPatient.getId());
+        assertEquals(expectedPatient.getFirstName(), returnedPatient.getFirstName());
+        assertEquals(expectedPatient.getLastName(), returnedPatient.getLastName());
+        assertEquals(expectedPatient.getPatronymic(), returnedPatient.getPatronymic());
+        assertEquals(expectedPatient.getBirthDate(), returnedPatient.getBirthDate());
+        assertEquals(expectedPatient.getPhoneNumber(), returnedPatient.getPhoneNumber());
+        assertEquals(expectedPatient.getDoctor().getId(), returnedPatient.getDoctor());
+        verify(doctorDao, times(1)).getById(testDoctor.getId());
+        verify(patientDao, times(1)).existsById(testPatient.getId());
         verify(patientDao, times(1)).save(any(Patient.class));
     }
 
@@ -100,7 +100,7 @@ class PatientServiceTest {
         doNothing().when(patientDao).deleteById(testPatientId);
         when(patientDao.existsById(testPatientId)).thenReturn(true);
         assertTrue(service.delete(testPatientId));
-        verify(patientDao, times(1)).existsById(anyLong());
+        verify(patientDao, times(1)).existsById(testPatientId);
     }
 
     @Test
@@ -121,14 +121,14 @@ class PatientServiceTest {
         assertEquals(2, returnedPatientDtoList.size(), "Expected 2 patients to be returned");
         for (int index = 0; index < returnedPatientDtoList.size(); index++) {
             PatientDto returnedPatientDto = returnedPatientDtoList.get(index);
-            Patient testPatient = testPatientList.get(index);
+            Patient expectedPatient = testPatientList.get(index);
             assertNotNull(returnedPatientDto);
-            assertEquals(testPatient.getId(), returnedPatientDto.getId());
-            assertEquals(testPatient.getFirstName(), returnedPatientDto.getFirstName());
-            assertEquals(testPatient.getLastName(), returnedPatientDto.getLastName());
-            assertEquals(testPatient.getPatronymic(), returnedPatientDto.getPatronymic());
-            assertEquals(testPatient.getBirthDate(), returnedPatientDto.getBirthDate());
-            assertEquals(testPatient.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
+            assertEquals(expectedPatient.getId(), returnedPatientDto.getId());
+            assertEquals(expectedPatient.getFirstName(), returnedPatientDto.getFirstName());
+            assertEquals(expectedPatient.getLastName(), returnedPatientDto.getLastName());
+            assertEquals(expectedPatient.getPatronymic(), returnedPatientDto.getPatronymic());
+            assertEquals(expectedPatient.getBirthDate(), returnedPatientDto.getBirthDate());
+            assertEquals(expectedPatient.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
         }
         verify(patientDao, times(1)).findAll();
     }
@@ -140,22 +140,23 @@ class PatientServiceTest {
                 "DoctorA_Name", "DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", "DoctorA_Position");
-        Patient testPatient = new Patient(1,
+        Patient expectedPatient = new Patient(1,
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", testDoctor);
 
-        when(patientDao.getById(testPatient.getId())).thenReturn(testPatient);
-        PatientDto returnedPatient = service.get(testPatient.getId());
+        when(patientDao.getById(expectedPatient.getId())).thenReturn(expectedPatient);
+        PatientDto returnedPatient = service.get(expectedPatient.getId());
         assertNotNull(returnedPatient);
-        assertEquals(testPatient.getId(), returnedPatient.getId());
-        assertEquals(testPatient.getFirstName(), returnedPatient.getFirstName());
-        assertEquals(testPatient.getLastName(), returnedPatient.getLastName());
-        assertEquals(testPatient.getPatronymic(), returnedPatient.getPatronymic());
-        assertEquals(testPatient.getBirthDate(), returnedPatient.getBirthDate());
-        assertEquals(testPatient.getPhoneNumber(), returnedPatient.getPhoneNumber());
-        assertEquals(testPatient.getDoctor().getId(), returnedPatient.getDoctor());
-        verify(patientDao, times(1)).getById(anyLong());
+        assertEquals(expectedPatient.getId(), returnedPatient.getId());
+        assertEquals(expectedPatient.getId(), returnedPatient.getId());
+        assertEquals(expectedPatient.getFirstName(), returnedPatient.getFirstName());
+        assertEquals(expectedPatient.getLastName(), returnedPatient.getLastName());
+        assertEquals(expectedPatient.getPatronymic(), returnedPatient.getPatronymic());
+        assertEquals(expectedPatient.getBirthDate(), returnedPatient.getBirthDate());
+        assertEquals(expectedPatient.getPhoneNumber(), returnedPatient.getPhoneNumber());
+        assertEquals(expectedPatient.getDoctor().getId(), returnedPatient.getDoctor());
+        verify(patientDao, times(1)).getById(expectedPatient.getId());
     }
 
     @Test
@@ -166,7 +167,7 @@ class PatientServiceTest {
         assertThrows(NotFoundException.class, () -> {
             service.get(nonExistingId);
         });
-        verify(patientDao, times(1)).getById(anyLong());
+        verify(patientDao, times(1)).getById(nonExistingId);
     }
 
     @Test
@@ -177,7 +178,7 @@ class PatientServiceTest {
         assertThrows(NotFoundException.class, () -> {
             service.delete(nonExistingId);
         });
-        verify(patientDao, times(1)).existsById(anyLong());
+        verify(patientDao, times(1)).existsById(nonExistingId);
     }
 
     @Test
@@ -188,7 +189,7 @@ class PatientServiceTest {
         assertThrows(NotFoundException.class, () -> {
             service.update(nonExistingId, null);
         });
-        verify(patientDao, times(1)).existsById(anyLong());
+        verify(patientDao, times(1)).existsById(nonExistingId);
     }
 
 }

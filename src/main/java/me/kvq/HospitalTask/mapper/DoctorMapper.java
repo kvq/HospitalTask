@@ -11,23 +11,27 @@ import java.util.stream.Collectors;
 public class DoctorMapper {
 
     public DoctorDto entityToDto(Doctor doctor) {
-        return new DoctorDto(doctor.getId(),
-                doctor.getFirstName(),
-                doctor.getLastName(),
-                doctor.getPatronymic(),
-                doctor.getBirthDate(),
-                doctor.getPhoneNumber(),
-                doctor.getPosition());
+        return DoctorDto.builder()
+                .id(doctor.getId())
+                .firstName(doctor.getFirstName())
+                .lastName(doctor.getLastName())
+                .patronymic(doctor.getPatronymic())
+                .birthDate(doctor.getBirthDate())
+                .phoneNumber(doctor.getPhoneNumber())
+                .position(doctor.getPosition())
+                .build();
     }
 
     public Doctor dtoToEntity(long id, DoctorDto doctorDto) {
-        return new Doctor(id,
-                doctorDto.getFirstName(),
-                doctorDto.getLastName(),
-                doctorDto.getPatronymic(),
-                doctorDto.getBirthDate(),
-                doctorDto.getPhoneNumber(),
-                doctorDto.getPosition());
+        return Doctor.builder()
+                .id(id)
+                .firstName(doctorDto.getFirstName())
+                .lastName(doctorDto.getLastName())
+                .patronymic(doctorDto.getPatronymic())
+                .birthDate(doctorDto.getBirthDate())
+                .phoneNumber(doctorDto.getPhoneNumber())
+                .position(doctorDto.getPosition())
+                .build();
     }
 
     public List<DoctorDto> entityListToDtoList(List<Doctor> list) {

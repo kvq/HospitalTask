@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class PatientMapperTest {
@@ -31,19 +31,19 @@ public class PatientMapperTest {
                 "DoctorA_Name", "DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", "DoctorA_Position");
-        Patient testPatient = new Patient(1,
+        Patient originPatient = new Patient(1,
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", testDoctor);
 
-        PatientDto returnPatientDto = mapper.entityToDto(testPatient);
-        assertEquals(returnPatientDto.getId(), testPatient.getId());
-        assertEquals(returnPatientDto.getFirstName(), testPatient.getFirstName());
-        assertEquals(returnPatientDto.getLastName(), testPatient.getLastName());
-        assertEquals(returnPatientDto.getPatronymic(), testPatient.getPatronymic());
-        assertEquals(returnPatientDto.getBirthDate(), testPatient.getBirthDate());
-        assertEquals(returnPatientDto.getPhoneNumber(), testPatient.getPhoneNumber());
-        assertEquals(returnPatientDto.getDoctor(), testDoctor.getId());
+        PatientDto returnedPatientDto = mapper.entityToDto(originPatient);
+        assertEquals(originPatient.getId(), returnedPatientDto.getId());
+        assertEquals(originPatient.getFirstName(), returnedPatientDto.getFirstName());
+        assertEquals(originPatient.getLastName(), returnedPatientDto.getLastName());
+        assertEquals(originPatient.getPatronymic(), returnedPatientDto.getPatronymic());
+        assertEquals(originPatient.getBirthDate(), returnedPatientDto.getBirthDate());
+        assertEquals(originPatient.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
+        assertEquals(testDoctor.getId(), returnedPatientDto.getDoctor());
     }
 
     @Test
@@ -53,37 +53,38 @@ public class PatientMapperTest {
                 "DoctorA_Name", "DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", "DoctorA_Position");
-        PatientDto testPatientDto = new PatientDto(1,
+        PatientDto originPatient = new PatientDto(1,
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", 3);
 
         when(doctorDao.getById(3L)).thenReturn(testDoctor);
-        Patient returnPatient = mapper.dtoToEntity(1, testPatientDto);
-        assertEquals(returnPatient.getId(), testPatientDto.getId());
-        assertEquals(returnPatient.getFirstName(), testPatientDto.getFirstName());
-        assertEquals(returnPatient.getLastName(), testPatientDto.getLastName());
-        assertEquals(returnPatient.getPatronymic(), testPatientDto.getPatronymic());
-        assertEquals(returnPatient.getBirthDate(), testPatientDto.getBirthDate());
-        assertEquals(returnPatient.getPhoneNumber(), testPatientDto.getPhoneNumber());
-        assertEquals(returnPatient.getDoctor(), testDoctor);
+        Patient returnedPatient = mapper.dtoToEntity(1, originPatient);
+        assertEquals(originPatient.getId(), returnedPatient.getId());
+        assertEquals(originPatient.getFirstName(), returnedPatient.getFirstName());
+        assertEquals(originPatient.getLastName(), returnedPatient.getLastName());
+        assertEquals(originPatient.getPatronymic(), returnedPatient.getPatronymic());
+        assertEquals(originPatient.getBirthDate(), returnedPatient.getBirthDate());
+        assertEquals(originPatient.getPhoneNumber(), returnedPatient.getPhoneNumber());
+        assertEquals(testDoctor, returnedPatient.getDoctor());
+        verify(doctorDao, times(1)).getById(3L);
     }
 
     @Test
     @DisplayName("(entityListToDtoList) passes Patient list, checks returned list size & compare Dtos")
     void mappingEntityListToDtoListTest() {
-        Doctor testDoctorA = new Doctor(3,
+        Doctor testDoctor = new Doctor(3,
                 "DoctorA_Name", "DoctorA_LastName", "DoctorA_Patronymic",
                 LocalDate.of(1991, 5, 4),
                 "380123455789", "DoctorA_Position");
         Patient testPatientA = new Patient(1,
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
-                "380123455789", testDoctorA);
+                "380123455789", testDoctor);
         Patient testPatientB = new Patient(2,
                 "PatientA_Name", "PatientA_LastName", "PatientA_Patronymic",
                 LocalDate.of(1991, 5, 4),
-                "380123455789", testDoctorA);
+                "380123455789", testDoctor);
         List<Patient> patientList = Arrays.asList(testPatientA, testPatientB);
 
         List<PatientDto> returnPatientDtoList = mapper.entityListToDtoList(patientList);
@@ -97,7 +98,7 @@ public class PatientMapperTest {
             assertEquals(originEntity.getPatronymic(), returnedDto.getPatronymic());
             assertEquals(originEntity.getBirthDate(), returnedDto.getBirthDate());
             assertEquals(originEntity.getPhoneNumber(), returnedDto.getPhoneNumber());
-            assertEquals(testDoctorA.getId(), returnedDto.getDoctor());
+            assertEquals(testDoctor.getId(), returnedDto.getDoctor());
         }
     }
 

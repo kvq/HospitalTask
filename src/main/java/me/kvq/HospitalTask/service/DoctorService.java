@@ -18,8 +18,7 @@ public class DoctorService {
     final private DoctorMapper mapper;
 
     public DoctorDto add(DoctorDto doctorDto) {
-        String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(doctorDto.getPhoneNumber());
-        doctorDto.setPhoneNumber(fixedPhoneNumber);
+        PhoneNumberUtils.checkPhoneNumber(doctorDto.getPhoneNumber());
         Doctor doctor = mapper.dtoToEntity(0, doctorDto);
         Doctor returnDoctor = dao.save(doctor);
         return mapper.entityToDto(returnDoctor);
@@ -29,8 +28,7 @@ public class DoctorService {
         if (!dao.existsById(id)) {
             throw new NotFoundException("No doctor found by that id");
         }
-        String fixedPhoneNumber = PhoneNumberUtils.fixPhoneNumber(doctorDto.getPhoneNumber());
-        doctorDto.setPhoneNumber(fixedPhoneNumber);
+        PhoneNumberUtils.checkPhoneNumber(doctorDto.getPhoneNumber());
         Doctor doctor = mapper.dtoToEntity(id, doctorDto);
         Doctor returnDoctor = dao.save(doctor);
         return mapper.entityToDto(returnDoctor);
