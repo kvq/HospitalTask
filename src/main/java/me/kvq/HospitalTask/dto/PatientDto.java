@@ -16,6 +16,6 @@ public class PatientDto {
     private String patronymic;
     private LocalDate birthDate;
     private String phoneNumber;
-    private long doctor;
+    private long[] doctors;
 
 }

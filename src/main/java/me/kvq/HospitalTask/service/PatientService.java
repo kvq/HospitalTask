@@ -26,7 +26,7 @@ public class PatientService {
 
     public PatientDto update(long id, PatientDto patientDto) {
         if (!dao.existsById(id)) {
-            throw new NotFoundException("No patient found by that Id");
+            throw new NotFoundException("No patient found by that id");
         }
         PhoneNumberUtils.checkPhoneNumber(patientDto.getPhoneNumber());
         Patient patient = mapper.dtoToEntity(id, patientDto);
@@ -36,7 +36,7 @@ public class PatientService {
 
     public boolean delete(long id) {
         if (!dao.existsById(id)) {
-            throw new NotFoundException("No patient found by that Id");
+            throw new NotFoundException("No patient found by that id");
         }
         dao.deleteById(id);
         return true;
@@ -51,7 +51,7 @@ public class PatientService {
     public PatientDto get(long id) {
         Patient entity = dao.getById(id);
         if (entity == null) {
-            throw new NotFoundException("No patient found by that Id");
+            throw new NotFoundException("No patient found by that id");
         }
         return mapper.entityToDto(entity);
     }

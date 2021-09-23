@@ -10,7 +10,7 @@ primary key (id)
 );
 
 CREATE TABLE IF NOT EXISTS patient(
-id int not null,
+id bigint not null,
 first_name varchar(32),
 last_name varchar(32),
 patronymic varchar(32),

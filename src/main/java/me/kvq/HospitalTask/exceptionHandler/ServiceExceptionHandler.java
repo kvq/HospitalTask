@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {NotFoundException.class, InvalidPhoneNumberException.class})
-    public ResponseEntity<ErrorMessageObject> handlePhoneNumberException(RuntimeException exception) {
+    public ResponseEntity<ErrorMessageObject> handleException(RuntimeException exception) {
         ErrorMessageObject messageObject = new ErrorMessageObject(exception.getMessage());
         return new ResponseEntity(messageObject, HttpStatus.BAD_REQUEST);
     }

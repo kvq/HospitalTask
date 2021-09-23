@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Builder
@@ -21,7 +22,11 @@ public class Patient {
     @Column(columnDefinition = "DATE")
     private LocalDate birthDate;
     private String phoneNumber;
-    @ManyToOne
-    private Doctor doctor;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "doctor_patients",
+            joinColumns = @JoinColumn(name = "patient_id"),
+            inverseJoinColumns = @JoinColumn(name = "doctor_id")
+    )
+    private List<Doctor> doctors;
 
 }
