@@ -93,7 +93,7 @@ class AppointmentControllerTest {
         when(service.getAllForDoctor(id)).thenReturn(expectedDtoList);
 
         ResultActions actions = mockMvc.perform(get("/appointment/doctor/" + id))
-                .andExpect(status().isOk()); // [{...} ,{...}]
+                .andExpect(status().isOk());
         for (int index = 0; index < expectedDtoList.size(); index++) {
             AppointmentDto expectedDto = expectedDtoList.get(index);
             actions.andExpect(jsonPath("$[" + index + "].id").value(expectedDto.getId()))
