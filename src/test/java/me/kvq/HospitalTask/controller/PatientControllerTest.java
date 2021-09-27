@@ -38,7 +38,7 @@ class PatientControllerTest {
 
     @Test
     @DisplayName("Add new valid Patient, then compare json fields")
-    void addPatientJsonRequestResponseCheckTest() throws Exception {
+    void addPatientAndCheckResponseTest() throws Exception {
         String patientJson = validPatientJson();
         PatientDto expectedDto = validPatientDto();
         long id = expectedDto.getId();
@@ -56,7 +56,7 @@ class PatientControllerTest {
 
     @Test
     @DisplayName("Update Patient with valid data, then compare json fields")
-    void patchPatientJsonRequestResponseCheckTest() throws Exception {
+    void updatePatientAndCheckResponseTest() throws Exception {
         String patientJson = validPatientJson();
         PatientDto expectedDto = validPatientDto();
         when(patientService.update(any(PatientDto.class))).thenReturn(expectedDto);
