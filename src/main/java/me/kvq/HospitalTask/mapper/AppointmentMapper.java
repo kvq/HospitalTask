@@ -1,9 +1,9 @@
 package me.kvq.HospitalTask.mapper;
 
-import lombok.AllArgsConstructor;
-import me.kvq.HospitalTask.dao.DoctorDao;
-import me.kvq.HospitalTask.dao.PatientDao;
+import lombok.RequiredArgsConstructor;
 import me.kvq.HospitalTask.dto.AppointmentDto;
+import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.model.Appointment;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
@@ -12,29 +12,31 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
-@AllArgsConstructor
 public class AppointmentMapper {
-    final private DoctorDao doctorDao;
-    final private PatientDao patientDao;
+    private final DoctorMapper doctorMapper;
+    private final PatientMapper patientMapper;
 
     public AppointmentDto entityToDto(Appointment appointment) {
+        DoctorDto doctorDto = doctorMapper.entityToDto(appointment.getDoctor());
+        PatientDto patientDto = patientMapper.entityToDto(appointment.getPatient());
         return AppointmentDto.builder()
                 .id(appointment.getId())
-                .doctorId(appointment.getDoctor().getId())
-                .patientId(appointment.getPatient().getId())
-                .time(appointment.getTime())
+                .doctor(doctorDto)
+                .patient(patientDto)
+                .dateTime(appointment.getDateTime())
                 .build();
     }
 
-    public Appointment dtoToEntity(long id, AppointmentDto appointmentDto) {
-        Doctor doctor = doctorDao.getById(appointmentDto.getDoctorId());
-        Patient patient = patientDao.getById(appointmentDto.getPatientId());
+    public Appointment dtoToEntity(AppointmentDto appointmentDto) {
+        Doctor doctor = doctorMapper.dtoToEntity(appointmentDto.getDoctor());
+        Patient patient = patientMapper.dtoToEntity(appointmentDto.getPatient());
         return Appointment.builder()
-                .id(id)
+                .id(appointmentDto.getId())
                 .doctor(doctor)
                 .patient(patient)
-                .time(appointmentDto.getTime())
+                .dateTime(appointmentDto.getDateTime())
                 .build();
     }
 

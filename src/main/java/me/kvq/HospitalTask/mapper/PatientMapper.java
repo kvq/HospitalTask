@@ -1,7 +1,8 @@
 package me.kvq.HospitalTask.mapper;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import me.kvq.HospitalTask.dao.DoctorDao;
+import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.model.Doctor;
@@ -12,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class PatientMapper {
-    final private DoctorDao doctorDao;
+    private final DoctorDao doctorDao;
 
     public PatientDto entityToDto(Patient patient) {
-        long[] doctors = listToIds(patient.getDoctors());
+        DoctorDto[] doctors = doctorsToDtoArray(patient.getDoctors());
         return PatientDto.builder()
                 .id(patient.getId())
                 .firstName(patient.getFirstName())
@@ -30,10 +31,10 @@ public class PatientMapper {
                 .build();
     }
 
-    public Patient dtoToEntity(long id, PatientDto patientDto) {
-        List<Doctor> doctors = idsToDoctorList(patientDto.getDoctors());
+    public Patient dtoToEntity(PatientDto patientDto) {
+        List<Doctor> doctors = doctorsDtoArrayToList(patientDto.getDoctors());
         return Patient.builder()
-                .id(id)
+                .id(patientDto.getId())
                 .firstName(patientDto.getFirstName())
                 .lastName(patientDto.getLastName())
                 .patronymic(patientDto.getPatronymic())
@@ -47,17 +48,34 @@ public class PatientMapper {
         return list.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public long[] listToIds(List<Doctor> doctorsList) {
-        if (doctorsList == null) return new long[]{};
-        return doctorsList.stream().mapToLong(doctor -> doctor.getId()).toArray();
+    private DoctorDto[] doctorsToDtoArray(List<Doctor> doctorList) {
+        if (doctorList == null) {
+            return new DoctorDto[]{};
+        }
+        DoctorDto[] dtoArray = new DoctorDto[doctorList.size()];
+        for (int index = 0; index < doctorList.size(); index++) {
+            Doctor doctor = doctorList.get(index);
+            dtoArray[index] = DoctorDto.builder()
+                    .id(doctor.getId())
+                    .firstName(doctor.getFirstName())
+                    .lastName(doctor.getLastName())
+                    .patronymic(doctor.getPatronymic())
+                    .birthDate(doctor.getBirthDate())
+                    .phoneNumber(doctor.getPhoneNumber())
+                    .position(doctor.getPosition())
+                    .build();
+        }
+        return dtoArray;
     }
 
-    private List<Doctor> idsToDoctorList(long[] doctorsArray) {
-        List<Doctor> list = new ArrayList<>();
+    private List<Doctor> doctorsDtoArrayToList(DoctorDto[] doctorsArray) {
+        ArrayList<Doctor> list = new ArrayList<>();
         if (doctorsArray == null) {
             return list;
         }
-        for (long doctorId : doctorsArray) {
+        list.ensureCapacity(doctorsArray.length);
+        for (int index = 0; index < doctorsArray.length; index++) {
+            long doctorId = doctorsArray[index].getId();
             if (!doctorDao.existsById(doctorId)) {
                 throw new NotFoundException("Doctor by id " + doctorId + " not found.");
             }
@@ -66,5 +84,6 @@ public class PatientMapper {
         }
         return list;
     }
+
 
 }

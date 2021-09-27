@@ -1,8 +1,8 @@
 package me.kvq.HospitalTask.mapper;
 
-import me.kvq.HospitalTask.dao.DoctorDao;
-import me.kvq.HospitalTask.dao.PatientDao;
 import me.kvq.HospitalTask.dto.AppointmentDto;
+import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.model.Appointment;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
@@ -21,53 +21,63 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class AppointmentMapperTest {
     @MockBean
-    DoctorDao doctorDao;
+    DoctorMapper doctorMapper;
     @MockBean
-    PatientDao patientDao;
+    PatientMapper patientMapper;
     @Autowired
     AppointmentMapper mapper;
 
     @Test
-    @DisplayName("(dtoToEntity) passes AppointmentDto, compare returned Dto fields")
+    @DisplayName("Mapping dto to entity, compare fields")
     void dtoToEntityTest() {
         AppointmentDto expected = TestDataGenerator.validAppointmentDto();
-        Patient patient = TestDataGenerator.validPatient();
-        Doctor doctor = TestDataGenerator.validDoctor();
-        when(doctorDao.getById(expected.getDoctorId())).thenReturn(doctor);
-        when(patientDao.getById(expected.getPatientId())).thenReturn(patient);
+        Patient expectedPatient = TestDataGenerator.validPatient();
+        Doctor expectedDoctor = TestDataGenerator.validDoctor();
+        when(doctorMapper.dtoToEntity(expected.getDoctor())).thenReturn(expectedDoctor);
+        when(patientMapper.dtoToEntity(expected.getPatient())).thenReturn(expectedPatient);
 
-        Appointment returned = mapper.dtoToEntity(expected.getId(), expected);
-        assertEquals(expected.getId(), returned.getId());
-        assertEquals(expected.getDoctorId(), returned.getDoctor().getId());
-        assertEquals(expected.getPatientId(), returned.getPatient().getId());
-        assertEquals(expected.getTime(), returned.getTime());
-        verify(doctorDao, times(1)).getById(doctor.getId());
-        verify(patientDao, times(1)).getById(patient.getId());
+        Appointment actual = mapper.dtoToEntity(expected);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expectedDoctor, actual.getDoctor());
+        assertEquals(expectedPatient, actual.getPatient());
+        assertEquals(expected.getDateTime(), actual.getDateTime());
+        verify(doctorMapper, times(1)).dtoToEntity(expected.getDoctor());
+        verify(patientMapper, times(1)).dtoToEntity(expected.getPatient());
     }
 
     @Test
-    @DisplayName("(entityToDto) passes Appointment, compare returned Dto fields")
+    @DisplayName("Mapping entity to dto, compare fields")
     void entityToDtoTest() {
         Appointment expected = TestDataGenerator.validAppointment();
-        AppointmentDto returned = mapper.entityToDto(expected);
-        assertEquals(expected.getId(), returned.getId());
-        assertEquals(expected.getDoctor().getId(), returned.getDoctorId());
-        assertEquals(expected.getPatient().getId(), returned.getPatientId());
-        assertEquals(expected.getTime(), returned.getTime());
+        PatientDto expectedPatient = TestDataGenerator.validPatientDto();
+        DoctorDto expectedDoctor = TestDataGenerator.validDoctorDto();
+        when(doctorMapper.entityToDto(expected.getDoctor())).thenReturn(expectedDoctor);
+        when(patientMapper.entityToDto(expected.getPatient())).thenReturn(expectedPatient);
+
+        AppointmentDto actual = mapper.entityToDto(expected);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expectedDoctor, actual.getDoctor());
+        assertEquals(expectedPatient, actual.getPatient());
+        assertEquals(expected.getDateTime(), actual.getDateTime());
     }
 
     @Test
-    @DisplayName("(entityListToDtoList) passes Appointment list, checks returned list size & compare Dtos")
+    @DisplayName("Mapping entity list to dto list, compare fields")
     void entityListToDtoTest() {
         List<Appointment> list = TestDataGenerator.getAppointmentsList();
+        DoctorDto expectedDoctor = TestDataGenerator.validDoctorDto();
+        PatientDto expectedPatient = TestDataGenerator.validPatientDto();
+        when(doctorMapper.entityToDto(any(Doctor.class))).thenReturn(expectedDoctor);
+        when(patientMapper.entityToDto(any(Patient.class))).thenReturn(expectedPatient);
+
         List<AppointmentDto> returnedList = mapper.entityListToDtoList(list);
         for (int index = 0; index < list.size(); index++) {
             Appointment expected = list.get(index);
-            AppointmentDto returned = returnedList.get(index);
-            assertEquals(expected.getId(), returned.getId());
-            assertEquals(expected.getPatient().getId(), returned.getPatientId());
-            assertEquals(expected.getDoctor().getId(), returned.getDoctorId());
-            assertEquals(expected.getTime(), returned.getTime());
+            AppointmentDto actual = returnedList.get(index);
+            assertEquals(expected.getId(), actual.getId());
+            assertEquals(expected.getPatient().getId(), actual.getPatient().getId());
+            assertEquals(expected.getDoctor().getId(), actual.getDoctor().getId());
+            assertEquals(expected.getDateTime(), actual.getDateTime());
         }
     }
 

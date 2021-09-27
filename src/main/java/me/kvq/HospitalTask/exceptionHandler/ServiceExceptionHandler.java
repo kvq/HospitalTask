@@ -1,6 +1,6 @@
 package me.kvq.HospitalTask.exceptionHandler;
 
-import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
+import me.kvq.HospitalTask.exception.InvalidDtoException;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = {NotFoundException.class, InvalidPhoneNumberException.class})
+    @ExceptionHandler(value = {NotFoundException.class, InvalidDtoException.class})
     public ResponseEntity<ErrorMessageObject> handleException(RuntimeException exception) {
         ErrorMessageObject messageObject = new ErrorMessageObject(exception.getMessage());
         return new ResponseEntity(messageObject, HttpStatus.BAD_REQUEST);

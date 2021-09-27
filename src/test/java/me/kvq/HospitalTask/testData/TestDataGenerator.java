@@ -1,7 +1,5 @@
 package me.kvq.HospitalTask.testData;
 
-import lombok.Builder;
-import lombok.Getter;
 import me.kvq.HospitalTask.dto.AppointmentDto;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.dto.PatientDto;
@@ -22,18 +20,6 @@ public class TestDataGenerator {
         return doctor;
     }
 
-    private static Doctor validDoctorWithoutPatients() {
-        return Doctor.builder()
-                .id(1)
-                .firstName("Doctor_FirstName")
-                .lastName("Doctor_LastName")
-                .patronymic("Doctor_Patronymic")
-                .birthDate(LocalDate.of(1995, 5, 6))
-                .phoneNumber("380123455789")
-                .position("Doctor_Position")
-                .build();
-    }
-
     public static List<Doctor> validDoctorList() {
         Doctor doctorOne = Doctor.builder()
                 .id(1)
@@ -43,7 +29,7 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1991, 5, 4))
                 .phoneNumber("380123455789")
                 .position("DoctorA_Position")
-                .patients(Arrays.asList(validPatientWithoutDoctor()))
+                .patients(List.of(validPatientWithoutDoctor()))
                 .build();
         Doctor doctorTwo = Doctor.builder()
                 .id(3)
@@ -53,22 +39,16 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1995, 2, 11))
                 .phoneNumber("380123455788")
                 .position("DoctorB_Position")
-                .patients(Arrays.asList(validPatientWithoutDoctor()))
+                .patients(List.of(validPatientWithoutDoctor()))
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
     }
 
     public static DoctorDto validDoctorDto() {
-        return DoctorDto.builder()
-                .id(1)
-                .firstName("Doctor_FirstName")
-                .lastName("Doctor_LastName")
-                .patronymic("Doctor_Patronymic")
-                .birthDate(LocalDate.of(1995, 5, 6))
-                .phoneNumber("380123455789")
-                .position("Doctor_Position")
-                .patients(new long[]{2, 4})
-                .build();
+        DoctorDto dto = validDoctorDtoWithoutPatients();
+        List<PatientDto> patientDtoList = validPatientDtoList();
+        dto.setPatients(patientDtoList.toArray(new PatientDto[0]));
+        return dto;
     }
 
     public static List<DoctorDto> validDoctorDtoList() {
@@ -80,7 +60,6 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1991, 5, 4))
                 .phoneNumber("380123455789")
                 .position("DoctorA_Position")
-                .patients(new long[]{1})
                 .build();
         DoctorDto doctorTwo = DoctorDto.builder()
                 .id(3)
@@ -90,36 +69,14 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1995, 2, 11))
                 .phoneNumber("380123455788")
                 .position("DoctorB_Position")
-                .patients(new long[]{1})
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
-    }
-
-    private static String validDoctorJson() {
-        return "{\"firstName\":\"Doctor_FirstName\","
-                + "\"lastName\":\"Doctor_LastName\","
-                + "\"patronymic\":\"Doctor_Patronymic\","
-                + "\"birthDate\":[1995,5,6],"
-                + "\"phoneNumber\":\"380123455789\","
-                + "\"position\":\"Doctor_Position\","
-                + "\"patients\": [3,4] }";
     }
 
     public static Patient validPatient() {
         Patient patient = validPatientWithoutDoctor();
         patient.setDoctors(validDoctorList());
         return patient;
-    }
-
-    private static Patient validPatientWithoutDoctor() {
-        return Patient.builder()
-                .id(2)
-                .firstName("Patient_FirstName")
-                .lastName("Patient_LastName")
-                .patronymic("Patient_Patronymic")
-                .birthDate(LocalDate.of(2000, 1, 21))
-                .phoneNumber("380123455780")
-                .build();
     }
 
     public static List<Patient> validPatientList() {
@@ -130,7 +87,7 @@ public class TestDataGenerator {
                 .patronymic("PatientA_Patronymic")
                 .birthDate(LocalDate.of(1991, 5, 4))
                 .phoneNumber("380123455789")
-                .doctors(Arrays.asList(validDoctorWithoutPatients()))
+                .doctors(List.of(validDoctorWithoutPatients()))
                 .build();
         Patient doctorTwo = Patient.builder()
                 .id(4)
@@ -139,21 +96,16 @@ public class TestDataGenerator {
                 .patronymic("DoctorB_Patronymic")
                 .birthDate(LocalDate.of(1995, 2, 11))
                 .phoneNumber("380123455788")
-                .doctors(Arrays.asList(validDoctorWithoutPatients()))
+                .doctors(List.of(validDoctorWithoutPatients()))
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
     }
 
     public static PatientDto validPatientDto() {
-        return PatientDto.builder()
-                .id(2)
-                .firstName("Patient_FirstName")
-                .lastName("Patient_LastName")
-                .patronymic("Patient_Patronymic")
-                .birthDate(LocalDate.of(2000, 1, 21))
-                .phoneNumber("380123455780")
-                .doctors(new long[]{1, 3})
-                .build();
+        PatientDto dto = validPatientDtoWithoutDoctors();
+        List<DoctorDto> patientDtoList = validDoctorDtoList();
+        dto.setDoctors(patientDtoList.toArray(new DoctorDto[0]));
+        return dto;
     }
 
     public static List<PatientDto> validPatientDtoList() {
@@ -164,7 +116,6 @@ public class TestDataGenerator {
                 .patronymic("PatientA_Patronymic")
                 .birthDate(LocalDate.of(1991, 5, 4))
                 .phoneNumber("380123455789")
-                .doctors(new long[]{1})
                 .build();
         PatientDto doctorTwo = PatientDto.builder()
                 .id(4)
@@ -173,73 +124,26 @@ public class TestDataGenerator {
                 .patronymic("DoctorB_Patronymic")
                 .birthDate(LocalDate.of(1995, 2, 11))
                 .phoneNumber("380123455788")
-                .doctors(new long[]{1})
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
     }
 
-    private static String validPatientJson() {
-        return "{\"firstName\":\"Patient_FirstName\","
-                + "\"lastName\":\"Patient_LastName\","
-                + "\"patronymic\":\"Patient_Patronymic\","
-                + "\"birthDate\":[2000,1,21],"
-                + "\"phoneNumber\":\"380123455789\","
-                + "\"position\":\"Doctor_Position\","
-                + "\"doctors\": [1, 3] }";
-    }
-
     public static Appointment validAppointment() {
-        Appointment appointment = Appointment.builder()
+        return Appointment.builder()
                 .id(5)
                 .doctor(validDoctorWithoutPatients())
                 .patient(validPatientWithoutDoctor())
-                .time(LocalDateTime.of(2022, 2, 11, 8, 0))
+                .dateTime(LocalDateTime.of(2022, 2, 11, 8, 0))
                 .build();
-        return appointment;
     }
 
     public static AppointmentDto validAppointmentDto() {
-        AppointmentDto appointmentDto = AppointmentDto.builder()
+        return AppointmentDto.builder()
                 .id(5)
-                .doctorId(validDoctorWithoutPatients().getId())
-                .patientId(validPatientWithoutDoctor().getId())
-                .time(LocalDateTime.of(2022, 2, 11, 8, 0))
+                .doctor(validDoctorDto())
+                .patient(validPatientDto())
+                .dateTime(LocalDateTime.of(2022, 2, 11, 8, 0))
                 .build();
-        return appointmentDto;
-    }
-
-    private static String validAppointmentJson() {
-        String json = "{\"doctor\": 1 ,"
-                + "\"patient\": 3 ,"
-                + "\"time\": [2022, 2, 11, 8, 0] }";
-        return json;
-    }
-
-    private static Appointment invalidAppointment() {
-        Appointment appointment = Appointment.builder()
-                .id(5)
-                .doctor(null)
-                .patient(null)
-                .time(null)
-                .build();
-        return appointment;
-    }
-
-    private static AppointmentDto invalidAppointmentDto() {
-        AppointmentDto appointmentDto = AppointmentDto.builder()
-                .id(5)
-                .doctorId(-1)
-                .patientId(-1)
-                .time(null)
-                .build();
-        return appointmentDto;
-    }
-
-    private static String invalidAppointmentJson() {
-        String json = "{\"doctor\": -1 ,"
-                + "\"patient\": -1 ,"
-                + "\"time\": null }";
-        return json;
     }
 
     public static List<Appointment> getAppointmentsList() {
@@ -247,77 +151,111 @@ public class TestDataGenerator {
                 .id(5)
                 .doctor(validDoctorWithoutPatients())
                 .patient(validPatientWithoutDoctor())
-                .time(LocalDateTime.of(2022, 2, 11, 8, 0))
+                .dateTime(LocalDateTime.of(2022, 2, 11, 8, 0))
                 .build();
-        Appointment appointment2 = Appointment.builder()
+        Appointment anotherAppointment = Appointment.builder()
                 .id(6)
                 .doctor(validDoctorWithoutPatients())
                 .patient(validPatientWithoutDoctor())
-                .time(LocalDateTime.of(2025, 6, 13, 9, 1))
+                .dateTime(LocalDateTime.of(2025, 6, 13, 9, 1))
                 .build();
-        return Arrays.asList(appointment, appointment2);
+        return Arrays.asList(appointment, anotherAppointment);
     }
 
     public static List<AppointmentDto> getAppointmentsDtoList() {
         AppointmentDto appointment = AppointmentDto.builder()
                 .id(5)
-                .doctorId(validDoctorWithoutPatients().getId())
-                .patientId(validPatientWithoutDoctor().getId())
-                .time(LocalDateTime.of(2022, 2, 11, 8, 0))
+                .doctor(validDoctorDto())
+                .patient(validPatientDto())
+                .dateTime(LocalDateTime.of(2022, 2, 11, 8, 0))
                 .build();
-        AppointmentDto appointment2 = AppointmentDto.builder()
+        AppointmentDto anotherAppointment = AppointmentDto.builder()
                 .id(6)
-                .doctorId(validDoctorWithoutPatients().getId())
-                .patientId(validPatientWithoutDoctor().getId())
-                .time(LocalDateTime.of(2025, 6, 13, 9, 1))
+                .doctor(validDoctorDto())
+                .patient(validPatientDto())
+                .dateTime(LocalDateTime.of(2025, 6, 13, 9, 1))
                 .build();
-        return Arrays.asList(appointment, appointment2);
+        return Arrays.asList(appointment, anotherAppointment);
     }
 
-    public static TestData getValidPatientData() {
-        return TestData.builder()
-                .id(2)
-                .entity(validPatient())
-                .dto(validPatientDto())
-                .json(validPatientJson())
-                .build();
-    }
-
-    public static TestData getValidDoctorData() {
-        return TestData.builder()
+    public static Doctor validDoctorWithoutPatients() {
+        return Doctor.builder()
                 .id(1)
-                .entity(validDoctor())
-                .dto(validDoctorDto())
-                .json(validDoctorJson())
+                .firstName("Doctor_FirstName")
+                .lastName("Doctor_LastName")
+                .patronymic("Doctor_Patronymic")
+                .birthDate(LocalDate.of(1995, 5, 6))
+                .phoneNumber("380123455789")
+                .position("Doctor_Position")
                 .build();
     }
 
-    public static TestData getValidAppointmentData() {
-        return TestData.builder()
+    public static String validAppointmentJson() {
+        return "{\"doctor\": " + validDoctorJson() + " ,"
+                + "\"patient\": " + validPatientJson() + " ,"
+                + "\"time\": \"2022-2-11 08:00\" }";
+    }
+
+    public static AppointmentDto invalidAppointmentDto() {
+        return AppointmentDto.builder()
                 .id(5)
-                .entity(validAppointment())
-                .dto(validAppointmentDto())
-                .json(validAppointmentJson())
+                .doctor(null)
+                .patient(null)
+                .dateTime(null)
                 .build();
     }
 
-    public static TestData getInvalidAppointmentData() {
-        return TestData.builder()
-                .id(5)
-                .entity(invalidAppointment())
-                .dto(invalidAppointmentDto())
-                .json(invalidAppointmentJson())
+    public static String validPatientJson() {
+        return "{\"firstName\":\"Patient_FirstName\","
+                + "\"lastName\":\"Patient_LastName\","
+                + "\"patronymic\":\"Patient_Patronymic\","
+                + "\"birthDate\":[2000,1,21],"
+                + "\"phoneNumber\":\"380123455789\","
+                + "\"doctors\": [{\"firstName\":\"Doctor_FirstName\",\"lastName\":\"Doctor_LastName\",\"patronymic\":\"Doctor_Patronymic\",\"birthDate\":[1995,5,6],\"phoneNumber\":\"380123455789\",\"position\":\"Doctor_Position\"}] }";
+    }
+
+    public static String validDoctorJson() {
+        return "{\"firstName\":\"Doctor_FirstName\","
+                + "\"lastName\":\"Doctor_LastName\","
+                + "\"patronymic\":\"Doctor_Patronymic\","
+                + "\"birthDate\":[1995,5,6],"
+                + "\"phoneNumber\":\"380123455789\","
+                + "\"position\":\"Doctor_Position\","
+                + "\"patients\": [{\"firstName\":\"Patient_FirstName\",\"lastName\":\"Patient_LastName\",\"patronymic\":\"Patient_Patronymic\",\"birthDate\":[2000,1,21],\"phoneNumber\":\"380123455789\"}] }";
+    }
+
+    public static Patient validPatientWithoutDoctor() {
+        return Patient.builder()
+                .id(2)
+                .firstName("Patient_FirstName")
+                .lastName("Patient_LastName")
+                .patronymic("Patient_Patronymic")
+                .birthDate(LocalDate.of(2000, 1, 21))
+                .phoneNumber("380123455780")
                 .build();
     }
 
-    @Getter
-    @Builder
-    public static class TestData<T, D> {
-        private long id;
-        private T entity;
-        private D dto;
-        private String json;
+    private static DoctorDto validDoctorDtoWithoutPatients() {
+        return DoctorDto.builder()
+                .id(1)
+                .firstName("Doctor_FirstName")
+                .lastName("Doctor_LastName")
+                .patronymic("Doctor_Patronymic")
+                .birthDate(LocalDate.of(1995, 5, 6))
+                .phoneNumber("380123455789")
+                .position("Doctor_Position")
+                .build();
+    }
 
+    private static PatientDto validPatientDtoWithoutDoctors() {
+        return PatientDto.builder()
+                .id(2)
+                .firstName("Patient_FirstName")
+                .lastName("Patient_LastName")
+                .patronymic("Patient_Patronymic")
+                .birthDate(LocalDate.of(2000, 1, 21))
+                .phoneNumber("380123455780")
+                .build();
     }
 
 }

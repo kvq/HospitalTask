@@ -1,5 +1,6 @@
 package me.kvq.HospitalTask.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,9 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AppointmentDto {
-    long id;
-    long doctorId;
-    long patientId;
-    LocalDateTime time;
+    private long id;
+    private DoctorDto doctor;
+    private PatientDto patient;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime dateTime;
 
 }

@@ -3,7 +3,6 @@ package me.kvq.HospitalTask.controller;
 import me.kvq.HospitalTask.dto.AppointmentDto;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.service.AppointmentService;
-import me.kvq.HospitalTask.testData.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
+import static me.kvq.HospitalTask.testData.TestMatchers.matchAppointmentDto;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,57 +29,40 @@ class AppointmentControllerTest {
     AppointmentService service;
     @Autowired
     MockMvc mockMvc;
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Test
-    @DisplayName("Valid Json POST /appointment/add. Expects HTTP OK, checks if returned Json values are correct")
-    void addJsonRequestResponseCheckTest() throws Exception {
-        TestDataGenerator.TestData<?, AppointmentDto> testData = TestDataGenerator.getValidAppointmentData();
-        String json = testData.getJson();
-        AppointmentDto expectedDto = testData.getDto();
+    @DisplayName("Create valid appointment, compare json fields")
+    void createAppointmentAndCheckResponseTest() throws Exception {
+        String json = validAppointmentJson();
+        AppointmentDto expectedDto = validAppointmentDto();
         when(service.add(any(AppointmentDto.class))).thenReturn(expectedDto);
 
         mockMvc.perform(post("/appointment/add")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(expectedDto.getId()))
-                .andExpect(jsonPath("$.doctorId").value(expectedDto.getDoctorId()))
-                .andExpect(jsonPath("$.patientId").value(expectedDto.getPatientId()))
-                .andExpect(jsonPath("$.time[0]").value(expectedDto.getTime().getYear()))
-                .andExpect(jsonPath("$.time[1]").value(expectedDto.getTime().getMonthValue()))
-                .andExpect(jsonPath("$.time[2]").value(expectedDto.getTime().getDayOfMonth()))
-                .andExpect(jsonPath("$.time[3]").value(expectedDto.getTime().getHour()))
-                .andExpect(jsonPath("$.time[4]").value(expectedDto.getTime().getMinute()));
+                .andExpect(matchAppointmentDto("$", expectedDto));
         verify(service, times(1)).add(any(AppointmentDto.class));
     }
 
     @Test
-    @DisplayName("Valid Json PATCH /appointment/edit. Expects HTTP OK, checks if returned Json values are correct")
-    void patchJsonRequestResponseCheckTest() throws Exception {
-        TestDataGenerator.TestData<?, AppointmentDto> testData = TestDataGenerator.getValidAppointmentData();
-        String json = testData.getJson();
-        AppointmentDto expectedDto = testData.getDto();
-        long id = testData.getId();
-        when(service.update(eq(id), any(AppointmentDto.class))).thenReturn(expectedDto);
-
-        mockMvc.perform(post("/appointment/edit/" + id)
+    @DisplayName("Update valid appointment, compare json fields")
+    void updateDoctorAndCheckResponseTest() throws Exception {
+        String json = validAppointmentJson();
+        AppointmentDto expectedDto = validAppointmentDto();
+        when(service.update(any(AppointmentDto.class))).thenReturn(expectedDto);
+        mockMvc.perform(post("/appointment/edit")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(expectedDto.getId()))
-                .andExpect(jsonPath("$.doctorId").value(expectedDto.getDoctorId()))
-                .andExpect(jsonPath("$.patientId").value(expectedDto.getPatientId()))
-                .andExpect(jsonPath("$.time[0]").value(expectedDto.getTime().getYear()))
-                .andExpect(jsonPath("$.time[1]").value(expectedDto.getTime().getMonthValue()))
-                .andExpect(jsonPath("$.time[2]").value(expectedDto.getTime().getDayOfMonth()))
-                .andExpect(jsonPath("$.time[3]").value(expectedDto.getTime().getHour()))
-                .andExpect(jsonPath("$.time[4]").value(expectedDto.getTime().getMinute()));
-        verify(service, times(1)).update(eq(id), any(AppointmentDto.class));
+                .andExpect(matchAppointmentDto("$", expectedDto));
+        verify(service, times(1)).update(any(AppointmentDto.class));
     }
 
     @Test
-    @DisplayName("Request DELETE /appointment/delete. Expects HTTP OK")
-    void deleteByIdResponseCheckTest() throws Exception {
+    @DisplayName("Delete appointment. Expects HTTP OK")
+    void deleteAppointmentByIdTest() throws Exception {
         long id = 1;
         mockMvc.perform(delete("/appointment/delete/" + id))
                 .andExpect(status().isOk());
@@ -86,54 +70,36 @@ class AppointmentControllerTest {
     }
 
     @Test
-    @DisplayName("Request GET /appointment/doctor. Expects HTTP OK and checking Json list values")
+    @DisplayName("Get List of Appointments for Doctor, check json fields")
     void getListOfDoctorsResponseCheckTest() throws Exception {
         long id = 2L;
-        List<AppointmentDto> expectedDtoList = TestDataGenerator.getAppointmentsDtoList();
-        when(service.getAllForDoctor(id)).thenReturn(expectedDtoList);
+        List<AppointmentDto> expectedDtoList = getAppointmentsDtoList();
+        when(service.findForDoctor(id)).thenReturn(expectedDtoList);
 
         ResultActions actions = mockMvc.perform(get("/appointment/doctor/" + id))
-                .andExpect(status().isOk());
-        for (int index = 0; index < expectedDtoList.size(); index++) {
-            AppointmentDto expectedDto = expectedDtoList.get(index);
-            actions.andExpect(jsonPath("$[" + index + "].id").value(expectedDto.getId()))
-                    .andExpect(jsonPath("$[" + index + "].doctorId").value(expectedDto.getDoctorId()))
-                    .andExpect(jsonPath("$[" + index + "].patientId").value(expectedDto.getPatientId()))
-                    .andExpect(jsonPath("$[" + index + "].time[0]").value(expectedDto.getTime().getYear()))
-                    .andExpect(jsonPath("$[" + index + "].time[1]").value(expectedDto.getTime().getMonthValue()))
-                    .andExpect(jsonPath("$[" + index + "].time[2]").value(expectedDto.getTime().getDayOfMonth()))
-                    .andExpect(jsonPath("$[" + index + "].time[3]").value(expectedDto.getTime().getHour()))
-                    .andExpect(jsonPath("$[" + index + "].time[4]").value(expectedDto.getTime().getMinute()));
-        }
-        verify(service, times(1)).getAllForDoctor(id);
+                .andExpect(status().isOk())
+                .andExpect(matchAppointmentDto("$[0]", expectedDtoList.get(0)))
+                .andExpect(matchAppointmentDto("$[1]", expectedDtoList.get(1)));
+        verify(service, times(1)).findForDoctor(id);
     }
 
     @Test
-    @DisplayName("Request GET /appointment/patient. Expects HTTP OK and checking Json list values")
+    @DisplayName("Get List of appointments for Patient, check json fields")
     void getListOfPatientsResponseCheckTest() throws Exception {
         long id = 2L;
-        List<AppointmentDto> expectedDtoList = TestDataGenerator.getAppointmentsDtoList();
-        when(service.getAllForPatient(id)).thenReturn(expectedDtoList);
+        List<AppointmentDto> expectedDtoList = getAppointmentsDtoList();
+        when(service.findForPatient(id)).thenReturn(expectedDtoList);
 
         ResultActions actions = mockMvc.perform(get("/appointment/patient/" + id))
-                .andExpect(status().isOk());
-        for (int index = 0; index < expectedDtoList.size(); index++) {
-            AppointmentDto expectedDto = expectedDtoList.get(index);
-            actions.andExpect(jsonPath("$[" + index + "].id").value(expectedDto.getId()))
-                    .andExpect(jsonPath("$[" + index + "].doctorId").value(expectedDto.getDoctorId()))
-                    .andExpect(jsonPath("$[" + index + "].patientId").value(expectedDto.getPatientId()))
-                    .andExpect(jsonPath("$[" + index + "].time[0]").value(expectedDto.getTime().getYear()))
-                    .andExpect(jsonPath("$[" + index + "].time[1]").value(expectedDto.getTime().getMonthValue()))
-                    .andExpect(jsonPath("$[" + index + "].time[2]").value(expectedDto.getTime().getDayOfMonth()))
-                    .andExpect(jsonPath("$[" + index + "].time[3]").value(expectedDto.getTime().getHour()))
-                    .andExpect(jsonPath("$[" + index + "].time[4]").value(expectedDto.getTime().getMinute()));
-        }
-        verify(service, times(1)).getAllForPatient(id);
+                .andExpect(status().isOk())
+                .andExpect(matchAppointmentDto("$[0]", expectedDtoList.get(0)))
+                .andExpect(matchAppointmentDto("$[1]", expectedDtoList.get(1)));
+        verify(service, times(1)).findForPatient(id);
     }
 
     @Test
-    @DisplayName("Invalid POST /appointment/add. Expects HTTP 400, and valid error message")
-    void addExceptionTest() throws Exception {
+    @DisplayName("Invalid appointment creation, Expects Bad Request and valid error message")
+    void createInvalidAppointmentExceptionTest() throws Exception {
         NotFoundException exception = new NotFoundException("Appointment not found");
         String emptyJson = "{}";
         when(service.add(any(AppointmentDto.class))).thenThrow(exception);
@@ -146,21 +112,21 @@ class AppointmentControllerTest {
     }
 
     @Test
-    @DisplayName("Invalid POST /appointment/edit. Expects HTTP 400, and valid error message")
+    @DisplayName("Update appointment with invalid data, expects Bad Request and valid error message")
     void updateExceptionTest() throws Exception {
         NotFoundException exception = new NotFoundException("Appointment not found");
         String emptyJson = "{}";
-        when(service.update(eq(1L), any(AppointmentDto.class))).thenThrow(exception);
-        mockMvc.perform(post("/appointment/edit/1")
+        when(service.update(any(AppointmentDto.class))).thenThrow(exception);
+        mockMvc.perform(post("/appointment/edit")
                         .content(emptyJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(service, times(1)).update(eq(1L), any(AppointmentDto.class));
+        verify(service, times(1)).update(any(AppointmentDto.class));
     }
 
     @Test
-    @DisplayName("Invalid POST /appointment/delete. Expects HTTP 400, and valid error message")
+    @DisplayName("Delete non existing appointment, expects Bad Request and valid error message")
     void deleteExceptionTest() throws Exception {
         NotFoundException exception = new NotFoundException("Appointment not found");
         String emptyJson = "{}";

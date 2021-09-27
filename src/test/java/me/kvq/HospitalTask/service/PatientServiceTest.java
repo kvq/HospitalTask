@@ -6,7 +6,6 @@ import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Patient;
-import me.kvq.HospitalTask.testData.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
+import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -30,12 +30,12 @@ class PatientServiceTest {
     PatientService service;
 
     @Test
-    @DisplayName("(add) Pass Valid Dto, then compare returned Dto to passed")
+    @DisplayName("Add valid patient, expected to return Dto with same fields")
     void addNewValidPatientTest() {
-        TestDataGenerator.TestData<Patient, PatientDto> testData = TestDataGenerator.getValidPatientData();
-        Patient testPatient = testData.getEntity();
-        PatientDto expectedPatientDto = testData.getDto();
-        when(mapper.dtoToEntity(0, expectedPatientDto)).thenReturn(testPatient);
+        Patient testPatient = validPatient();
+        PatientDto expectedPatientDto = validPatientDto();
+        expectedPatientDto.setId(0);
+        when(mapper.dtoToEntity(expectedPatientDto)).thenReturn(testPatient);
         when(mapper.entityToDto(testPatient)).thenReturn(expectedPatientDto);
         when(patientDao.save(testPatient)).thenReturn(testPatient);
 
@@ -47,24 +47,23 @@ class PatientServiceTest {
         assertEquals(expectedPatientDto.getBirthDate(), returnedPatientDto.getBirthDate());
         assertEquals(expectedPatientDto.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
         assertArrayEquals(expectedPatientDto.getDoctors(), returnedPatientDto.getDoctors());
-        verify(mapper, times(1)).dtoToEntity(0, expectedPatientDto);
+        verify(mapper, times(1)).dtoToEntity(expectedPatientDto);
         verify(mapper, times(1)).entityToDto(testPatient);
         verify(patientDao, times(1)).save(testPatient);
     }
 
     @Test
-    @DisplayName("(update) Pass Id & Dto, then compare return Dto to passed")
+    @DisplayName("Add valid patient, expected to return Dto with same fields")
     void updateExistingPatientByIdWithValidDataTest() {
-        TestDataGenerator.TestData<Patient, PatientDto> testData = TestDataGenerator.getValidPatientData();
-        Patient testPatient = testData.getEntity();
-        PatientDto expectedPatientDto = testData.getDto();
-        long id = testData.getId();
+        Patient testPatient = validPatient();
+        PatientDto expectedPatientDto = validPatientDto();
+        long id = expectedPatientDto.getId();
         when(mapper.entityToDto(testPatient)).thenReturn(expectedPatientDto);
-        when(mapper.dtoToEntity(expectedPatientDto.getId(), expectedPatientDto)).thenReturn(testPatient);
+        when(mapper.dtoToEntity(expectedPatientDto)).thenReturn(testPatient);
         when(patientDao.existsById(testPatient.getId())).thenReturn(true);
         when(patientDao.save(testPatient)).thenReturn(testPatient);
 
-        PatientDto returnedPatientDto = service.update(id, expectedPatientDto);
+        PatientDto returnedPatientDto = service.update(expectedPatientDto);
         assertEquals(expectedPatientDto.getId(), returnedPatientDto.getId());
         assertEquals(expectedPatientDto.getFirstName(), returnedPatientDto.getFirstName());
         assertEquals(expectedPatientDto.getLastName(), returnedPatientDto.getLastName());
@@ -73,26 +72,26 @@ class PatientServiceTest {
         assertEquals(expectedPatientDto.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
         assertArrayEquals(expectedPatientDto.getDoctors(), returnedPatientDto.getDoctors());
         verify(mapper, times(1)).entityToDto(testPatient);
-        verify(mapper, times(1)).dtoToEntity(id, expectedPatientDto);
+        verify(mapper, times(1)).dtoToEntity(expectedPatientDto);
         verify(patientDao, times(1)).existsById(id);
         verify(patientDao, times(1)).save(testPatient);
     }
 
     @Test
-    @DisplayName("(delete) Pass Id, expected to return true")
+    @DisplayName("Delete existing patient, no exception expected")
     void deleteExistingPatientByIdTest() {
         long testPatientId = 1;
         when(patientDao.existsById(testPatientId)).thenReturn(true);
-        assertTrue(service.delete(testPatientId));
+        service.delete(testPatientId);
         verify(patientDao, times(1)).existsById(testPatientId);
         verify(patientDao, times(1)).deleteById(testPatientId);
     }
 
     @Test
-    @DisplayName("(getList) expected to return 2 Dtos, then compare fields to origin entities")
+    @DisplayName("Find list of all patients, compare Dto fields")
     void getPatientListTest() {
-        List<Patient> testPatientList = TestDataGenerator.validPatientList();
-        List<PatientDto> expectedPatientDtoList = TestDataGenerator.validPatientDtoList();
+        List<Patient> testPatientList = validPatientList();
+        List<PatientDto> expectedPatientDtoList = validPatientDtoList();
         when(patientDao.findAll()).thenReturn(testPatientList);
         when(mapper.entityListToDtoList(testPatientList)).thenReturn(expectedPatientDtoList);
         List<PatientDto> returnedPatientDtoList = service.getList();
@@ -113,14 +112,14 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("(get) Pass Id, expected to return Dto, fields compared to origin entity")
+    @DisplayName("Get patient by id, compare Dto fields")
     void getPatientByIdTest() {
-        TestDataGenerator.TestData<Patient, PatientDto> testData = TestDataGenerator.getValidPatientData();
-        Patient daoPatient = testData.getEntity();
-        PatientDto expectedPatientDto = testData.getDto();
-        long id = testData.getId();
+        Patient daoPatient = validPatient();
+        PatientDto expectedPatientDto = validPatientDto();
+        long id = expectedPatientDto.getId();
         when(patientDao.getById(id)).thenReturn(daoPatient);
         when(mapper.entityToDto(daoPatient)).thenReturn(expectedPatientDto);
+
         PatientDto returnedPatientDto = service.get(id);
         assertEquals(expectedPatientDto.getId(), returnedPatientDto.getId());
         assertEquals(expectedPatientDto.getFirstName(), returnedPatientDto.getFirstName());
@@ -134,7 +133,7 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("(get) Pass non existing Id, expected exception")
+    @DisplayName("Get patient by invalid id, exception expected")
     void getNonExistingPatientByIdTest() {
         long nonExistingId = 1L;
         when(patientDao.getById(nonExistingId)).thenReturn(null);
@@ -145,7 +144,7 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("(delete) Pass non existing Id, expected exception")
+    @DisplayName("Delete patient by invalid id, exception expected")
     void deleteNonExistingPatientByIdTestTest() {
         long nonExistingId = 1L;
         when(patientDao.existsById(nonExistingId)).thenReturn(false);
@@ -156,12 +155,13 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("(update) Pass non existing Id, expected exception")
+    @DisplayName("Update patient with invalid id, exception expected")
     void updateNonExistingPatientByIdTestTest() {
-        long nonExistingId = 1L;
+        PatientDto dto = validPatientDto();
+        long nonExistingId = dto.getId();
         when(patientDao.existsById(nonExistingId)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> {
-            service.update(nonExistingId, null);
+            service.update(dto);
         });
         verify(patientDao, times(1)).existsById(nonExistingId);
     }

@@ -1,50 +1,56 @@
 package me.kvq.HospitalTask.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import me.kvq.HospitalTask.dao.DoctorDao;
 import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.exception.InvalidDtoException;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.mapper.DoctorMapper;
+import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
-@AllArgsConstructor
 public class DoctorService {
-    final private DoctorDao dao;
-    final private DoctorMapper mapper;
+    private final DoctorDao dao;
+    private final DoctorMapper doctorMapper;
+    private final PatientMapper patientMapper;
+    private final PatientService patientService;
 
     public DoctorDto add(DoctorDto doctorDto) {
+        if (doctorDto.getId() != 0) {
+            throw new InvalidDtoException("You should not specify id when adding new doctor");
+        }
         PhoneNumberUtils.checkPhoneNumber(doctorDto.getPhoneNumber());
-        Doctor doctor = mapper.dtoToEntity(0, doctorDto);
+        Doctor doctor = doctorMapper.dtoToEntity(doctorDto);
         Doctor returnDoctor = dao.save(doctor);
-        return mapper.entityToDto(returnDoctor);
+        return doctorMapper.entityToDto(returnDoctor);
     }
 
-    public DoctorDto update(long id, DoctorDto doctorDto) {
-        if (!dao.existsById(id)) {
+    public DoctorDto update(DoctorDto doctorDto) {
+        if (!dao.existsById(doctorDto.getId())) {
             throw new NotFoundException("No doctor found by that id");
         }
         PhoneNumberUtils.checkPhoneNumber(doctorDto.getPhoneNumber());
-        Doctor doctor = mapper.dtoToEntity(id, doctorDto);
+        Doctor doctor = doctorMapper.dtoToEntity(doctorDto);
         Doctor returnDoctor = dao.save(doctor);
-        return mapper.entityToDto(returnDoctor);
+        return doctorMapper.entityToDto(returnDoctor);
     }
 
-    public boolean delete(long id) {
+    public void delete(long id) {
         if (!dao.existsById(id)) {
             throw new NotFoundException("No doctor found by that id");
         }
         dao.deleteById(id);
-        return true;
     }
 
     public List<DoctorDto> getList() {
         List<Doctor> doctorList = dao.findAll();
-        return mapper.entityListToDtoList(doctorList);
+        return doctorMapper.entityListToDtoList(doctorList);
     }
 
     public DoctorDto get(long id) {
@@ -52,7 +58,7 @@ public class DoctorService {
         if (entity == null) {
             throw new NotFoundException("No doctor found by that id");
         }
-        return mapper.entityToDto(entity);
+        return doctorMapper.entityToDto(entity);
     }
 
 }

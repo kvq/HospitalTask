@@ -2,7 +2,9 @@ package me.kvq.HospitalTask.mapper;
 
 import me.kvq.HospitalTask.dao.PatientDao;
 import me.kvq.HospitalTask.dto.DoctorDto;
+import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.model.Doctor;
+import me.kvq.HospitalTask.model.Patient;
 import me.kvq.HospitalTask.testData.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class DoctorMapperTest {
@@ -25,43 +27,42 @@ public class DoctorMapperTest {
     @Test
     @DisplayName("(entityToDto) passes Doctor, compare returned Dto fields")
     void mappingEntityToDtoTest() {
-        Doctor originDoctor = TestDataGenerator.validDoctor();
-        DoctorDto returnedDoctorDto = mapper.entityToDto(originDoctor);
-        assertEquals(originDoctor.getId(), returnedDoctorDto.getId());
-        assertEquals(originDoctor.getFirstName(), returnedDoctorDto.getFirstName());
-        assertEquals(originDoctor.getLastName(), returnedDoctorDto.getLastName());
-        assertEquals(originDoctor.getPatronymic(), returnedDoctorDto.getPatronymic());
-        assertEquals(originDoctor.getBirthDate(), returnedDoctorDto.getBirthDate());
-        assertEquals(originDoctor.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
-        assertEquals(originDoctor.getPosition(), returnedDoctorDto.getPosition());
-        for (int index = 0; index < originDoctor.getPatients().size(); index++) {
-            long expectedPatientId = originDoctor.getPatients().get(index).getId();
-            long returnedPatientId = returnedDoctorDto.getPatients()[index];
-            assertEquals(expectedPatientId, returnedPatientId);
+        Doctor expected = TestDataGenerator.validDoctor();
+        DoctorDto actual = mapper.entityToDto(expected);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getFirstName(), actual.getFirstName());
+        assertEquals(expected.getLastName(), actual.getLastName());
+        assertEquals(expected.getPatronymic(), actual.getPatronymic());
+        assertEquals(expected.getBirthDate(), actual.getBirthDate());
+        assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
+        assertEquals(expected.getPosition(), actual.getPosition());
+        for (int index = 0; index < expected.getPatients().size(); index++) {
+            Patient expectedPatient = expected.getPatients().get(index);
+            PatientDto actualPatient = actual.getPatients()[index];
+            assertEquals(expectedPatient.getId(), actualPatient.getId());
+            assertEquals(expectedPatient.getFirstName(), actualPatient.getFirstName());
+            assertEquals(expectedPatient.getLastName(), actualPatient.getLastName());
+            assertEquals(expectedPatient.getPatronymic(), actualPatient.getPatronymic());
+            assertEquals(expectedPatient.getPhoneNumber(), actualPatient.getPhoneNumber());
         }
     }
 
     @Test
     @DisplayName("(dtoToEntity) passes Id & DoctorDto, compare returned Dto fields")
     void mappingDtoToEntityTest() {
-        DoctorDto originDoctorDto = TestDataGenerator.validDoctorDto();
+        DoctorDto expected = TestDataGenerator.validDoctorDto();
         when(patientDao.existsById(2L)).thenReturn(true);
         when(patientDao.existsById(4L)).thenReturn(true);
-        Doctor returnedDoctor = mapper.dtoToEntity(1, originDoctorDto);
-        assertEquals(originDoctorDto.getId(), returnedDoctor.getId());
-        assertEquals(originDoctorDto.getFirstName(), returnedDoctor.getFirstName());
-        assertEquals(originDoctorDto.getLastName(), returnedDoctor.getLastName());
-        assertEquals(originDoctorDto.getPatronymic(), returnedDoctor.getPatronymic());
-        assertEquals(originDoctorDto.getBirthDate(), returnedDoctor.getBirthDate());
-        assertEquals(originDoctorDto.getPhoneNumber(), returnedDoctor.getPhoneNumber());
-        assertEquals(originDoctorDto.getPosition(), returnedDoctor.getPosition());
-        for (int index = 0; index < originDoctorDto.getPatients().length; index++) {
-            long expectedPatientId = originDoctorDto.getPatients()[index];
-            long returnedPatientId = returnedDoctor.getPatients().get(index).getId();
-            assertEquals(expectedPatientId, returnedPatientId);
-        }
-        verify(patientDao, times(1)).existsById(2L);
-        verify(patientDao, times(1)).existsById(4L);
+        Doctor actual = mapper.dtoToEntity(expected);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getFirstName(), actual.getFirstName());
+        assertEquals(expected.getLastName(), actual.getLastName());
+        assertEquals(expected.getPatronymic(), actual.getPatronymic());
+        assertEquals(expected.getBirthDate(), actual.getBirthDate());
+        assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
+        assertEquals(expected.getPosition(), actual.getPosition());
+        assertEquals(expected.getPatients()[0].getId(), actual.getPatients().get(0).getId());
+        assertEquals(expected.getPatients()[1].getId(), actual.getPatients().get(1).getId());
     }
 
     @Test
@@ -71,19 +72,23 @@ public class DoctorMapperTest {
         List<DoctorDto> returnDoctorDtoList = mapper.entityListToDtoList(doctorList);
         assertEquals(doctorList.size(), returnDoctorDtoList.size());
         for (int i = 0; i < doctorList.size(); i++) {
-            Doctor originEntity = doctorList.get(i);
-            DoctorDto returnedDto = returnDoctorDtoList.get(i);
-            assertEquals(originEntity.getId(), returnedDto.getId());
-            assertEquals(originEntity.getFirstName(), returnedDto.getFirstName());
-            assertEquals(originEntity.getLastName(), returnedDto.getLastName());
-            assertEquals(originEntity.getPatronymic(), returnedDto.getPatronymic());
-            assertEquals(originEntity.getBirthDate(), returnedDto.getBirthDate());
-            assertEquals(originEntity.getPhoneNumber(), returnedDto.getPhoneNumber());
-            assertEquals(originEntity.getPosition(), returnedDto.getPosition());
-            for (int patientIndex = 0; patientIndex < originEntity.getPatients().size(); patientIndex++) {
-                long expectedPatientId = originEntity.getPatients().get(patientIndex).getId();
-                long returnedPatientId = returnedDto.getPatients()[patientIndex];
-                assertEquals(expectedPatientId, returnedPatientId);
+            Doctor expected = doctorList.get(i);
+            DoctorDto actual = returnDoctorDtoList.get(i);
+            assertEquals(expected.getId(), actual.getId());
+            assertEquals(expected.getFirstName(), actual.getFirstName());
+            assertEquals(expected.getLastName(), actual.getLastName());
+            assertEquals(expected.getPatronymic(), actual.getPatronymic());
+            assertEquals(expected.getBirthDate(), actual.getBirthDate());
+            assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
+            assertEquals(expected.getPosition(), actual.getPosition());
+            for (int index = 0; index < expected.getPatients().size(); index++) {
+                Patient expectedPatient = expected.getPatients().get(index);
+                PatientDto actualPatient = actual.getPatients()[index];
+                assertEquals(expectedPatient.getId(), actualPatient.getId());
+                assertEquals(expectedPatient.getFirstName(), actualPatient.getFirstName());
+                assertEquals(expectedPatient.getLastName(), actualPatient.getLastName());
+                assertEquals(expectedPatient.getPatronymic(), actualPatient.getPatronymic());
+                assertEquals(expectedPatient.getPhoneNumber(), actualPatient.getPhoneNumber());
             }
         }
     }

@@ -9,8 +9,8 @@ import java.util.List;
 @Repository
 public interface AppointmentDao extends JpaRepository<Appointment, Long> {
 
-    List<Appointment> findAllByDoctor_id(long id);
+    List<Appointment> findAllByDoctor(long id);
 
-    List<Appointment> findAllByPatient_id(long id);
+    List<Appointment> findAllByPatient(long id);
 
 }

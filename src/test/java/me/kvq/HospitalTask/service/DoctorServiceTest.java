@@ -5,7 +5,6 @@ import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.mapper.DoctorMapper;
 import me.kvq.HospitalTask.model.Doctor;
-import me.kvq.HospitalTask.testData.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
+import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -27,12 +27,12 @@ class DoctorServiceTest {
     DoctorService service;
 
     @Test
-    @DisplayName("(add) Pass Valid Dto, then compares return Dto to passed")
+    @DisplayName("Add valid doctor, expected to return Dto with same fields")
     void addNewValidDoctorTest() {
-        TestDataGenerator.TestData<Doctor, DoctorDto> testData = TestDataGenerator.getValidDoctorData();
-        DoctorDto expectedDoctorDto = testData.getDto();
-        Doctor doctor = testData.getEntity();
-        when(mapper.dtoToEntity(0, expectedDoctorDto)).thenReturn(doctor);
+        DoctorDto expectedDoctorDto = validDoctorDto();
+        expectedDoctorDto.setId(0);
+        Doctor doctor = validDoctor();
+        when(mapper.dtoToEntity(expectedDoctorDto)).thenReturn(doctor);
         when(mapper.entityToDto(doctor)).thenReturn(expectedDoctorDto);
         when(doctorDao.save(doctor)).thenReturn(doctor);
 
@@ -46,23 +46,22 @@ class DoctorServiceTest {
         assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
         assertArrayEquals(expectedDoctorDto.getPatients(), returnedDoctorDto.getPatients());
         verify(doctorDao, times(1)).save(doctor);
-        verify(mapper, times(1)).dtoToEntity(0, expectedDoctorDto);
+        verify(mapper, times(1)).dtoToEntity(expectedDoctorDto);
         verify(mapper, times(1)).entityToDto(doctor);
     }
 
     @Test
-    @DisplayName("(update) Pass existing Id & Valid Dto, then compares return Dto to passed")
+    @DisplayName("Update doctor with valid data, expected to return Dto with same fields")
     void updateExistingDoctorByIdWithValidDataTest() {
-        TestDataGenerator.TestData<Doctor, DoctorDto> testData = TestDataGenerator.getValidDoctorData();
-        DoctorDto expectedDoctorDto = testData.getDto();
-        Doctor doctor = testData.getEntity();
-        long id = testData.getId();
-        when(mapper.dtoToEntity(id, expectedDoctorDto)).thenReturn(doctor);
+        DoctorDto expectedDoctorDto = validDoctorDto();
+        Doctor doctor = validDoctor();
+        long id = expectedDoctorDto.getId();
+        when(mapper.dtoToEntity(expectedDoctorDto)).thenReturn(doctor);
         when(mapper.entityToDto(doctor)).thenReturn(expectedDoctorDto);
         when(doctorDao.save(doctor)).thenReturn(doctor);
         when(doctorDao.existsById(id)).thenReturn(true);
 
-        DoctorDto returnedDoctorDto = service.update(id, expectedDoctorDto);
+        DoctorDto returnedDoctorDto = service.update(expectedDoctorDto);
         assertEquals(expectedDoctorDto.getId(), returnedDoctorDto.getId());
         assertEquals(expectedDoctorDto.getFirstName(), returnedDoctorDto.getFirstName());
         assertEquals(expectedDoctorDto.getLastName(), returnedDoctorDto.getLastName());
@@ -73,25 +72,25 @@ class DoctorServiceTest {
         assertArrayEquals(expectedDoctorDto.getPatients(), returnedDoctorDto.getPatients());
         verify(doctorDao, times(1)).existsById(expectedDoctorDto.getId());
         verify(doctorDao, times(1)).save(doctor);
-        verify(mapper, times(1)).dtoToEntity(id, expectedDoctorDto);
+        verify(mapper, times(1)).dtoToEntity(expectedDoctorDto);
         verify(mapper, times(1)).entityToDto(doctor);
     }
 
     @Test
-    @DisplayName("(delete) Pass existing Id, expected to return true")
+    @DisplayName("Delete existing doctor, no exception expected")
     void deleteExistingDoctorByIdTest() {
         long testId = 1;
         when(doctorDao.existsById(1L)).thenReturn(true);
-        assertTrue(service.delete(testId));
+        service.delete(testId);
         verify(doctorDao, times(1)).existsById(testId);
         verify(doctorDao, times(1)).deleteById(testId);
     }
 
     @Test
-    @DisplayName("(getList) expected to return 2 Dtos, then compare fields to origin entities")
+    @DisplayName("Find list of all doctors, compare Dto fields")
     void getDoctorListTest() {
-        List<Doctor> testDoctorList = TestDataGenerator.validDoctorList();
-        List<DoctorDto> expectedDoctorDtoList = TestDataGenerator.validDoctorDtoList();
+        List<Doctor> testDoctorList = validDoctorList();
+        List<DoctorDto> expectedDoctorDtoList = validDoctorDtoList();
         when(doctorDao.findAll()).thenReturn(testDoctorList);
         when(mapper.entityListToDtoList(testDoctorList)).thenReturn(expectedDoctorDtoList);
 
@@ -114,12 +113,11 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("(get) Pass Id, expected to return Dto, fields compared to origin entity")
+    @DisplayName("Get doctor by id, compare Dto fields")
     void getDoctorByIdTest() {
-        TestDataGenerator.TestData<Doctor, DoctorDto> testData = TestDataGenerator.getValidDoctorData();
-        Doctor daoDoctor = testData.getEntity();
-        DoctorDto expectedDoctorDto = testData.getDto();
-        long id = testData.getId();
+        Doctor daoDoctor = validDoctor();
+        DoctorDto expectedDoctorDto = validDoctorDto();
+        long id = expectedDoctorDto.getId();
         when(doctorDao.getById(id)).thenReturn(daoDoctor);
         when(mapper.entityToDto(daoDoctor)).thenReturn(expectedDoctorDto);
 
@@ -137,7 +135,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("(get) Pass non existing Id, expected exception")
+    @DisplayName("Get doctor by invalid id, exception expected")
     void getNonExistingDoctorByIdTest() {
         long nonExistingId = 1L;
         when(doctorDao.getById(nonExistingId)).thenReturn(null);
@@ -148,7 +146,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("(delete) Pass non existing Id, expected exception")
+    @DisplayName("Delete doctor by invalid id, exception expected")
     void deleteNonExistingDoctorByIdTest() {
         long nonExistingId = 1L;
         when(doctorDao.existsById(nonExistingId)).thenReturn(false);
@@ -159,12 +157,13 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("(update) Pass non existing Id, expected exception")
-    void updateNonExistingDoctorByIdTest() {
-        long nonExistingId = 1L;
+    @DisplayName("Update doctor by invalid id, exception expected")
+    void updateNonExistingDoctorTest() {
+        DoctorDto dto = validDoctorDto();
+        long nonExistingId = dto.getId();
         when(doctorDao.existsById(nonExistingId)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> {
-            service.update(nonExistingId, null);
+            service.update(dto);
         });
         verify(doctorDao, times(1)).existsById(nonExistingId);
     }

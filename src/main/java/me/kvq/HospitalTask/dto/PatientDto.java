@@ -1,5 +1,7 @@
 package me.kvq.HospitalTask.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,8 +16,10 @@ public class PatientDto {
     private String firstName;
     private String lastName;
     private String patronymic;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     private String phoneNumber;
-    private long[] doctors;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private DoctorDto[] doctors;
 
 }

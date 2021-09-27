@@ -4,7 +4,6 @@ import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.service.PatientService;
-import me.kvq.HospitalTask.testData.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,9 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
+import static me.kvq.HospitalTask.testData.TestMatchers.matchDoctorDto;
+import static me.kvq.HospitalTask.testData.TestMatchers.matchPatientDto;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,97 +34,63 @@ class PatientControllerTest {
     PatientService patientService;
     @Autowired
     private MockMvc mockMvc;
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Test
-    @DisplayName("Valid Json POST /patient/add. Expects HTTP OK, checks if returned Json values are correct")
+    @DisplayName("Add new valid Patient, then compare json fields")
     void addPatientJsonRequestResponseCheckTest() throws Exception {
-        TestDataGenerator.TestData<?, PatientDto> testData = TestDataGenerator.getValidPatientData();
-        String patientJson = testData.getJson();
-        PatientDto expectedDto = testData.getDto();
-        long id = testData.getId();
+        String patientJson = validPatientJson();
+        PatientDto expectedDto = validPatientDto();
+        long id = expectedDto.getId();
         when(patientService.add(any(PatientDto.class))).thenReturn(expectedDto);
 
         ResultActions actions = mockMvc.perform(post("/patient/add")
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.firstName").value(expectedDto.getFirstName()))
-                .andExpect(jsonPath("$.lastName").value(expectedDto.getLastName()))
-                .andExpect(jsonPath("$.patronymic").value(expectedDto.getPatronymic()))
-                .andExpect(jsonPath("$.phoneNumber").value(expectedDto.getPhoneNumber()))
-                .andExpect(jsonPath("$.birthDate[0]").value(expectedDto.getBirthDate().getYear()))
-                .andExpect(jsonPath("$.birthDate[1]").value(expectedDto.getBirthDate().getMonthValue()))
-                .andExpect(jsonPath("$.birthDate[2]").value(expectedDto.getBirthDate().getDayOfYear()));
-        for (int doctorIndex = 0; doctorIndex < expectedDto.getDoctors().length; doctorIndex++) {
-            actions.andExpect(jsonPath("$.doctors[" + doctorIndex + "]")
-                    .value(expectedDto.getDoctors()[doctorIndex]));
-        }
+                .andExpect(matchPatientDto("$", expectedDto))
+                .andExpect(matchDoctorDto("$.doctors[0]", expectedDto.getDoctors()[0]))
+                .andExpect(matchDoctorDto("$.doctors[1]", expectedDto.getDoctors()[1]));
         verify(patientService, times(1)).add(any(PatientDto.class));
     }
 
     @Test
-    @DisplayName("Valid Json PATCH /patient/edit. Expects HTTP OK, checks if returned Json values are correct")
+    @DisplayName("Update Patient with valid data, then compare json fields")
     void patchPatientJsonRequestResponseCheckTest() throws Exception {
-        TestDataGenerator.TestData<?, PatientDto> testData = TestDataGenerator.getValidPatientData();
-        String patientJson = testData.getJson();
-        PatientDto expectedDto = testData.getDto();
-        long id = testData.getId();
-        when(patientService.update(eq(id), any(PatientDto.class))).thenReturn(expectedDto);
+        String patientJson = validPatientJson();
+        PatientDto expectedDto = validPatientDto();
+        when(patientService.update(any(PatientDto.class))).thenReturn(expectedDto);
 
-        ResultActions actions = mockMvc.perform(patch("/patient/edit/" + id)
+        ResultActions actions = mockMvc.perform(patch("/patient/edit")
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.firstName").value(expectedDto.getFirstName()))
-                .andExpect(jsonPath("$.lastName").value(expectedDto.getLastName()))
-                .andExpect(jsonPath("$.patronymic").value(expectedDto.getPatronymic()))
-                .andExpect(jsonPath("$.phoneNumber").value(expectedDto.getPhoneNumber()))
-                .andExpect(jsonPath("$.birthDate[0]").value(expectedDto.getBirthDate().getYear()))
-                .andExpect(jsonPath("$.birthDate[1]").value(expectedDto.getBirthDate().getMonthValue()))
-                .andExpect(jsonPath("$.birthDate[2]").value(expectedDto.getBirthDate().getDayOfYear()));
-        for (int doctorIndex = 0; doctorIndex < expectedDto.getDoctors().length; doctorIndex++) {
-            actions.andExpect(jsonPath("$.doctors[" + doctorIndex + "]")
-                    .value(expectedDto.getDoctors()[doctorIndex]));
-        }
-        verify(patientService, times(1)).update(eq(id), any(PatientDto.class));
+                .andExpect(matchPatientDto("$", expectedDto))
+                .andExpect(matchDoctorDto("$.doctors[0]", expectedDto.getDoctors()[0]))
+                .andExpect(matchDoctorDto("$.doctors[1]", expectedDto.getDoctors()[1]));
+        verify(patientService, times(1)).update(any(PatientDto.class));
     }
 
     @Test
-    @DisplayName("Request DELETE /patient/delete. Expects HTTP OK")
+    @DisplayName("Delete existing Patient, expected HTTP OK")
     void deletePatientByIdResponseCheckTest() throws Exception {
         long testPatientId = 1;
-        when(patientService.delete(testPatientId)).thenReturn(true);
         mockMvc.perform(delete("/patient/delete/" + testPatientId))
                 .andExpect(status().isOk());
         verify(patientService, times(1)).delete(testPatientId);
     }
 
     @Test
-    @DisplayName("Request GET /patient/list. Expects HTTP OK and checking Json list values")
+    @DisplayName("Get list of all patients and compare json fields")
     void getListOfPatientsResponseCheckTest() throws Exception {
-        List<PatientDto> expectedDtoList = TestDataGenerator.validPatientDtoList();
+        List<PatientDto> expectedDtoList = validPatientDtoList();
         when(patientService.getList()).thenReturn(expectedDtoList);
 
         ResultActions actions = mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
-        for (int index = 0; index < expectedDtoList.size(); index++) {
-            PatientDto expectedDto = expectedDtoList.get(index);
-            actions.andExpect(jsonPath("$[" + index + "].id").value(expectedDto.getId()))
-                    .andExpect(jsonPath("$[" + index + "].firstName").value(expectedDto.getFirstName()))
-                    .andExpect(jsonPath("$[" + index + "].lastName").value(expectedDto.getLastName()))
-                    .andExpect(jsonPath("$[" + index + "].patronymic").value(expectedDto.getPatronymic()))
-                    .andExpect(jsonPath("$[" + index + "].phoneNumber").value(expectedDto.getPhoneNumber()))
-                    .andExpect(jsonPath("$[" + index + "].birthDate[0]").value(expectedDto.getBirthDate().getYear()))
-                    .andExpect(jsonPath("$[" + index + "].birthDate[1]").value(expectedDto.getBirthDate().getMonthValue()))
-                    .andExpect(jsonPath("$[" + index + "].birthDate[2]").value(expectedDto.getBirthDate().getDayOfMonth()));
-            for (int doctorIndex = 0; doctorIndex < expectedDto.getDoctors().length; doctorIndex++) {
-                actions.andExpect(jsonPath("$[" + index + "].doctors[" + doctorIndex + "]")
-                        .value(expectedDto.getDoctors()[doctorIndex]));
-            }
-        }
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(matchPatientDto("$[0]", expectedDtoList.get(0)))
+                .andExpect(matchPatientDto("$[1]", expectedDtoList.get(1)));
         verify(patientService, times(1)).getList();
     }
 
@@ -132,11 +101,11 @@ class PatientControllerTest {
     }
 
     @ParameterizedTest
-    @DisplayName("Invalid DELETE /patient/delete. Expects HTTP 400, and valid error message")
+    @DisplayName("Deletion of invalid Patient, bad request expected")
     @MethodSource("getExceptions")
     void deletePatientExceptionTest(RuntimeException exception) throws Exception {
         long invalidId = 1L;
-        when(patientService.delete(invalidId)).thenThrow(exception);
+        doThrow(exception).when(patientService).delete(invalidId);
         mockMvc.perform(delete("/patient/delete/" + invalidId))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
@@ -144,22 +113,21 @@ class PatientControllerTest {
     }
 
     @ParameterizedTest
-    @DisplayName("Invalid PATCH /patient/edit. Expects HTTP 400, and valid error message")
+    @DisplayName("Doctor updated with invalid data, bad request expected")
     @MethodSource("getExceptions")
     void updatePatientExceptionTest(RuntimeException exception) throws Exception {
-        long invalidId = 1L;
         String emptyJson = "{}";
-        when(patientService.update(eq(invalidId), any(PatientDto.class))).thenThrow(exception);
-        mockMvc.perform(patch("/patient/edit/" + invalidId)
+        when(patientService.update(any(PatientDto.class))).thenThrow(exception);
+        mockMvc.perform(patch("/patient/edit")
                         .content(emptyJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
-        verify(patientService, times(1)).update(eq(invalidId), any(PatientDto.class));
+        verify(patientService, times(1)).update(any(PatientDto.class));
     }
 
     @Test
-    @DisplayName("Invalid POST /patient/add. Expects HTTP 400, and valid error message")
+    @DisplayName("Adding invalid Patient, bad request expected")
     void addPatientExceptionTest() throws Exception {
         InvalidPhoneNumberException exception = new InvalidPhoneNumberException("12345");
         String emptyJson = "{}";

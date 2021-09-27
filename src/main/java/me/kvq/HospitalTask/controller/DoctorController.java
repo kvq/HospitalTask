@@ -1,13 +1,13 @@
 package me.kvq.HospitalTask.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.service.DoctorService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("doctor")
 public class DoctorController {
@@ -23,15 +23,14 @@ public class DoctorController {
         return service.add(doctorDto);
     }
 
-    @PatchMapping("/edit/{id}")
-    public DoctorDto update(@PathVariable long id, @RequestBody DoctorDto doctorDto) {
-        return service.update(id, doctorDto);
+    @PatchMapping("/edit")
+    public DoctorDto update(@RequestBody DoctorDto doctorDto) {
+        return service.update(doctorDto);
     }
 
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable long id) {
+    public void delete(@PathVariable long id) {
         service.delete(id);
-        return "success";
     }
 
 }
