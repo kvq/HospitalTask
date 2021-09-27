@@ -71,9 +71,9 @@ public class DoctorMapperTest {
         List<Doctor> doctorList = TestDataGenerator.validDoctorList();
         List<DoctorDto> returnDoctorDtoList = mapper.entityListToDtoList(doctorList);
         assertEquals(doctorList.size(), returnDoctorDtoList.size());
-        for (int i = 0; i < doctorList.size(); i++) {
-            Doctor expected = doctorList.get(i);
-            DoctorDto actual = returnDoctorDtoList.get(i);
+        for (int firstIndex = 0; firstIndex < doctorList.size(); firstIndex++) {
+            Doctor expected = doctorList.get(firstIndex);
+            DoctorDto actual = returnDoctorDtoList.get(firstIndex);
             assertEquals(expected.getId(), actual.getId());
             assertEquals(expected.getFirstName(), actual.getFirstName());
             assertEquals(expected.getLastName(), actual.getLastName());
@@ -81,9 +81,9 @@ public class DoctorMapperTest {
             assertEquals(expected.getBirthDate(), actual.getBirthDate());
             assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
             assertEquals(expected.getPosition(), actual.getPosition());
-            for (int index = 0; index < expected.getPatients().size(); index++) {
-                Patient expectedPatient = expected.getPatients().get(index);
-                PatientDto actualPatient = actual.getPatients()[index];
+            for (int secondIndex = 0; secondIndex < expected.getPatients().size(); secondIndex++) {
+                Patient expectedPatient = expected.getPatients().get(secondIndex);
+                PatientDto actualPatient = actual.getPatients()[secondIndex];
                 assertEquals(expectedPatient.getId(), actualPatient.getId());
                 assertEquals(expectedPatient.getFirstName(), actualPatient.getFirstName());
                 assertEquals(expectedPatient.getLastName(), actualPatient.getLastName());
