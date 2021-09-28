@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
+@Data
 @Setter
 public class AppointmentDto {
     private long id;

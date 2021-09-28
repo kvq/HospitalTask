@@ -1,16 +1,18 @@
 package me.kvq.HospitalTask.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-@Setter
-@Entity
+@Data
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
