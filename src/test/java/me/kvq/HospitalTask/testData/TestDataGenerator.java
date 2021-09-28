@@ -44,13 +44,6 @@ public class TestDataGenerator {
         return Arrays.asList(doctorOne, doctorTwo);
     }
 
-    public static DoctorDto validDoctorDto() {
-        DoctorDto dto = validDoctorDtoWithoutPatients();
-        List<PatientDto> patientDtoList = validPatientDtoList();
-        dto.setPatients(patientDtoList.toArray(new PatientDto[0]));
-        return dto;
-    }
-
     public static List<DoctorDto> validDoctorDtoList() {
         DoctorDto doctorOne = DoctorDto.builder()
                 .id(1)
@@ -99,13 +92,6 @@ public class TestDataGenerator {
                 .doctors(List.of(validDoctorWithoutPatients()))
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
-    }
-
-    public static PatientDto validPatientDto() {
-        PatientDto dto = validPatientDtoWithoutDoctors();
-        List<DoctorDto> patientDtoList = validDoctorDtoList();
-        dto.setDoctors(patientDtoList.toArray(new DoctorDto[0]));
-        return dto;
     }
 
     public static List<PatientDto> validPatientDtoList() {
@@ -210,8 +196,7 @@ public class TestDataGenerator {
                 + "\"lastName\":\"Patient_LastName\","
                 + "\"patronymic\":\"Patient_Patronymic\","
                 + "\"birthDate\":[2000,1,21],"
-                + "\"phoneNumber\":\"380123455789\","
-                + "\"doctors\": [{\"firstName\":\"Doctor_FirstName\",\"lastName\":\"Doctor_LastName\",\"patronymic\":\"Doctor_Patronymic\",\"birthDate\":[1995,5,6],\"phoneNumber\":\"380123455789\",\"position\":\"Doctor_Position\"}] }";
+                + "\"phoneNumber\":\"380123455789\"}";
     }
 
     public static String validDoctorJson() {
@@ -220,8 +205,7 @@ public class TestDataGenerator {
                 + "\"patronymic\":\"Doctor_Patronymic\","
                 + "\"birthDate\":[1995,5,6],"
                 + "\"phoneNumber\":\"380123455789\","
-                + "\"position\":\"Doctor_Position\","
-                + "\"patients\": [{\"firstName\":\"Patient_FirstName\",\"lastName\":\"Patient_LastName\",\"patronymic\":\"Patient_Patronymic\",\"birthDate\":[2000,1,21],\"phoneNumber\":\"380123455789\"}] }";
+                + "\"position\":\"Doctor_Position\"}";
     }
 
     public static Patient validPatientWithoutDoctor() {
@@ -235,7 +219,7 @@ public class TestDataGenerator {
                 .build();
     }
 
-    private static DoctorDto validDoctorDtoWithoutPatients() {
+    public static DoctorDto validDoctorDto() {
         return DoctorDto.builder()
                 .id(1)
                 .firstName("Doctor_FirstName")
@@ -247,7 +231,7 @@ public class TestDataGenerator {
                 .build();
     }
 
-    private static PatientDto validPatientDtoWithoutDoctors() {
+    public static PatientDto validPatientDto() {
         return PatientDto.builder()
                 .id(2)
                 .firstName("Patient_FirstName")

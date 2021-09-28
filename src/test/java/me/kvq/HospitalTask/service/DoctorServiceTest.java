@@ -14,7 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.List;
 
 import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -44,7 +45,6 @@ class DoctorServiceTest {
         assertEquals(expectedDoctorDto.getBirthDate(), returnedDoctorDto.getBirthDate());
         assertEquals(expectedDoctorDto.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
         assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
-        assertArrayEquals(expectedDoctorDto.getPatients(), returnedDoctorDto.getPatients());
         verify(doctorDao, times(1)).save(doctor);
         verify(mapper, times(1)).dtoToEntity(expectedDoctorDto);
         verify(mapper, times(1)).entityToDto(doctor);
@@ -69,7 +69,6 @@ class DoctorServiceTest {
         assertEquals(expectedDoctorDto.getBirthDate(), returnedDoctorDto.getBirthDate());
         assertEquals(expectedDoctorDto.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
         assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
-        assertArrayEquals(expectedDoctorDto.getPatients(), returnedDoctorDto.getPatients());
         verify(doctorDao, times(1)).existsById(expectedDoctorDto.getId());
         verify(doctorDao, times(1)).save(doctor);
         verify(mapper, times(1)).dtoToEntity(expectedDoctorDto);
@@ -106,7 +105,6 @@ class DoctorServiceTest {
             assertEquals(expectedDoctorDto.getBirthDate(), returnedDoctorDto.getBirthDate());
             assertEquals(expectedDoctorDto.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
             assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
-            assertArrayEquals(expectedDoctorDto.getPatients(), returnedDoctorDto.getPatients());
         }
         verify(doctorDao, times(1)).findAll();
         verify(mapper, times(1)).entityListToDtoList(testDoctorList);
@@ -129,7 +127,6 @@ class DoctorServiceTest {
         assertEquals(expectedDoctorDto.getBirthDate(), returnedDoctorDto.getBirthDate());
         assertEquals(expectedDoctorDto.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
         assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
-        assertArrayEquals(expectedDoctorDto.getPatients(), returnedDoctorDto.getPatients());
         verify(doctorDao, times(1)).getById(id);
         verify(mapper, times(1)).entityToDto(daoDoctor);
     }

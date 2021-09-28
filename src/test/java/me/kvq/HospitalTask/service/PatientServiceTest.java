@@ -15,7 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.List;
 
 import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -46,7 +47,6 @@ class PatientServiceTest {
         assertEquals(expectedPatientDto.getPatronymic(), returnedPatientDto.getPatronymic());
         assertEquals(expectedPatientDto.getBirthDate(), returnedPatientDto.getBirthDate());
         assertEquals(expectedPatientDto.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
-        assertArrayEquals(expectedPatientDto.getDoctors(), returnedPatientDto.getDoctors());
         verify(mapper, times(1)).dtoToEntity(expectedPatientDto);
         verify(mapper, times(1)).entityToDto(testPatient);
         verify(patientDao, times(1)).save(testPatient);
@@ -70,7 +70,6 @@ class PatientServiceTest {
         assertEquals(expectedPatientDto.getPatronymic(), returnedPatientDto.getPatronymic());
         assertEquals(expectedPatientDto.getBirthDate(), returnedPatientDto.getBirthDate());
         assertEquals(expectedPatientDto.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
-        assertArrayEquals(expectedPatientDto.getDoctors(), returnedPatientDto.getDoctors());
         verify(mapper, times(1)).entityToDto(testPatient);
         verify(mapper, times(1)).dtoToEntity(expectedPatientDto);
         verify(patientDao, times(1)).existsById(id);
@@ -105,7 +104,6 @@ class PatientServiceTest {
             assertEquals(expectedPatientDto.getPatronymic(), returnedPatientDto.getPatronymic());
             assertEquals(expectedPatientDto.getBirthDate(), returnedPatientDto.getBirthDate());
             assertEquals(expectedPatientDto.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
-            assertArrayEquals(expectedPatientDto.getDoctors(), returnedPatientDto.getDoctors());
         }
         verify(patientDao, times(1)).findAll();
         verify(mapper, times(1)).entityListToDtoList(testPatientList);
@@ -127,7 +125,6 @@ class PatientServiceTest {
         assertEquals(expectedPatientDto.getPatronymic(), returnedPatientDto.getPatronymic());
         assertEquals(expectedPatientDto.getBirthDate(), returnedPatientDto.getBirthDate());
         assertEquals(expectedPatientDto.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
-        assertArrayEquals(expectedPatientDto.getDoctors(), returnedPatientDto.getDoctors());
         verify(patientDao, times(1)).getById(id);
         verify(mapper, times(1)).entityToDto(daoPatient);
     }

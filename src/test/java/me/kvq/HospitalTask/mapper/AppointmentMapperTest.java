@@ -59,6 +59,8 @@ class AppointmentMapperTest {
         assertEquals(expectedDoctor, actual.getDoctor());
         assertEquals(expectedPatient, actual.getPatient());
         assertEquals(expected.getDateTime(), actual.getDateTime());
+        verify(doctorMapper, times(1)).entityToDto(expected.getDoctor());
+        verify(patientMapper, times(1)).entityToDto(expected.getPatient());
     }
 
     @Test
@@ -79,6 +81,8 @@ class AppointmentMapperTest {
             assertEquals(expected.getDoctor().getId(), actual.getDoctor().getId());
             assertEquals(expected.getDateTime(), actual.getDateTime());
         }
+        verify(doctorMapper, times(list.size())).entityToDto(any(Doctor.class));
+        verify(patientMapper, times(list.size())).entityToDto(any(Patient.class));
     }
 
 }

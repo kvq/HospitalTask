@@ -1,9 +1,7 @@
 package me.kvq.HospitalTask.mapper;
 
 import me.kvq.HospitalTask.dao.DoctorDao;
-import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.dto.PatientDto;
-import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
 import me.kvq.HospitalTask.testData.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class PatientMapperTest {
@@ -35,24 +32,12 @@ public class PatientMapperTest {
         assertEquals(expected.getPatronymic(), actual.getPatronymic());
         assertEquals(expected.getBirthDate(), actual.getBirthDate());
         assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
-        for (int index = 0; index < expected.getDoctors().size(); index++) {
-            Doctor expectedDoctor = expected.getDoctors().get(index);
-            DoctorDto actualDoctor = actual.getDoctors()[index];
-            assertEquals(expectedDoctor.getId(), actualDoctor.getId());
-            assertEquals(expectedDoctor.getFirstName(), actualDoctor.getFirstName());
-            assertEquals(expectedDoctor.getLastName(), actualDoctor.getLastName());
-            assertEquals(expectedDoctor.getPatronymic(), actualDoctor.getPatronymic());
-            assertEquals(expectedDoctor.getPhoneNumber(), actualDoctor.getPhoneNumber());
-            assertEquals(expectedDoctor.getPosition(), actualDoctor.getPosition());
-        }
     }
 
     @Test
     @DisplayName("(dtoToEntity) passes Id & PatientDto, compare returned Dto fields")
     void mappingDtoToEntityTest() {
         PatientDto expected = TestDataGenerator.validPatientDto();
-        when(doctorDao.existsById(1L)).thenReturn(true);
-        when(doctorDao.existsById(3L)).thenReturn(true);
         Patient actual = mapper.dtoToEntity(expected);
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getFirstName(), actual.getFirstName());
@@ -60,8 +45,6 @@ public class PatientMapperTest {
         assertEquals(expected.getPatronymic(), actual.getPatronymic());
         assertEquals(expected.getBirthDate(), actual.getBirthDate());
         assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
-        assertEquals(expected.getDoctors()[0].getId(), actual.getDoctors().get(0).getId());
-        assertEquals(expected.getDoctors()[1].getId(), actual.getDoctors().get(1).getId());
     }
 
     @Test
@@ -79,16 +62,6 @@ public class PatientMapperTest {
             assertEquals(expected.getPatronymic(), actual.getPatronymic());
             assertEquals(expected.getBirthDate(), actual.getBirthDate());
             assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
-            for (int secondIndex = 0; secondIndex < expected.getDoctors().size(); secondIndex++) {
-                Doctor expectedDoctor = expected.getDoctors().get(secondIndex);
-                DoctorDto actualDoctor = actual.getDoctors()[secondIndex];
-                assertEquals(expectedDoctor.getId(), actualDoctor.getId());
-                assertEquals(expectedDoctor.getFirstName(), actualDoctor.getFirstName());
-                assertEquals(expectedDoctor.getLastName(), actualDoctor.getLastName());
-                assertEquals(expectedDoctor.getPatronymic(), actualDoctor.getPatronymic());
-                assertEquals(expectedDoctor.getPhoneNumber(), actualDoctor.getPhoneNumber());
-                assertEquals(expectedDoctor.getPosition(), actualDoctor.getPosition());
-            }
         }
     }
 

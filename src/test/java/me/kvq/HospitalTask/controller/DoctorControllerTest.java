@@ -17,13 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
 import static me.kvq.HospitalTask.testData.TestMatchers.matchDoctorDto;
-import static me.kvq.HospitalTask.testData.TestMatchers.matchPatientDto;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,7 +34,6 @@ class DoctorControllerTest {
     DoctorService doctorService;
     @Autowired
     private MockMvc mockMvc;
-    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Test
     @DisplayName("Add new valid doctor, then compare json fields")
@@ -50,10 +47,7 @@ class DoctorControllerTest {
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(matchDoctorDto("$", expectedDto))
-                .andExpect(matchPatientDto("$.patients[0]", expectedDto.getPatients()[0]))
-                .andExpect(matchPatientDto("$.patients[1]", expectedDto.getPatients()[1]));
-
+                .andExpect(matchDoctorDto("$", expectedDto));
         verify(doctorService, times(1)).add(any(DoctorDto.class));
     }
 
@@ -68,9 +62,7 @@ class DoctorControllerTest {
                         .content(doctorJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(matchDoctorDto("$", expectedDto))
-                .andExpect(matchPatientDto("$.patients[0]", expectedDto.getPatients()[0]))
-                .andExpect(matchPatientDto("$.patients[1]", expectedDto.getPatients()[1]));
+                .andExpect(matchDoctorDto("$", expectedDto));
         verify(doctorService, times(1)).update(any(DoctorDto.class));
     }
 
@@ -91,9 +83,7 @@ class DoctorControllerTest {
 
         ResultActions actions = mockMvc.perform(get("/doctor/list"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(matchDoctorDto("$[0]", expectedDtoList.get(0)))
-                .andExpect(matchDoctorDto("$[1]", expectedDtoList.get(1)));
+                .andExpect(jsonPath("$").isArray());
         verify(doctorService, times(1)).getList();
     }
 

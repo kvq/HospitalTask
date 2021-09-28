@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
@@ -29,7 +28,6 @@ class AppointmentControllerTest {
     AppointmentService service;
     @Autowired
     MockMvc mockMvc;
-    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Test
     @DisplayName("Create valid appointment, compare json fields")

@@ -16,12 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static me.kvq.HospitalTask.testData.TestDataGenerator.*;
-import static me.kvq.HospitalTask.testData.TestMatchers.matchDoctorDto;
 import static me.kvq.HospitalTask.testData.TestMatchers.matchPatientDto;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -34,7 +32,6 @@ class PatientControllerTest {
     PatientService patientService;
     @Autowired
     private MockMvc mockMvc;
-    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Test
     @DisplayName("Add new valid Patient, then compare json fields")
@@ -48,9 +45,7 @@ class PatientControllerTest {
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(matchPatientDto("$", expectedDto))
-                .andExpect(matchDoctorDto("$.doctors[0]", expectedDto.getDoctors()[0]))
-                .andExpect(matchDoctorDto("$.doctors[1]", expectedDto.getDoctors()[1]));
+                .andExpect(matchPatientDto("$", expectedDto));
         verify(patientService, times(1)).add(any(PatientDto.class));
     }
 
@@ -65,9 +60,7 @@ class PatientControllerTest {
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(matchPatientDto("$", expectedDto))
-                .andExpect(matchDoctorDto("$.doctors[0]", expectedDto.getDoctors()[0]))
-                .andExpect(matchDoctorDto("$.doctors[1]", expectedDto.getDoctors()[1]));
+                .andExpect(matchPatientDto("$", expectedDto));
         verify(patientService, times(1)).update(any(PatientDto.class));
     }
 
