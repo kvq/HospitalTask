@@ -6,7 +6,6 @@ import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.exception.InvalidDtoException;
 import me.kvq.HospitalTask.exception.NotFoundException;
 import me.kvq.HospitalTask.mapper.DoctorMapper;
-import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.utils.PhoneNumberUtils;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,6 @@ import java.util.List;
 public class DoctorService {
     private final DoctorDao dao;
     private final DoctorMapper doctorMapper;
-    private final PatientMapper patientMapper;
-    private final PatientService patientService;
 
     public DoctorDto add(DoctorDto doctorDto) {
         if (doctorDto.getId() != 0) {

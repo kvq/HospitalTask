@@ -5,7 +5,6 @@ import me.kvq.HospitalTask.dao.PatientDao;
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.exception.InvalidDtoException;
 import me.kvq.HospitalTask.exception.NotFoundException;
-import me.kvq.HospitalTask.mapper.DoctorMapper;
 import me.kvq.HospitalTask.mapper.PatientMapper;
 import me.kvq.HospitalTask.model.Patient;
 import me.kvq.HospitalTask.utils.PhoneNumberUtils;
@@ -18,7 +17,6 @@ import java.util.List;
 public class PatientService {
     private final PatientDao dao;
     private final PatientMapper patientMapper;
-    private final DoctorMapper doctorMapper;
 
     public PatientDto add(PatientDto patientDto) {
         if (patientDto.getId() != 0) {
