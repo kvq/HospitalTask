@@ -51,12 +51,4 @@ public class PatientService {
         return patientDtoList;
     }
 
-    public PatientDto get(long id) {
-        Patient entity = dao.getById(id);
-        if (entity == null) {
-            throw new NotFoundException("No patient found by that id");
-        }
-        return patientMapper.entityToDto(entity);
-    }
-
 }

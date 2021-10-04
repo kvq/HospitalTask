@@ -110,37 +110,6 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("Get patient by id, compare Dto fields")
-    void getPatientByIdTest() {
-        Patient daoPatient = validPatient();
-        PatientDto expectedPatientDto = validPatientDto();
-        long id = expectedPatientDto.getId();
-        when(patientDao.getById(id)).thenReturn(daoPatient);
-        when(mapper.entityToDto(daoPatient)).thenReturn(expectedPatientDto);
-
-        PatientDto returnedPatientDto = service.get(id);
-        assertEquals(expectedPatientDto.getId(), returnedPatientDto.getId());
-        assertEquals(expectedPatientDto.getFirstName(), returnedPatientDto.getFirstName());
-        assertEquals(expectedPatientDto.getLastName(), returnedPatientDto.getLastName());
-        assertEquals(expectedPatientDto.getPatronymic(), returnedPatientDto.getPatronymic());
-        assertEquals(expectedPatientDto.getBirthDate(), returnedPatientDto.getBirthDate());
-        assertEquals(expectedPatientDto.getPhoneNumber(), returnedPatientDto.getPhoneNumber());
-        verify(patientDao, times(1)).getById(id);
-        verify(mapper, times(1)).entityToDto(daoPatient);
-    }
-
-    @Test
-    @DisplayName("Get patient by invalid id, exception expected")
-    void getNonExistingPatientByIdTest() {
-        long nonExistingId = 1L;
-        when(patientDao.getById(nonExistingId)).thenReturn(null);
-        assertThrows(NotFoundException.class, () -> {
-            service.get(nonExistingId);
-        });
-        verify(patientDao, times(1)).getById(nonExistingId);
-    }
-
-    @Test
     @DisplayName("Delete patient by invalid id, exception expected")
     void deleteNonExistingPatientByIdTestTest() {
         long nonExistingId = 1L;

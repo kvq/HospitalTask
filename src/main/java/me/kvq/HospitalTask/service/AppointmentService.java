@@ -44,13 +44,13 @@ public class AppointmentService {
         dao.deleteById(id);
     }
 
-    public List<AppointmentDto> findForPatient(long patientId) {
-        List<Appointment> appointmentList = dao.findAllByPatient(patientId);
+    public List<AppointmentDto> findByPatient(long patientId) {
+        List<Appointment> appointmentList = dao.findAllByPatientId(patientId);
         return mapper.entityListToDtoList(appointmentList);
     }
 
-    public List<AppointmentDto> findForDoctor(long doctorId) {
-        List<Appointment> appointmentList = dao.findAllByDoctor(doctorId);
+    public List<AppointmentDto> findByDoctor(long doctorId) {
+        List<Appointment> appointmentList = dao.findAllByDoctorId(doctorId);
         return mapper.entityListToDtoList(appointmentList);
     }
 

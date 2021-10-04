@@ -50,12 +50,4 @@ public class DoctorService {
         return doctorMapper.entityListToDtoList(doctorList);
     }
 
-    public DoctorDto get(long id) {
-        Doctor entity = dao.getById(id);
-        if (entity == null) {
-            throw new NotFoundException("No doctor found by that id");
-        }
-        return doctorMapper.entityToDto(entity);
-    }
-
 }

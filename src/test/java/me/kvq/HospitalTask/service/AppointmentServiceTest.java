@@ -114,10 +114,10 @@ class AppointmentServiceTest {
         List<Appointment> appointmentList = getAppointmentsList();
         List<AppointmentDto> appointmentDtoList = getAppointmentsDtoList();
         long id = 2L;
-        when(dao.findAllByPatient(id)).thenReturn(appointmentList);
+        when(dao.findAllByPatientId(id)).thenReturn(appointmentList);
         when(mapper.entityListToDtoList(appointmentList)).thenReturn(appointmentDtoList);
 
-        List<AppointmentDto> returnedDtoList = service.findForPatient(id);
+        List<AppointmentDto> returnedDtoList = service.findByPatient(id);
         for (int index = 0; index < appointmentDtoList.size(); index++) {
             AppointmentDto expectedDto = appointmentDtoList.get(index);
             AppointmentDto returnedDto = returnedDtoList.get(index);
@@ -126,7 +126,7 @@ class AppointmentServiceTest {
             assertEquals(expectedDto.getPatient(), returnedDto.getPatient());
             assertEquals(expectedDto.getDateTime(), returnedDto.getDateTime());
         }
-        verify(dao, times(1)).findAllByPatient(id);
+        verify(dao, times(1)).findAllByPatientId(id);
         verify(mapper, times(1)).entityListToDtoList(appointmentList);
     }
 
@@ -136,10 +136,10 @@ class AppointmentServiceTest {
         List<Appointment> appointmentList = getAppointmentsList();
         List<AppointmentDto> appointmentDtoList = getAppointmentsDtoList();
         long id = 1L;
-        when(dao.findAllByDoctor(id)).thenReturn(appointmentList);
+        when(dao.findAllByDoctorId(id)).thenReturn(appointmentList);
         when(mapper.entityListToDtoList(appointmentList)).thenReturn(appointmentDtoList);
 
-        List<AppointmentDto> returnedDtoList = service.findForDoctor(id);
+        List<AppointmentDto> returnedDtoList = service.findByDoctor(id);
         for (int index = 0; index < appointmentDtoList.size(); index++) {
             AppointmentDto expectedDto = appointmentDtoList.get(index);
             AppointmentDto returnedDto = returnedDtoList.get(index);
@@ -148,7 +148,7 @@ class AppointmentServiceTest {
             assertEquals(expectedDto.getPatient(), returnedDto.getPatient());
             assertEquals(expectedDto.getDateTime(), returnedDto.getDateTime());
         }
-        verify(dao, times(1)).findAllByDoctor(id);
+        verify(dao, times(1)).findAllByDoctorId(id);
         verify(mapper, times(1)).entityListToDtoList(appointmentList);
     }
 

@@ -6,6 +6,10 @@ import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.model.Appointment;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.model.Patient;
+import me.kvq.HospitalTask.security.Role;
+import me.kvq.HospitalTask.security.SecurityUser;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -179,6 +183,7 @@ public class TestDataGenerator {
     public static String validAppointmentJson() {
         return "{\"doctor\": " + validDoctorJson() + " ,"
                 + "\"patient\": " + validPatientJson() + " ,"
+                + "\"id\": 5 ,"
                 + "\"time\": \"2022-2-11 08:00\" }";
     }
 
@@ -192,7 +197,8 @@ public class TestDataGenerator {
     }
 
     public static String validPatientJson() {
-        return "{\"firstName\":\"Patient_FirstName\","
+        return "{\"id\": 2 ,"
+                + "\"firstName\":\"Patient_FirstName\","
                 + "\"lastName\":\"Patient_LastName\","
                 + "\"patronymic\":\"Patient_Patronymic\","
                 + "\"birthDate\":[2000,1,21],"
@@ -200,7 +206,8 @@ public class TestDataGenerator {
     }
 
     public static String validDoctorJson() {
-        return "{\"firstName\":\"Doctor_FirstName\","
+        return "{\"id\": 1 ,"
+                + "\"firstName\":\"Doctor_FirstName\","
                 + "\"lastName\":\"Doctor_LastName\","
                 + "\"patronymic\":\"Doctor_Patronymic\","
                 + "\"birthDate\":[1995,5,6],"
@@ -239,6 +246,22 @@ public class TestDataGenerator {
                 .patronymic("Patient_Patronymic")
                 .birthDate(LocalDate.of(2000, 1, 21))
                 .phoneNumber("380123455780")
+                .build();
+    }
+
+    public static User validUserDetails() {
+        return new User("Test", "test",
+                Arrays.asList(
+                        new SimpleGrantedAuthority("TEST_AUTHORITY")
+                ));
+    }
+
+    public static SecurityUser validSecurityUser() {
+        return new SecurityUser().builder()
+                .username("Test")
+                .password("test")
+                .role(Role.PATIENT)
+                .id(2)
                 .build();
     }
 

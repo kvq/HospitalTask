@@ -1,6 +1,5 @@
 package me.kvq.HospitalTask.mapper;
 
-import me.kvq.HospitalTask.dao.PatientDao;
 import me.kvq.HospitalTask.dto.DoctorDto;
 import me.kvq.HospitalTask.model.Doctor;
 import me.kvq.HospitalTask.testData.TestDataGenerator;
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
@@ -16,8 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class DoctorMapperTest {
-    @MockBean
-    PatientDao patientDao;
     @Autowired
     DoctorMapper mapper;
 

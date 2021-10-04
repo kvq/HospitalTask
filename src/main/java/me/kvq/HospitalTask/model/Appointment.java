@@ -18,10 +18,10 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     long id;
     @ManyToOne
-    @JoinColumn(name = "doctor")
+    @JoinColumn(name = "doctorId")
     Doctor doctor;
     @ManyToOne
-    @JoinColumn(name = "patient")
+    @JoinColumn(name = "patientId")
     Patient patient;
     LocalDateTime dateTime;
 

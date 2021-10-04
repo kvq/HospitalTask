@@ -3,6 +3,7 @@ package me.kvq.HospitalTask.controller;
 import me.kvq.HospitalTask.dto.PatientDto;
 import me.kvq.HospitalTask.exception.InvalidPhoneNumberException;
 import me.kvq.HospitalTask.exception.NotFoundException;
+import me.kvq.HospitalTask.security.SecurityUserService;
 import me.kvq.HospitalTask.service.PatientService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,9 +33,12 @@ class PatientControllerTest {
     @MockBean
     PatientService patientService;
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
+    @MockBean(name = "securityService")
+    SecurityUserService securityUserService;
 
     @Test
+    @WithMockUser(authorities = "CREATE_PATIENT")
     @DisplayName("Add new valid Patient, then compare json fields")
     void addPatientAndCheckResponseTest() throws Exception {
         String patientJson = validPatientJson();
@@ -41,7 +46,7 @@ class PatientControllerTest {
         long id = expectedDto.getId();
         when(patientService.add(any(PatientDto.class))).thenReturn(expectedDto);
 
-        ResultActions actions = mockMvc.perform(post("/patient/add")
+        mockMvc.perform(post("/patient/add")
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -50,13 +55,24 @@ class PatientControllerTest {
     }
 
     @Test
+    @DisplayName("Add new valid Patient as unauthorized, expected forbidden status")
+    void addPatientAsUnauthorizedTest() throws Exception {
+        String patientJson = validPatientJson();
+        mockMvc.perform(post("/patient/add")
+                        .content(patientJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("Update Patient with valid data, then compare json fields")
+    @WithMockUser(authorities = "UPDATE_PATIENT")
     void updatePatientAndCheckResponseTest() throws Exception {
         String patientJson = validPatientJson();
         PatientDto expectedDto = validPatientDto();
         when(patientService.update(any(PatientDto.class))).thenReturn(expectedDto);
 
-        ResultActions actions = mockMvc.perform(patch("/patient/edit")
+        mockMvc.perform(patch("/patient/edit")
                         .content(patientJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -65,7 +81,35 @@ class PatientControllerTest {
     }
 
     @Test
+    @DisplayName("Update Patient with valid data as authorized user, expected ok status")
+    @WithMockUser(authorities = "UPDATE_SELF")
+    void updatePatientAsAuthorizedTest() throws Exception {
+        String patientJson = validPatientJson();
+        PatientDto dto = validPatientDto();
+        when(patientService.update(any(PatientDto.class))).thenReturn(dto);
+        when(securityUserService.ownsAccount(any(User.class), eq(dto.getId()))).thenReturn(true);
+        mockMvc.perform(patch("/patient/edit")
+                        .content(patientJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        verify(patientService, times(1)).update(any(PatientDto.class));
+        verify(securityUserService, times(1)).ownsAccount(any(User.class), eq(dto.getId()));
+    }
+
+    @Test
+    @DisplayName("Update Patient with valid data as unauthorized, expected forbidden status")
+    @WithMockUser(authorities = "UPDATE_SELF")
+    void updatePatientAsUnauthorizedTest() throws Exception {
+        String patientJson = validPatientJson();
+        mockMvc.perform(patch("/patient/edit")
+                        .content(patientJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("Delete existing Patient, expected HTTP OK")
+    @WithMockUser(authorities = "DELETE_PATIENT")
     void deletePatientByIdResponseCheckTest() throws Exception {
         long testPatientId = 1;
         mockMvc.perform(delete("/patient/delete/" + testPatientId))
@@ -74,17 +118,45 @@ class PatientControllerTest {
     }
 
     @Test
+    @DisplayName("Delete existing Patient as authorized user, expected ok status")
+    @WithMockUser(authorities = "DELETE_SELF")
+    void deletePatientByIdAsAuthorizedTest() throws Exception {
+        long testPatientId = 1;
+        when(securityUserService.ownsAccount(any(User.class), eq(testPatientId))).thenReturn(true);
+        mockMvc.perform(delete("/patient/delete/" + testPatientId))
+                .andExpect(status().isOk());
+        verify(patientService, times(1)).delete(testPatientId);
+        verify(securityUserService, times(1)).ownsAccount(any(User.class), eq(testPatientId));
+    }
+
+    @Test
+    @DisplayName("Delete existing Patient as unauthorized, expected forbidden status")
+    void deletePatientByIdAsUnauthorizedTest() throws Exception {
+        long testPatientId = 1;
+        mockMvc.perform(delete("/patient/delete/" + testPatientId))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("Get list of all patients and compare json fields")
+    @WithMockUser(authorities = "SEE_ALL_PATIENTS")
     void getListOfPatientsResponseCheckTest() throws Exception {
         List<PatientDto> expectedDtoList = validPatientDtoList();
         when(patientService.getList()).thenReturn(expectedDtoList);
 
-        ResultActions actions = mockMvc.perform(get("/patient/list"))
+        mockMvc.perform(get("/patient/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(matchPatientDto("$[0]", expectedDtoList.get(0)))
                 .andExpect(matchPatientDto("$[1]", expectedDtoList.get(1)));
         verify(patientService, times(1)).getList();
+    }
+
+    @Test
+    @DisplayName("Get list of all patients as unauthorized, expected forbidden status")
+    void getListOfPatientsAsUnauthorizedTest() throws Exception {
+        mockMvc.perform(get("/patient/list"))
+                .andExpect(status().isForbidden());
     }
 
     public static Stream<Arguments> getExceptions() {
@@ -96,6 +168,7 @@ class PatientControllerTest {
     @ParameterizedTest
     @DisplayName("Deletion of invalid Patient, bad request expected")
     @MethodSource("getExceptions")
+    @WithMockUser(authorities = "DELETE_PATIENT")
     void deletePatientExceptionTest(RuntimeException exception) throws Exception {
         long invalidId = 1L;
         doThrow(exception).when(patientService).delete(invalidId);
@@ -108,6 +181,7 @@ class PatientControllerTest {
     @ParameterizedTest
     @DisplayName("Doctor updated with invalid data, bad request expected")
     @MethodSource("getExceptions")
+    @WithMockUser(authorities = "UPDATE_PATIENT")
     void updatePatientExceptionTest(RuntimeException exception) throws Exception {
         String emptyJson = "{}";
         when(patientService.update(any(PatientDto.class))).thenThrow(exception);
@@ -121,6 +195,7 @@ class PatientControllerTest {
 
     @Test
     @DisplayName("Adding invalid Patient, bad request expected")
+    @WithMockUser(authorities = "CREATE_PATIENT")
     void addPatientExceptionTest() throws Exception {
         InvalidPhoneNumberException exception = new InvalidPhoneNumberException("12345");
         String emptyJson = "{}";

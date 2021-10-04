@@ -17,7 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Patient {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
+    @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
     private long id;
     private String firstName;
     private String lastName;
