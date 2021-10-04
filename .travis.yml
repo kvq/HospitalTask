@@ -6,3 +6,4 @@ services:
   - postgresql
 before_install:
   - psql -c 'create database hospital;' -U postgres
+
