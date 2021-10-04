@@ -5,4 +5,4 @@ jdk:
 services:
   - postgresql
 before_install:
-  - psql -c 'create database IF NOT EXISTS hospital;' -U postgres
+  - psql -c 'create database hospital;' -U postgres
