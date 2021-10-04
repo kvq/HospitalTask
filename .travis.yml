@@ -4,5 +4,5 @@ jdk:
   - openjdk11
 services:
   - postgresql
-before_script:
+before_install:
   - psql -c 'create database IF NOT EXISTS hospital;' -U postgres
