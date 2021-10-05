@@ -58,6 +58,7 @@ class DoctorControllerTest {
 
     @Test
     @DisplayName("Add new valid doctor as unauthorized, expected forbidden status")
+    @WithMockUser()
     void addDoctorAsUnauthorizedTest() throws Exception {
         String doctorJson = validDoctorJson();
         mockMvc.perform(post("/doctor/add")
@@ -98,6 +99,7 @@ class DoctorControllerTest {
 
     @Test
     @DisplayName("Update doctor with valid data as unauthorized, expected forbidden status")
+    @WithMockUser()
     void updateDoctorAsUnauthorizedTest() throws Exception {
         String doctorJson = validDoctorJson();
         mockMvc.perform(patch("/doctor/edit")
@@ -129,6 +131,7 @@ class DoctorControllerTest {
 
     @Test
     @DisplayName("Delete existing doctor as unauthorized, expected forbidden status")
+    @WithMockUser()
     void deleteDoctorByIdUnauthorizedTest() throws Exception {
         long id = 1;
         mockMvc.perform(delete("/doctor/delete/" + id))
@@ -149,6 +152,7 @@ class DoctorControllerTest {
 
     @Test
     @DisplayName("Get list of all doctors as unauthorized, expected forbidden status")
+    @WithMockUser()
     void getListOfDoctorsAsUnauthorizedTest() throws Exception {
         List<DoctorDto> expectedDtoList = validDoctorDtoList();
         mockMvc.perform(get("/doctor/list"))

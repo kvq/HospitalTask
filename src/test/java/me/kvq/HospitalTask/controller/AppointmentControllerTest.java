@@ -70,6 +70,7 @@ class AppointmentControllerTest {
 
     @Test
     @DisplayName("Create valid appointment as unauthorized, expected forbidden status")
+    @WithMockUser()
     void makeNewAppointmentAsUnauthorizedTest() throws Exception {
         String json = validAppointmentJson();
         mockMvc.perform(post("/appointment/add")
@@ -111,6 +112,7 @@ class AppointmentControllerTest {
 
     @Test
     @DisplayName("Update valid appointment as unauthorized, expected forbidden status")
+    @WithMockUser()
     void updateAppointmentAsUnauthorizedTest() throws Exception {
         String json = validAppointmentJson();
         mockMvc.perform(post("/appointment/edit")
@@ -143,6 +145,7 @@ class AppointmentControllerTest {
 
     @Test
     @DisplayName("Delete appointment as unauthorized, expected forbidden status")
+    @WithMockUser()
     void deleteAppointmentAsUnauthorizedTest() throws Exception {
         long id = 1;
         mockMvc.perform(delete("/appointment/delete/" + id))
@@ -179,6 +182,7 @@ class AppointmentControllerTest {
 
     @Test
     @DisplayName("Get List of Appointments for Doctor as unauthorized, expected forbidden status")
+    @WithMockUser()
     void getAllAppointmentForDoctorAsUnauthorized() throws Exception {
         long id = 2L;
         List<AppointmentDto> expectedDtoList = getAppointmentsDtoList();
@@ -217,6 +221,7 @@ class AppointmentControllerTest {
 
     @Test
     @DisplayName("Get List of appointments for Patient as unauthorized, expected forbidden")
+    @WithMockUser()
     void getAllAppointmentForPatientAsUnauthorized() throws Exception {
         long id = 2L;
         List<AppointmentDto> expectedDtoList = getAppointmentsDtoList();
