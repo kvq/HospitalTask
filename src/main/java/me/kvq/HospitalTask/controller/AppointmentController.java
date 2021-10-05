@@ -23,7 +23,7 @@ public class AppointmentController {
         return service.add(appointmentDto);
     }
 
-    @PostMapping("/edit")
+    @PatchMapping("/edit")
     @PreAuthorize("(hasAuthority(\"UPDATE_APPOINTMENT\"))" +
             "OR (hasAuthority(\"UPDATE_OWN_APPOINTMENT\") AND @appointmentSecurityService.ownsAppointment(authentication.principal, #appointment.getId()))")
     public AppointmentDto update(@RequestBody @P("appointment") AppointmentDto appointmentDto) {

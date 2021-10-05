@@ -86,7 +86,7 @@ class AppointmentControllerTest {
         String json = validAppointmentJson();
         AppointmentDto expectedDto = validAppointmentDto();
         when(service.update(any(AppointmentDto.class))).thenReturn(expectedDto);
-        mockMvc.perform(post("/appointment/edit")
+        mockMvc.perform(patch("/appointment/edit")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -102,7 +102,7 @@ class AppointmentControllerTest {
         AppointmentDto dto = validAppointmentDto();
         when(service.update(any(AppointmentDto.class))).thenReturn(dto);
         when(appointmentSecurity.ownsAppointment(any(User.class), eq(dto.getId()))).thenReturn(true);
-        mockMvc.perform(post("/appointment/edit")
+        mockMvc.perform(patch("/appointment/edit")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -115,7 +115,7 @@ class AppointmentControllerTest {
     @WithMockUser()
     void updateAppointmentAsUnauthorizedTest() throws Exception {
         String json = validAppointmentJson();
-        mockMvc.perform(post("/appointment/edit")
+        mockMvc.perform(patch("/appointment/edit")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -252,7 +252,7 @@ class AppointmentControllerTest {
         NotFoundException exception = new NotFoundException("Appointment not found");
         String emptyJson = "{}";
         when(service.update(any(AppointmentDto.class))).thenThrow(exception);
-        mockMvc.perform(post("/appointment/edit")
+        mockMvc.perform(patch("/appointment/edit")
                         .content(emptyJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
