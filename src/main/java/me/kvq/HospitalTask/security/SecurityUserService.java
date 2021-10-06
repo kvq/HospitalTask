@@ -35,7 +35,7 @@ public class SecurityUserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        SecurityUser securityUser = dao.findById(username)
+        SecurityUser securityUser = dao.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new User(securityUser.getUsername(),
                 securityUser.getPassword(),
