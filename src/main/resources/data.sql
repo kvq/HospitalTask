@@ -25,6 +25,6 @@ username varchar(32),
 password varchar(64),
 account_type varchar(32),
 role varchar(32),
-bigint id,
+id bigint,
 primary key (username)
 );
