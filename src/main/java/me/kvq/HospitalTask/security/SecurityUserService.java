@@ -21,7 +21,7 @@ public class SecurityUserService implements UserDetailsService {
     private final SecurityUserDao dao;
 
     public SecurityUser getSecurityUser(User principal) {
-        return dao.findById(principal.getUsername())
+        return dao.findByUsername(principal.getUsername())
                 .orElseThrow(() -> new NotFoundException("Security user not found"));
     }
 

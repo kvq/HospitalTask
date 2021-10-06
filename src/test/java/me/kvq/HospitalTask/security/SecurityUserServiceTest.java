@@ -34,21 +34,21 @@ class SecurityUserServiceTest {
     void getValidSecurityUserTest() {
         User user = validUserDetails();
         SecurityUser expected = validSecurityUser();
-        when(dao.findById(user.getUsername())).thenReturn(Optional.of(expected));
+        when(dao.findByUsername(user.getUsername())).thenReturn(Optional.of(expected));
         SecurityUser actual = service.getSecurityUser(user);
         assertEquals(expected, actual);
-        verify(dao, times(1)).findById(user.getUsername());
+        verify(dao, times(1)).findByUsername(user.getUsername());
     }
 
     @Test
     @DisplayName("Gets SecurityUser that does not exists, exception expected")
     void getNonExistentSecurityUserTest() {
         User user = validUserDetails();
-        when(dao.findById(user.getUsername())).thenReturn(Optional.empty());
+        when(dao.findByUsername(user.getUsername())).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> {
             service.getSecurityUser(user);
         });
-        verify(dao, times(1)).findById(user.getUsername());
+        verify(dao, times(1)).findByUsername(user.getUsername());
     }
 
     @Test
@@ -56,9 +56,9 @@ class SecurityUserServiceTest {
     void validUserOwnsAccountTest() {
         User user = validUserDetails();
         SecurityUser securityUser = validSecurityUser();
-        when(dao.findById(user.getUsername())).thenReturn(Optional.of(securityUser));
+        when(dao.findByUsername(user.getUsername())).thenReturn(Optional.of(securityUser));
         assertTrue(service.ownsAccount(user, securityUser.getId()));
-        verify(dao, times(1)).findById(user.getUsername());
+        verify(dao, times(1)).findByUsername(user.getUsername());
     }
 
     @Test
@@ -70,30 +70,30 @@ class SecurityUserServiceTest {
         assertThrows(NotFoundException.class, () -> {
             service.ownsAccount(user, securityUser.getId());
         });
-        verify(dao, times(1)).findById(user.getUsername());
+        verify(dao, times(1)).findByUsername(user.getUsername());
     }
 
     @Test
     @DisplayName("Gets user by its username, expects valid UserDetails")
     void loadUserByUsernameTest() {
         SecurityUser expected = validSecurityUser();
-        when(dao.findById(expected.getUsername())).thenReturn(Optional.of(expected));
+        when(dao.findByUsername(expected.getUsername())).thenReturn(Optional.of(expected));
         UserDetails actual = service.loadUserByUsername(expected.getUsername());
         assertEquals(expected.getUsername(), actual.getUsername());
         assertEquals(expected.getPassword(), actual.getPassword());
         compareAuthorities(expected.getRole().getPermissions(), actual.getAuthorities());
-        verify(dao, times(1)).findById(expected.getUsername());
+        verify(dao, times(1)).findByUsername(expected.getUsername());
     }
 
     @Test
     @DisplayName("Gets non-existent user by username, expects exception")
     void loadUserByInvalidUsernameTest() {
         SecurityUser user = validSecurityUser();
-        when(dao.findById(user.getUsername())).thenReturn(Optional.empty());
+        when(dao.findByUsername(user.getUsername())).thenReturn(Optional.empty());
         assertThrows(UsernameNotFoundException.class, () -> {
             service.loadUserByUsername(user.getUsername());
         });
-        verify(dao, times(1)).findById(user.getUsername());
+        verify(dao, times(1)).findByUsername(user.getUsername());
     }
 
     private void compareAuthorities(String[] expected, Collection<? extends GrantedAuthority> actual) {
