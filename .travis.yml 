@@ -6,3 +6,11 @@ services:
   - postgresql
 before_install:
   - psql -c 'create database hospital;' -U postgres
+addons:
+  sonarcloud:
+    organization: "kvq"
+    token:
+      secure: "rNef/579SBZlryRwY+fZE0cjU95pnlmogGV9q9hDkIzPOwXHeMtCp6plG1TqaQ9vvMtEsn5lVaJ5i7TGPq8NxePjR3nHn+UliRAAuz3U3DcncDnrdxj3+cENO7gQ5gtBQmziUGRO+u13A2iOAXimt4mWawMYX1ZOj/6hEy7UCK6eIhlvDPTGwZBr1bZAanEVe7q8jjwRR2kazPd9W3bt2gboT6N6XGEWLHIiFlREIL5Vo/JP89vmoX751/Bt20Lf9C77GAT1DfVX2kdPcy5WuqMKadHb8b5bgEDV++5oZyjbCVaH5bByjZGyQ8yAg0ihno0X2sHduQ3fqle1hkROXF0wnoIQ2q0hqjRhfHUW1r086tH9S/pW6Eh7Jx9uWmfsZPO3cgx4G5UbZUeQrHTypCwUu2QesxlfkjhpsCUp5e9ANvhSbcd0PZdK6oCHLYaPpOMTWdl0e9l/Azwci8CEJ+HL1WfiGdkjwAM4mVZxCEJd8kyi4Lx6lNRPpmwusoSDR/ntgqe0yI4qRYOw/csGlYzzBTk4QQtTIA84hOk4KbN3lZDwNAlUqKLvGPUFQX68yoKFLfKK9DbAD9fwWv5qraE7W5bDACg0MGwDszbqeZfNA0hh3OdBnQ1taxM3iolZXRufnCYdCLkrsKm53CQJZUa+7XB6PkxzIGS2iMOwBek=" # encrypted value of your token
+
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=kvq_HospitalTask
