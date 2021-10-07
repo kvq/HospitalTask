@@ -1,0 +1,8 @@
+language: java
+install: mvn install
+jdk:
+  - openjdk11
+services:
+  - postgresql
+before_install:
+  - psql -c 'create database hospital;' -U postgres
