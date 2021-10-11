@@ -35,21 +35,5 @@ class NumberUtilsTest {
             PhoneNumberUtils.checkPhoneNumber("+04423343242382");
         });
     }
-
-    @Test
-    @DisplayName("Invalid Landline Number Parsing, expecting exception")
-    void invalidNumberWithIllegalCharacters() {
-        assertThrows(InvalidPhoneNumberException.class, () -> {
-            PhoneNumberUtils.checkPhoneNumber("+044233abch82");
-        });
-    }
-
-    @Test
-    @DisplayName("Invalid Landline Number Parsing, expecting exception")
-    void invalidNumberForDifferentCountry() {
-        assertThrows(InvalidPhoneNumberException.class, () -> {
-            PhoneNumberUtils.checkPhoneNumber("532454352646");
-        });
-    }
-
+    
 }
