@@ -1,4 +1,4 @@
-package me.kvq.hospitaltask.exceptionHandler;
+package me.kvq.hospitaltask.exceptionhandler;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package me.kvq.hospitaltask.exceptionHandler;
+package me.kvq.hospitaltask.exceptionhandler;
 
 import me.kvq.hospitaltask.exception.InvalidDtoException;
 import me.kvq.hospitaltask.exception.NotFoundException;
@@ -14,7 +14,7 @@ public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {NotFoundException.class, InvalidDtoException.class})
     public ResponseEntity<ErrorMessageObject> handleException(RuntimeException exception) {
         ErrorMessageObject messageObject = new ErrorMessageObject(exception.getMessage());
-        return new ResponseEntity<ErrorMessageObject>(messageObject, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(messageObject, HttpStatus.BAD_REQUEST);
     }
 
 }
