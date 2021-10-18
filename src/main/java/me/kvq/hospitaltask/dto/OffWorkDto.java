@@ -8,19 +8,16 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Builder
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DoctorDto {
-    private long id;
-    private String firstName;
-    private String lastName;
-    private String patronymic;
+@Builder
+@Data
+public class OffWorkDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthDate;
-    private String phoneNumber;
-    private String position;
-    private TariffDto tariff;
+    private LocalDate dateFrom;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateUntil;
+    private DoctorDto doctor;
+    private String reason;
 
 }

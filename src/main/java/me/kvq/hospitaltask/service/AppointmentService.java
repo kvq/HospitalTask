@@ -4,11 +4,15 @@ import lombok.RequiredArgsConstructor;
 import me.kvq.hospitaltask.dao.AppointmentDao;
 import me.kvq.hospitaltask.dto.AppointmentDto;
 import me.kvq.hospitaltask.exception.InvalidDtoException;
+import me.kvq.hospitaltask.exception.IsBusyException;
 import me.kvq.hospitaltask.exception.NotFoundException;
 import me.kvq.hospitaltask.mapper.AppointmentMapper;
 import me.kvq.hospitaltask.model.Appointment;
+import me.kvq.hospitaltask.model.Doctor;
+import me.kvq.hospitaltask.model.Patient;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,6 +20,7 @@ import java.util.List;
 public class AppointmentService {
     private final AppointmentMapper mapper;
     private final AppointmentDao dao;
+    private final OffWorkService offWorkService;
 
     public AppointmentDto add(AppointmentDto appointmentDto) {
         if (appointmentDto.getId() != 0) {
@@ -55,14 +60,49 @@ public class AppointmentService {
     }
 
     private void verify(Appointment appointment) {
-        if (appointment.getDoctor() == null) {
+        Doctor doctor = appointment.getDoctor();
+        Patient patient = appointment.getPatient();
+        LocalDateTime dateTime = appointment.getDateTime();
+        if (doctor == null) {
             throw new NotFoundException("No doctor found");
         }
-        if (appointment.getPatient() == null) {
+        if (patient == null) {
             throw new NotFoundException("No patient found");
         }
-        if (appointment.getDateTime() == null) {
-            throw new NotFoundException("Time not entered");
+        validateTime(dateTime);
+        if (!offWorkService.isAvailableAtDate(appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId())) {
+            throw new IsBusyException("Doctor is not available at this date");
+        }
+        if (patientHasAppointment(patient.getId(), dateTime)) {
+            throw new IsBusyException("You have another appointment for that time");
+        }
+        if (doctorHasAppointment(doctor.getId(), dateTime)) {
+            throw new IsBusyException("Doctor is not available at this time");
+        }
+    }
+
+    private boolean doctorHasAppointment(long doctorId, LocalDateTime dateTime) {
+        return dao.existsByDoctorIdAndDateTime(doctorId, dateTime);
+    }
+
+    private boolean patientHasAppointment(long patientId, LocalDateTime dateTime) {
+        return dao.existsByPatientIdAndDateTime(patientId, dateTime);
+    }
+
+    private void validateTime(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            throw new InvalidDtoException("Time not entered");
+        }
+        if (dateTime.isBefore(LocalDateTime.now())) {
+            throw new InvalidDtoException("Appointment time cannot be in the past");
+        }
+        int hour = dateTime.getHour();
+        if (hour < 7 || hour > 19) {
+            throw new InvalidDtoException("Hospital is not opened at this time");
+        }
+        int minute = dateTime.getMinute();
+        if (minute % 15 != 0) {
+            throw new InvalidDtoException("Your time should be multiple of 15");
         }
     }
 

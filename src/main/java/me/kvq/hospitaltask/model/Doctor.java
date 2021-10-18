@@ -33,5 +33,7 @@ public class Doctor {
             inverseJoinColumns = @JoinColumn(name = "patient_id")
     )
     private List<Patient> patients = new ArrayList<>();
+    @ManyToOne
+    private Tariff tariff;
 
 }

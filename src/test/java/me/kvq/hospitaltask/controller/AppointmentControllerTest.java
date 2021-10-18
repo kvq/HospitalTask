@@ -1,6 +1,7 @@
 package me.kvq.hospitaltask.controller;
 
 import me.kvq.hospitaltask.dto.AppointmentDto;
+import me.kvq.hospitaltask.exception.IsBusyException;
 import me.kvq.hospitaltask.exception.NotFoundException;
 import me.kvq.hospitaltask.security.AppointmentSecurityService;
 import me.kvq.hospitaltask.security.SecurityUserService;
@@ -235,6 +236,21 @@ class AppointmentControllerTest {
     @WithMockUser(authorities = {"CREATE_APPOINTMENT"})
     void createInvalidAppointmentExceptionTest() throws Exception {
         NotFoundException exception = new NotFoundException("Appointment not found");
+        String emptyJson = "{}";
+        when(service.add(any(AppointmentDto.class))).thenThrow(exception);
+        mockMvc.perform(post("/appointment/add/")
+                        .content(emptyJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value(exception.getMessage()));
+        verify(service, times(1)).add(any(AppointmentDto.class));
+    }
+
+    @Test
+    @DisplayName("Appointment creation when doctor is busy, Expects Bad Request and valid error message")
+    @WithMockUser(authorities = {"CREATE_APPOINTMENT"})
+    void createAppointmentWhenDoctorIsBusy() throws Exception {
+        IsBusyException exception = new IsBusyException("Doctor is unavailable");
         String emptyJson = "{}";
         when(service.add(any(AppointmentDto.class))).thenThrow(exception);
         mockMvc.perform(post("/appointment/add/")

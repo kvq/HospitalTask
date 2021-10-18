@@ -2,7 +2,9 @@ package me.kvq.hospitaltask.controller;
 
 import lombok.RequiredArgsConstructor;
 import me.kvq.hospitaltask.dto.DoctorDto;
+import me.kvq.hospitaltask.dto.OffWorkDto;
 import me.kvq.hospitaltask.service.DoctorService;
+import me.kvq.hospitaltask.service.OffWorkService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.List;
 @RequestMapping("doctor")
 public class DoctorController {
     private final DoctorService service;
+    private final OffWorkService offWorkService; // FIX
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority(\"CREATE_DOCTOR\")")
@@ -39,6 +42,18 @@ public class DoctorController {
     @PreAuthorize("hasAuthority(\"SEE_ALL_DOCTORS\")")
     public List<DoctorDto> getList() {
         return service.getList();
+    }
+
+    @GetMapping("/unavailability/{id}")
+    @PreAuthorize("hasAuthority(\"SEE_DOCTOR_UNAVAILABILITY\")")
+    public List<OffWorkDto> unavailability(@PathVariable long id) { //fix
+        return offWorkService.getAllActiveOffWorks(id);
+    }
+
+    @PostMapping("/updateOffWork")
+    @PreAuthorize("hasAuthority(\"UPDATE_OFFWORK\")")
+    public OffWorkDto addOffWork(OffWorkDto offWorkDto) {
+        return offWorkService.updateOffWork(offWorkDto);
     }
 
 }

@@ -2,7 +2,9 @@ package me.kvq.hospitaltask.mapper;
 
 import lombok.RequiredArgsConstructor;
 import me.kvq.hospitaltask.dto.DoctorDto;
+import me.kvq.hospitaltask.dto.TariffDto;
 import me.kvq.hospitaltask.model.Doctor;
+import me.kvq.hospitaltask.model.Tariff;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +13,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class DoctorMapper {
+    private final TariffMapper tariffMapper;
 
     public DoctorDto entityToDto(Doctor doctor) {
+        TariffDto tariffDto = doctor.getTariff() == null ? null
+                : tariffMapper.entityToDto(doctor.getTariff());
         return DoctorDto.builder()
                 .id(doctor.getId())
                 .firstName(doctor.getFirstName())
@@ -21,10 +26,13 @@ public class DoctorMapper {
                 .birthDate(doctor.getBirthDate())
                 .phoneNumber(doctor.getPhoneNumber())
                 .position(doctor.getPosition())
+                .tariff(tariffDto)
                 .build();
     }
 
     public Doctor dtoToEntity(DoctorDto doctorDto) {
+        Tariff tariff = doctorDto.getTariff() == null ? null
+                : tariffMapper.dtoToEntity(doctorDto.getTariff());
         return Doctor.builder()
                 .id(doctorDto.getId())
                 .firstName(doctorDto.getFirstName())
@@ -33,6 +41,7 @@ public class DoctorMapper {
                 .birthDate(doctorDto.getBirthDate())
                 .phoneNumber(doctorDto.getPhoneNumber())
                 .position(doctorDto.getPosition())
+                .tariff(tariff)
                 .build();
     }
 

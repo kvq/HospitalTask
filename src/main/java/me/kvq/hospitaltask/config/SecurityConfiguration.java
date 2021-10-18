@@ -17,7 +17,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/appointment/*", "/doctor/*", "/patient/*")
+                .antMatchers("/appointment/*", "/doctor/*", "/patient/*", "/tariff/*")
                 .authenticated()
                 .and().httpBasic();
         http.csrf().disable();

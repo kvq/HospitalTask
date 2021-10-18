@@ -1,11 +1,7 @@
 package me.kvq.hospitaltask.testData;
 
-import me.kvq.hospitaltask.dto.AppointmentDto;
-import me.kvq.hospitaltask.dto.DoctorDto;
-import me.kvq.hospitaltask.dto.PatientDto;
-import me.kvq.hospitaltask.model.Appointment;
-import me.kvq.hospitaltask.model.Doctor;
-import me.kvq.hospitaltask.model.Patient;
+import me.kvq.hospitaltask.dto.*;
+import me.kvq.hospitaltask.model.*;
 import me.kvq.hospitaltask.security.Role;
 import me.kvq.hospitaltask.security.SecurityUser;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +9,7 @@ import org.springframework.security.core.userdetails.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +31,7 @@ public class TestDataGenerator {
                 .phoneNumber("380123455789")
                 .position("DoctorA_Position")
                 .patients(List.of(validPatientWithoutDoctor()))
+                .tariff(validTariff())
                 .build();
         Doctor doctorTwo = Doctor.builder()
                 .id(3)
@@ -44,6 +42,7 @@ public class TestDataGenerator {
                 .phoneNumber("380123455788")
                 .position("DoctorB_Position")
                 .patients(List.of(validPatientWithoutDoctor()))
+                .tariff(validTariff())
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
     }
@@ -57,6 +56,7 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1991, 5, 4))
                 .phoneNumber("380123455789")
                 .position("DoctorA_Position")
+                .tariff(validTariffDto())
                 .build();
         DoctorDto doctorTwo = DoctorDto.builder()
                 .id(3)
@@ -66,6 +66,7 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1995, 2, 11))
                 .phoneNumber("380123455788")
                 .position("DoctorB_Position")
+                .tariff(validTariffDto())
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
     }
@@ -177,6 +178,7 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1995, 5, 6))
                 .phoneNumber("380123455789")
                 .position("Doctor_Position")
+                .tariff(validTariff())
                 .build();
     }
 
@@ -235,6 +237,7 @@ public class TestDataGenerator {
                 .birthDate(LocalDate.of(1995, 5, 6))
                 .phoneNumber("380123455789")
                 .position("Doctor_Position")
+                .tariff(validTariffDto())
                 .build();
     }
 
@@ -263,6 +266,103 @@ public class TestDataGenerator {
                 .role(Role.PATIENT)
                 .id(2)
                 .build();
+    }
+
+    public static OffWork validOffWorkCurrent() {
+        return OffWork.builder().id(1)
+                .reason("Sick leave")
+                .dateFrom(LocalDate.now())
+                .dateUntil(LocalDate.now().plusDays(2))
+                .doctor(validDoctor())
+                .build();
+    }
+
+    public static OffWork validOffWorkFuture() {
+        return OffWork.builder().id(2)
+                .reason("Vacation")
+                .dateFrom(LocalDate.now().plusMonths(1))
+                .dateUntil(LocalDate.now().plusMonths(2))
+                .doctor(validDoctor())
+                .build();
+    }
+
+    public static OffWorkDto validOffWorkDtoCurrent() {
+        return OffWorkDto.builder()
+                .reason("Sick leave")
+                .dateFrom(LocalDate.now())
+                .dateUntil(LocalDate.now().plusDays(2))
+                .doctor(validDoctorDto())
+                .build();
+    }
+
+    public static String validOffWorkJson() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return "{" +
+                "\"reason\": \"Vacation\"," +
+                "\"dateFrom\": " + LocalDate.now().format(formatter) + "," +
+                "\"dateUntil\": " + LocalDate.now().plusDays(2).format(formatter) + "," +
+                "\"doctor\": " + validDoctorJson() +
+                "}";
+    }
+
+    public static OffWorkDto validOffWorkDtoFuture() {
+        return OffWorkDto.builder()
+                .reason("Vacation")
+                .dateFrom(LocalDate.now().plusMonths(1))
+                .dateUntil(LocalDate.now().plusMonths(2))
+                .doctor(validDoctorDto())
+                .build();
+    }
+
+    public static List<OffWork> validOffWorkList() {
+        return Arrays.asList(validOffWorkCurrent(), validOffWorkFuture());
+    }
+
+    public static List<OffWorkDto> validOffWorkDtoList() {
+        return Arrays.asList(validOffWorkDtoCurrent(), validOffWorkDtoFuture());
+    }
+
+    public static Tariff validTariff() {
+        return Tariff.builder().name("First-ish")
+                .price(9.99F)
+                .build();
+    }
+
+    public static TariffDto validTariffDto() {
+        return TariffDto.builder().name("First-ish")
+                .price(9.99F)
+                .build();
+    }
+
+    public static String validTariffJson() {
+        return "{" +
+                "\"name\": \"First-ish\"," +
+                "\"price\": 9.99" +
+                "}";
+    }
+
+    public static List<Tariff> validTariffList() {
+        return Arrays.asList(
+                Tariff.builder().name("First-ish")
+                        .price(9.99F)
+                        .build()
+                ,
+                Tariff.builder().name("Second-ish")
+                        .price(14.99F)
+                        .build()
+        );
+    }
+
+    public static List<TariffDto> validTariffDtoList() {
+        return Arrays.asList(
+                TariffDto.builder().name("First-ish")
+                        .price(9.99F)
+                        .build()
+                ,
+                TariffDto.builder().name("Second-ish")
+                        .price(14.99F)
+                        .build()
+        );
     }
 
 }

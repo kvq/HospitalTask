@@ -1,11 +1,13 @@
 package me.kvq.hospitaltask.controller;
 
 import me.kvq.hospitaltask.dto.DoctorDto;
+import me.kvq.hospitaltask.dto.OffWorkDto;
 import me.kvq.hospitaltask.exception.InvalidDtoException;
 import me.kvq.hospitaltask.exception.InvalidPhoneNumberException;
 import me.kvq.hospitaltask.exception.NotFoundException;
 import me.kvq.hospitaltask.security.SecurityUserService;
 import me.kvq.hospitaltask.service.DoctorService;
+import me.kvq.hospitaltask.service.OffWorkService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +26,7 @@ import java.util.stream.Stream;
 
 import static me.kvq.hospitaltask.testData.TestDataGenerator.*;
 import static me.kvq.hospitaltask.testData.TestMatchers.matchDoctorDto;
+import static me.kvq.hospitaltask.testData.TestMatchers.matchOffWorkDto;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,6 +41,8 @@ class DoctorControllerTest {
     MockMvc mockMvc;
     @MockBean(name = "securityService")
     SecurityUserService securityUserService;
+    @MockBean
+    OffWorkService offWorkService;
 
     @Test
     @DisplayName("Add new valid doctor, then compare json fields")
@@ -206,6 +211,31 @@ class DoctorControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").value(exception.getMessage()));
         verify(doctorService, times(1)).add(any(DoctorDto.class));
+    }
+
+    @Test
+    @DisplayName("Adding invalid doctor, bad request expected")
+    @WithMockUser(authorities = "SEE_DOCTOR_UNAVAILABILITY")
+    void seeWhenDoctorIsUnavailableTest() throws Exception {
+        long doctorId = 1;
+        List<OffWorkDto> offWorkDtoList = validOffWorkDtoList();
+        when(offWorkService.getAllActiveOffWorks(doctorId)).thenReturn(offWorkDtoList);
+        mockMvc.perform(get("/doctor/unavailability/" + doctorId))
+                .andExpect(status().isOk())
+                .andExpect(matchOffWorkDto("$[0]", offWorkDtoList.get(0)))
+                .andExpect(matchOffWorkDto("$[1]", offWorkDtoList.get(1)));
+    }
+
+    @Test
+    @DisplayName("Update/Create OffWork, checks returned fields")
+    @WithMockUser(authorities = "UPDATE_OFFWORK")
+    void addDoctorOffWorkTest() throws Exception {
+        OffWorkDto offWorkDto = validOffWorkDtoCurrent();
+        String json = validOffWorkJson();
+        when(offWorkService.updateOffWork(any(OffWorkDto.class))).thenReturn(offWorkDto);
+        mockMvc.perform(post("/doctor/updateOffWork"))
+                .andExpect(status().isOk())
+                .andExpect(matchOffWorkDto("$", offWorkDto));
     }
 
 }

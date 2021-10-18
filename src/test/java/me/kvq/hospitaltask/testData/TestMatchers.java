@@ -1,8 +1,6 @@
 package me.kvq.hospitaltask.testData;
 
-import me.kvq.hospitaltask.dto.AppointmentDto;
-import me.kvq.hospitaltask.dto.DoctorDto;
-import me.kvq.hospitaltask.dto.PatientDto;
+import me.kvq.hospitaltask.dto.*;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.format.DateTimeFormatter;
@@ -37,6 +35,18 @@ public class TestMatchers {
                 jsonPath(prefix + ".dateTime").value(expected.getDateTime().format(dateTimeFormat)),
                 matchPatientDto(prefix + ".patient", expected.getPatient()),
                 matchDoctorDto(prefix + ".doctor", expected.getDoctor()));
+    }
+
+    public static ResultMatcher matchOffWorkDto(String prefix, OffWorkDto expected) {
+        return ResultMatcher.matchAll(jsonPath(prefix + ".reason").value(expected.getReason()),
+                jsonPath(prefix + ".dateFrom").value(expected.getDateFrom().format(dateFormat)),
+                jsonPath(prefix + ".dateUntil").value(expected.getDateUntil().format(dateFormat)),
+                matchDoctorDto(prefix + ".doctor", expected.getDoctor()));
+    }
+
+    public static ResultMatcher matchTariff(String prefix, TariffDto expected) {
+        return ResultMatcher.matchAll(jsonPath(prefix + ".name").value(expected.getName()),
+                jsonPath(prefix + ".price").value(expected.getPrice()));
     }
 
 }
