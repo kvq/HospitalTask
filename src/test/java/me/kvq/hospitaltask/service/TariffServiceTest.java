@@ -14,7 +14,7 @@ import java.util.List;
 
 import static me.kvq.hospitaltask.testData.TestDataGenerator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class TariffServiceTest {
@@ -35,6 +35,9 @@ class TariffServiceTest {
         when(tariffDao.save(tariff)).thenReturn(tariff);
         TariffDto actual = tariffService.updateTariff(expected);
         assertEquals(expected, actual);
+        verify(tariffMapper, times(1)).dtoToEntity(expected);
+        verify(tariffMapper, times(1)).entityToDto(tariff);
+        verify(tariffDao, times(1)).save(tariff);
     }
 
     @Test
@@ -43,17 +46,20 @@ class TariffServiceTest {
         String tariffName = "Test";
         when(tariffDao.existsById(tariffName)).thenReturn(true);
         tariffService.deleteTariff(tariffName);
+        verify(tariffDao, times(1)).existsById(tariffName);
     }
 
     @Test
     @DisplayName("Gets list of all tariffs")
-    void getAllTariffs() {
+    void getAllTariffsTest() {
         List<Tariff> tariffList = validTariffList();
         List<TariffDto> expectedList = validTariffDtoList();
         when(tariffDao.findAll()).thenReturn(tariffList);
         when(tariffMapper.entityListToDtoList(tariffList)).thenReturn(expectedList);
         List<TariffDto> actualList = tariffService.getAllTariffs();
         assertEquals(expectedList, actualList);
+        verify(tariffDao, times(1)).findAll();
+        verify(tariffMapper, times(1)).entityListToDtoList(tariffList);
     }
 
 }

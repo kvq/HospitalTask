@@ -1,6 +1,6 @@
 package me.kvq.hospitaltask.model;
 
 public enum Speciality {
-    FamilyDoctor, ENT, Surgeon, Ophthalmologist,
-    Gynecologist, Proctologist, Dentist, Psychiatrist
+    FAMILY_DOCTOR, ENT, SURGEON, OPHTHALMOLOGIST,
+    GYNECOLOGIST, PROCTOLOGIST, DENTIST, PSYCHIATRIST
 }

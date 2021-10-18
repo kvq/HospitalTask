@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.kvq.hospitaltask.model.Speciality;
 
 import java.time.LocalDate;
 
@@ -20,7 +21,7 @@ public class DoctorDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     private String phoneNumber;
-    private String position;
+    private Speciality speciality;
     private TariffDto tariff;
 
 }

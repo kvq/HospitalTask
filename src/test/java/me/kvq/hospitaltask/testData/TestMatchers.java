@@ -18,7 +18,7 @@ public class TestMatchers {
                 jsonPath(prefix + ".patronymic").value(expected.getPatronymic()),
                 jsonPath(prefix + ".birthDate").value(expected.getBirthDate().format(dateFormat)),
                 jsonPath(prefix + ".phoneNumber").value(expected.getPhoneNumber()),
-                jsonPath(prefix + ".position").value(expected.getPosition()));
+                jsonPath(prefix + ".speciality").value(expected.getSpeciality().name()));
     }
 
     public static ResultMatcher matchPatientDto(String prefix, PatientDto expected) {

@@ -29,7 +29,7 @@ public class TestDataGenerator {
                 .patronymic("DoctorA_Patronymic")
                 .birthDate(LocalDate.of(1991, 5, 4))
                 .phoneNumber("380123455789")
-                .position("DoctorA_Position")
+                .speciality(Speciality.FAMILY_DOCTOR)
                 .patients(List.of(validPatientWithoutDoctor()))
                 .tariff(validTariff())
                 .build();
@@ -40,7 +40,7 @@ public class TestDataGenerator {
                 .patronymic("DoctorB_Patronymic")
                 .birthDate(LocalDate.of(1995, 2, 11))
                 .phoneNumber("380123455788")
-                .position("DoctorB_Position")
+                .speciality(Speciality.PROCTOLOGIST)
                 .patients(List.of(validPatientWithoutDoctor()))
                 .tariff(validTariff())
                 .build();
@@ -55,7 +55,7 @@ public class TestDataGenerator {
                 .patronymic("DoctorA_Patronymic")
                 .birthDate(LocalDate.of(1991, 5, 4))
                 .phoneNumber("380123455789")
-                .position("DoctorA_Position")
+                .speciality(Speciality.FAMILY_DOCTOR)
                 .tariff(validTariffDto())
                 .build();
         DoctorDto doctorTwo = DoctorDto.builder()
@@ -65,7 +65,7 @@ public class TestDataGenerator {
                 .patronymic("DoctorB_Patronymic")
                 .birthDate(LocalDate.of(1995, 2, 11))
                 .phoneNumber("380123455788")
-                .position("DoctorB_Position")
+                .speciality(Speciality.PROCTOLOGIST)
                 .tariff(validTariffDto())
                 .build();
         return Arrays.asList(doctorOne, doctorTwo);
@@ -177,7 +177,7 @@ public class TestDataGenerator {
                 .patronymic("Doctor_Patronymic")
                 .birthDate(LocalDate.of(1995, 5, 6))
                 .phoneNumber("380123455789")
-                .position("Doctor_Position")
+                .speciality(Speciality.FAMILY_DOCTOR)
                 .tariff(validTariff())
                 .build();
     }
@@ -236,7 +236,7 @@ public class TestDataGenerator {
                 .patronymic("Doctor_Patronymic")
                 .birthDate(LocalDate.of(1995, 5, 6))
                 .phoneNumber("380123455789")
-                .position("Doctor_Position")
+                .speciality(Speciality.FAMILY_DOCTOR)
                 .tariff(validTariffDto())
                 .build();
     }

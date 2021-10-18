@@ -25,7 +25,7 @@ public class DoctorMapper {
                 .patronymic(doctor.getPatronymic())
                 .birthDate(doctor.getBirthDate())
                 .phoneNumber(doctor.getPhoneNumber())
-                .position(doctor.getPosition())
+                .speciality(doctor.getSpeciality())
                 .tariff(tariffDto)
                 .build();
     }
@@ -40,7 +40,7 @@ public class DoctorMapper {
                 .patronymic(doctorDto.getPatronymic())
                 .birthDate(doctorDto.getBirthDate())
                 .phoneNumber(doctorDto.getPhoneNumber())
-                .position(doctorDto.getPosition())
+                .speciality(doctorDto.getSpeciality())
                 .tariff(tariff)
                 .build();
     }

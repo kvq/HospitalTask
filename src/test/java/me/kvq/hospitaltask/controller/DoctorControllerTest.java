@@ -224,6 +224,7 @@ class DoctorControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(matchOffWorkDto("$[0]", offWorkDtoList.get(0)))
                 .andExpect(matchOffWorkDto("$[1]", offWorkDtoList.get(1)));
+        verify(offWorkService, times(1)).getAllActiveOffWorks(doctorId);
     }
 
     @Test
@@ -236,6 +237,7 @@ class DoctorControllerTest {
         mockMvc.perform(post("/doctor/updateOffWork"))
                 .andExpect(status().isOk())
                 .andExpect(matchOffWorkDto("$", offWorkDto));
+        verify(offWorkService, times(1)).updateOffWork(any(OffWorkDto.class));
     }
 
 }

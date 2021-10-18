@@ -34,7 +34,7 @@ class TariffControllerTest {
     @Test
     @WithMockUser(authorities = "UPDATE_TARIFF")
     @DisplayName("Update tariff, expects same fields back")
-    void updateTest() throws Exception {
+    void updateOrCreateTariffTest() throws Exception {
         TariffDto expected = validTariffDto();
         String json = validTariffJson();
         when(service.updateTariff(any(TariffDto.class))).thenReturn(expected);
@@ -47,7 +47,7 @@ class TariffControllerTest {
     @Test
     @WithMockUser(authorities = "DELETE_TARIFF")
     @DisplayName("Delete tariff by id, expects ok status")
-    void deleteTest() throws Exception {
+    void deleteTariffTest() throws Exception {
         mockMvc.perform(delete("/tariff/delete/test"))
                 .andExpect(status().isOk());
     }
@@ -55,7 +55,7 @@ class TariffControllerTest {
     @Test
     @WithMockUser(authorities = "SEE_ALL_TARIFFS")
     @DisplayName("Gets list of all tariffs, checks json fields")
-    void list() throws Exception {
+    void gettingTaritffListTest() throws Exception {
         TariffDto expected = validTariffDto();
         when(service.getAllTariffs()).thenReturn(Arrays.asList(expected));
         mockMvc.perform(get("/tariff/list")

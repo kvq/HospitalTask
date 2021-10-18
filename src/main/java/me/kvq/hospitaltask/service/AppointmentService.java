@@ -74,7 +74,7 @@ public class AppointmentService {
             throw new IsBusyException("Doctor is not available at this date");
         }
         if (patientHasAppointment(patient.getId(), dateTime)) {
-            throw new IsBusyException("You have another appointment for that time");
+            throw new IsBusyException("Patient has another appointment for that time");
         }
         if (doctorHasAppointment(doctor.getId(), dateTime)) {
             throw new IsBusyException("Doctor is not available at this time");

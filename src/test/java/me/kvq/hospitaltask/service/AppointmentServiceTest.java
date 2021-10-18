@@ -3,16 +3,22 @@ package me.kvq.hospitaltask.service;
 import me.kvq.hospitaltask.dao.AppointmentDao;
 import me.kvq.hospitaltask.dto.AppointmentDto;
 import me.kvq.hospitaltask.exception.InvalidDtoException;
+import me.kvq.hospitaltask.exception.IsBusyException;
 import me.kvq.hospitaltask.exception.NotFoundException;
 import me.kvq.hospitaltask.mapper.AppointmentMapper;
 import me.kvq.hospitaltask.model.Appointment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static me.kvq.hospitaltask.testData.TestDataGenerator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +31,8 @@ class AppointmentServiceTest {
     AppointmentMapper mapper;
     @MockBean
     AppointmentDao dao;
+    @MockBean
+    OffWorkService offWorkService;
     @Autowired
     AppointmentService service;
 
@@ -37,6 +45,8 @@ class AppointmentServiceTest {
         when(mapper.dtoToEntity(expectedDto)).thenReturn(appointment);
         when(mapper.entityToDto(appointment)).thenReturn(expectedDto);
         when(dao.save(appointment)).thenReturn(appointment);
+        when(offWorkService.isAvailableAtDate(
+                appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId())).thenReturn(true);
 
         AppointmentDto returnedDto = service.add(expectedDto);
         assertEquals(expectedDto.getId(), returnedDto.getId());
@@ -46,6 +56,8 @@ class AppointmentServiceTest {
         verify(mapper, times(1)).dtoToEntity(expectedDto);
         verify(mapper, times(1)).entityToDto(appointment);
         verify(dao, times(1)).save(appointment);
+        verify(offWorkService, times(1))
+                .isAvailableAtDate(appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId());
     }
 
     @Test
@@ -58,6 +70,8 @@ class AppointmentServiceTest {
         when(mapper.entityToDto(appointment)).thenReturn(expectedDto);
         when(dao.save(appointment)).thenReturn(appointment);
         when(dao.existsById(id)).thenReturn(true);
+        when(offWorkService.isAvailableAtDate(
+                appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId())).thenReturn(true);
 
         AppointmentDto returnedDto = service.update(expectedDto);
         assertEquals(expectedDto.getId(), returnedDto.getId());
@@ -68,6 +82,8 @@ class AppointmentServiceTest {
         verify(mapper, times(1)).entityToDto(appointment);
         verify(dao, times(1)).save(appointment);
         verify(dao, times(1)).existsById(id);
+        verify(offWorkService, times(1))
+                .isAvailableAtDate(appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId());
     }
 
     @Test
@@ -150,6 +166,84 @@ class AppointmentServiceTest {
         }
         verify(dao, times(1)).findAllByDoctorId(id);
         verify(mapper, times(1)).entityListToDtoList(appointmentList);
+    }
+
+    public static Stream<Arguments> invalidTimeList() {
+        return Stream.of(
+                null,
+                Arguments.of(LocalDateTime.now().minusDays(1).withHour(9).withMinute(0)),
+                Arguments.of(LocalDateTime.now().plusDays(1).withHour(3).withMinute(15)),
+                Arguments.of(LocalDateTime.now().plusDays(1).withHour(10).withMinute(14)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidTimeList")
+    @DisplayName("Creates appointment with invalid time, expected exception")
+    void createAppointmentWithInvalidTimeTest(LocalDateTime invalidTime) {
+        AppointmentDto appointmentDto = validAppointmentDto();
+        appointmentDto.setId(0);
+        Appointment appointment = validAppointment();
+        appointment.setDateTime(invalidTime);
+        when(mapper.dtoToEntity(appointmentDto)).thenReturn(appointment);
+        assertThrows(InvalidDtoException.class, () -> {
+            service.add(appointmentDto);
+        });
+        verify(mapper, times(1)).dtoToEntity(appointmentDto);
+    }
+
+    @Test
+    @DisplayName("Creates appointment with doctor that is unavailable for that date")
+    void doctorUnavailable() {
+        AppointmentDto appointmentDto = validAppointmentDto();
+        appointmentDto.setId(0);
+        Appointment appointment = validAppointment();
+        when(mapper.dtoToEntity(appointmentDto)).thenReturn(appointment);
+        assertThrows(IsBusyException.class, () -> {
+            service.add(appointmentDto);
+        });
+        verify(mapper, times(1)).dtoToEntity(appointmentDto);
+    }
+
+    @Test
+    @DisplayName("Creates appointment if patient already has different appointment for that time")
+    void patientHasAnotherAppointmentTest() {
+        AppointmentDto appointmentDto = validAppointmentDto();
+        appointmentDto.setId(0);
+        Appointment appointment = validAppointment();
+        when(mapper.dtoToEntity(appointmentDto)).thenReturn(appointment);
+        when(offWorkService.isAvailableAtDate(
+                appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId())).thenReturn(true);
+        when(dao.existsByPatientIdAndDateTime(appointment.getPatient().getId(), appointment.getDateTime()))
+                .thenReturn(true);
+        assertThrows(IsBusyException.class, () -> {
+            service.add(appointmentDto);
+        });
+        verify(mapper, times(1)).dtoToEntity(appointmentDto);
+        verify(offWorkService, times(1))
+                .isAvailableAtDate(appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId());
+        verify(dao, times(1))
+                .existsByPatientIdAndDateTime(appointment.getPatient().getId(), appointment.getDateTime());
+    }
+
+    @Test
+    @DisplayName("Creates appointment if doctor already has different appointment for that time")
+    void doctorHasAnotherAppointmentTest() {
+        AppointmentDto appointmentDto = validAppointmentDto();
+        appointmentDto.setId(0);
+        Appointment appointment = validAppointment();
+        when(mapper.dtoToEntity(appointmentDto)).thenReturn(appointment);
+        when(offWorkService.isAvailableAtDate(
+                appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId())).thenReturn(true);
+        when(dao.existsByDoctorIdAndDateTime(appointment.getDoctor().getId(), appointment.getDateTime()))
+                .thenReturn(true);
+        assertThrows(IsBusyException.class, () -> {
+            service.add(appointmentDto);
+        });
+        verify(mapper, times(1)).dtoToEntity(appointmentDto);
+        verify(offWorkService, times(1))
+                .isAvailableAtDate(appointment.getDateTime().toLocalDate(), appointment.getDoctor().getId());
+        verify(dao, times(1))
+                .existsByDoctorIdAndDateTime(appointment.getDoctor().getId(), appointment.getDateTime());
     }
 
 }

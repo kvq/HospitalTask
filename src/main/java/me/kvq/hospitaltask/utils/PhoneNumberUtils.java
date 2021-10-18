@@ -13,7 +13,7 @@ public class PhoneNumberUtils {
             return;
         }
         int length = number.length();
-        if (!number.matches("^[0-9+]+$")
+        if (!number.matches("^[0-9]+$")
                 || !number.startsWith("38")
                 || length < 12 || length > 13) {
             throw new InvalidPhoneNumberException(number);

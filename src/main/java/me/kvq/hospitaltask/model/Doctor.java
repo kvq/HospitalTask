@@ -26,7 +26,7 @@ public class Doctor {
     @Column(columnDefinition = "DATE")
     private LocalDate birthDate;
     private String phoneNumber;
-    private String position;
+    private Speciality speciality;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "doctor_patients",
             joinColumns = @JoinColumn(name = "doctor_id"),

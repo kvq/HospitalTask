@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("doctor")
 public class DoctorController {
     private final DoctorService service;
-    private final OffWorkService offWorkService; // FIX
+    private final OffWorkService offWorkService;
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority(\"CREATE_DOCTOR\")")
@@ -46,7 +46,7 @@ public class DoctorController {
 
     @GetMapping("/unavailability/{id}")
     @PreAuthorize("hasAuthority(\"SEE_DOCTOR_UNAVAILABILITY\")")
-    public List<OffWorkDto> unavailability(@PathVariable long id) { //fix
+    public List<OffWorkDto> unavailability(@PathVariable long id) {
         return offWorkService.getAllActiveOffWorks(id);
     }
 

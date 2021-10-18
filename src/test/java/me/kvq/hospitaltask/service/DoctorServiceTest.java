@@ -44,7 +44,7 @@ class DoctorServiceTest {
         assertEquals(expectedDoctorDto.getPatronymic(), returnedDoctorDto.getPatronymic());
         assertEquals(expectedDoctorDto.getBirthDate(), returnedDoctorDto.getBirthDate());
         assertEquals(expectedDoctorDto.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
-        assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
+        assertEquals(expectedDoctorDto.getSpeciality(), returnedDoctorDto.getSpeciality());
         verify(doctorDao, times(1)).save(doctor);
         verify(mapper, times(1)).dtoToEntity(expectedDoctorDto);
         verify(mapper, times(1)).entityToDto(doctor);
@@ -68,7 +68,7 @@ class DoctorServiceTest {
         assertEquals(expectedDoctorDto.getPatronymic(), returnedDoctorDto.getPatronymic());
         assertEquals(expectedDoctorDto.getBirthDate(), returnedDoctorDto.getBirthDate());
         assertEquals(expectedDoctorDto.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
-        assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
+        assertEquals(expectedDoctorDto.getSpeciality(), returnedDoctorDto.getSpeciality());
         verify(doctorDao, times(1)).existsById(expectedDoctorDto.getId());
         verify(doctorDao, times(1)).save(doctor);
         verify(mapper, times(1)).dtoToEntity(expectedDoctorDto);
@@ -104,7 +104,7 @@ class DoctorServiceTest {
             assertEquals(expectedDoctorDto.getPatronymic(), returnedDoctorDto.getPatronymic());
             assertEquals(expectedDoctorDto.getBirthDate(), returnedDoctorDto.getBirthDate());
             assertEquals(expectedDoctorDto.getPhoneNumber(), returnedDoctorDto.getPhoneNumber());
-            assertEquals(expectedDoctorDto.getPosition(), returnedDoctorDto.getPosition());
+            assertEquals(expectedDoctorDto.getSpeciality(), returnedDoctorDto.getSpeciality());
         }
         verify(doctorDao, times(1)).findAll();
         verify(mapper, times(1)).entityListToDtoList(testDoctorList);

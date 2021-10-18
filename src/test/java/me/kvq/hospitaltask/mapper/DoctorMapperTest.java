@@ -37,7 +37,7 @@ class DoctorMapperTest {
         assertEquals(expected.getPatronymic(), actual.getPatronymic());
         assertEquals(expected.getBirthDate(), actual.getBirthDate());
         assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
-        assertEquals(expected.getPosition(), actual.getPosition());
+        assertEquals(expected.getSpeciality(), actual.getSpeciality());
         assertEquals(expectedTariff, actual.getTariff());
     }
 
@@ -54,7 +54,7 @@ class DoctorMapperTest {
         assertEquals(expected.getPatronymic(), actual.getPatronymic());
         assertEquals(expected.getBirthDate(), actual.getBirthDate());
         assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
-        assertEquals(expected.getPosition(), actual.getPosition());
+        assertEquals(expected.getSpeciality(), actual.getSpeciality());
         assertEquals(expectedTariff, actual.getTariff());
     }
 
@@ -75,7 +75,7 @@ class DoctorMapperTest {
             assertEquals(expected.getPatronymic(), actual.getPatronymic());
             assertEquals(expected.getBirthDate(), actual.getBirthDate());
             assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber());
-            assertEquals(expected.getPosition(), actual.getPosition());
+            assertEquals(expected.getSpeciality(), actual.getSpeciality());
             assertEquals(expectedTariff, actual.getTariff());
         }
     }
