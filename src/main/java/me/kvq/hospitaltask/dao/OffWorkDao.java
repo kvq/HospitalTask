@@ -14,8 +14,7 @@ public interface OffWorkDao extends JpaRepository<OffWork, Long> {
 
     @Query(value = "SELECT * FROM off_work WHERE date_until > ?1 and doctor_id = ?2", nativeQuery = true)
     List<OffWork> finaAllAfterDate(LocalDate date, long doctorId);
-
-
+    
     @Query(value = "SELECT CASE WHEN EXISTS " +
             "(SELECT * FROM off_work WHERE ?1 between date_from and date_until and doctor_id = ?2) " +
             "THEN 'FALSE' ELSE 'TRUE' END", nativeQuery = true)
