@@ -26,6 +26,7 @@ public class Doctor {
     @Column(columnDefinition = "DATE")
     private LocalDate birthDate;
     private String phoneNumber;
+    @Enumerated(EnumType.STRING)
     private Speciality speciality;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "doctor_patients",

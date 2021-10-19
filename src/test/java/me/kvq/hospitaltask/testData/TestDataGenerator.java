@@ -214,7 +214,7 @@ public class TestDataGenerator {
                 + "\"patronymic\":\"Doctor_Patronymic\","
                 + "\"birthDate\":[1995,5,6],"
                 + "\"phoneNumber\":\"380123455789\","
-                + "\"position\":\"Doctor_Position\"}";
+                + "\"speciality\":\"FAMILY_DOCTOR\"}";
     }
 
     public static Patient validPatientWithoutDoctor() {
