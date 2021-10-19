@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS tariff(
+name varchar(32),
+price DECIMAL(8,2),
+primary key (name)
+);
+
 CREATE TABLE IF NOT EXISTS doctor(
 id bigint not null,
 first_name varchar(32),
@@ -5,7 +11,9 @@ last_name varchar(32),
 patronymic varchar(32),
 birth_date date,
 phone_number varchar(32),
-position varchar(32),
+speciality varchar(32),
+tariff_name varchar(32),
+foreign key (tariff_name) references tariff(name),
 primary key (id)
 );
 
